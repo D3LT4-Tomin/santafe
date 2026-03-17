@@ -1,0 +1,341 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import '../models/expense_data.dart';
+import '../theme/app_theme.dart';
+
+// ─── Expense Row ──────────────────────────────────────────────────────────────
+class ExpenseRow extends StatelessWidget {
+  final ExpenseData data;
+
+  const ExpenseRow({super.key, required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          height: 60,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(
+                      (data.iconColor.r * 255.0).round().clamp(0, 255),
+                      (data.iconColor.g * 255.0).round().clamp(0, 255),
+                      (data.iconColor.b * 255.0).round().clamp(0, 255),
+                      0.15,
+                    ),
+                    borderRadius: const BorderRadius.all(Radius.circular(9)),
+                  ),
+                  child: SizedBox(
+                    width: 36, height: 36,
+                    child: Icon(data.icon, color: data.iconColor, size: 18),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        data.title,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: -0.32,
+                          color: AppColors.label,
+                          height: 1.31,
+                        ),
+                      ),
+                      const SizedBox(height: 1),
+                      Text(data.subtitle, style: AppTextStyles.caption1),
+                    ],
+                  ),
+                ),
+                Text(
+                  data.amount,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: -0.32,
+                    color: AppColors.label,
+                    height: 1.31,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                const Icon(CupertinoIcons.chevron_right,
+                    size: 13, color: AppColors.tertiaryLabel),
+              ],
+            ),
+          ),
+        ),
+        const Padding(
+          padding: EdgeInsets.only(left: 64),
+          child: ColoredBox(
+            color: AppColors.separator,
+            child: SizedBox(height: 0.5, width: double.infinity),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─── Show More Button ─────────────────────────────────────────────────────────
+class ShowMoreButton extends StatelessWidget {
+  final bool expanded;
+  final VoidCallback onTap;
+
+  const ShowMoreButton({super.key, required this.expanded, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          border: Border(top: BorderSide(color: AppColors.separator, width: 0.5)),
+        ),
+        child: SizedBox(
+          height: 48,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 220),
+                transitionBuilder: (child, anim) => FadeTransition(
+                  opacity: anim,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0, 0.3),
+                      end: Offset.zero,
+                    ).animate(anim),
+                    child: child,
+                  ),
+                ),
+                child: Text(
+                  expanded ? 'Ver menos' : 'Ver más',
+                  key: ValueKey(expanded),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.systemBlue,
+                    letterSpacing: -0.08,
+                    height: 1.38,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 4),
+              AnimatedRotation(
+                turns: expanded ? 0.5 : 0.0,
+                duration: const Duration(milliseconds: 280),
+                curve: Curves.easeOutCubic,
+                child: const Icon(CupertinoIcons.chevron_down,
+                    size: 12, color: AppColors.systemBlue),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Filter Pill ──────────────────────────────────────────────────────────────
+class FilterPill extends StatelessWidget {
+  final String       label;
+  final bool         selected;
+  final VoidCallback onTap;
+  final double?      width;
+
+  const FilterPill({
+    super.key,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    this.width,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutCubic,
+        width: width,
+        height: 32,
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.systemBlue : const Color(0x1AFFFFFF),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+            color: selected ? AppColors.systemBlue : const Color(0x1FFFFFFF),
+            width: 0.5,
+          ),
+          boxShadow: selected
+              ? const [
+                  BoxShadow(
+                    color: Color(0x400A84FF),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Center(
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+              letterSpacing: -0.1,
+              color: selected ? AppColors.label : AppColors.secondaryLabel,
+              height: 1.3,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Filter Pill Pager ────────────────────────────────────────────────────────
+class PillPager extends StatelessWidget {
+  final List<String>         categories;
+  final String               selectedFilter;
+  final PageController       pageController;
+  final int                  currentPage;
+  final ValueChanged<int>    onPageChanged;
+  final ValueChanged<String> onFilterSelected;
+  final VoidCallback         onAddCategory;
+
+  static const int    _pillsPerPage = 3;
+  static const double _pillGap      = 8.0;
+  static const double _addBtnWidth  = 32.0;
+  static const double _addBtnGap    = 8.0;
+  static const double _pillHeight   = 32.0;
+
+  const PillPager({
+    super.key,
+    required this.categories,
+    required this.selectedFilter,
+    required this.pageController,
+    required this.currentPage,
+    required this.onPageChanged,
+    required this.onFilterSelected,
+    required this.onAddCategory,
+  });
+
+  int _pageCount() => (categories.length / _pillsPerPage).ceil();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final pageViewWidth = constraints.maxWidth - _addBtnWidth - _addBtnGap;
+          const interPageGap = 16.0;
+          final pillWidth = ((pageViewWidth - interPageGap) - (_pillsPerPage - 1) * _pillGap) / _pillsPerPage;
+          final pageCount = _pageCount();
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: pageViewWidth,
+                    height: _pillHeight,
+                    child: PageView.builder(
+                      controller: pageController,
+                      itemCount: pageCount,
+                      onPageChanged: onPageChanged,
+                      physics: const BouncingScrollPhysics(),
+                      itemBuilder: (context, pageIndex) {
+                        final start    = pageIndex * _pillsPerPage;
+                        final end      = (start + _pillsPerPage).clamp(0, categories.length);
+                        final pageCats = categories.sublist(start, end);
+
+                        return Padding(
+                          padding: const EdgeInsets.only(right: interPageGap),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              for (int i = 0; i < pageCats.length; i++) ...[
+                                if (i > 0) const SizedBox(width: _pillGap),
+                                FilterPill(
+                                  label: pageCats[i],
+                                  selected: selectedFilter == pageCats[i],
+                                  width: pillWidth,
+                                  onTap: () => onFilterSelected(pageCats[i]),
+                                ),
+                              ],
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: _addBtnGap),
+                  GestureDetector(
+                    onTap: onAddCategory,
+                    child: Container(
+                      height: _pillHeight,
+                      width: _addBtnWidth,
+                      decoration: BoxDecoration(
+                        color: const Color(0x1AFFFFFF),
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(
+                          color: const Color(0x1FFFFFFF),
+                          width: 0.5,
+                        ),
+                      ),
+                      child: const Icon(
+                        CupertinoIcons.plus,
+                        size: 14,
+                        color: AppColors.systemBlue,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              if (pageCount > 1) ...[
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    for (int i = 0; i < pageCount; i++) ...[
+                      if (i > 0) const SizedBox(width: 5),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 260),
+                        curve: Curves.easeOutCubic,
+                        width: 5,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: currentPage == i
+                              ? AppColors.systemBlue
+                              : const Color(0x3DFFFFFF),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
