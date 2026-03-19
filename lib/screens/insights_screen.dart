@@ -1,48 +1,46 @@
 import 'dart:math' as math;
-import 'dart:ui' show ImageFilter;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../theme/app_theme.dart';
 import '../widgets/animated_blobs.dart';
-import '../widgets/header_row.dart';
 
 class InsightsScreen extends StatefulWidget {
-  const InsightsScreen({super.key});
+  final ScrollController scrollController;
+  const InsightsScreen({super.key, required this.scrollController});
 
   @override
   State<InsightsScreen> createState() => _InsightsScreenState();
 }
 
-class _InsightsScreenState extends State<InsightsScreen>
-    with TickerProviderStateMixin {
+class _InsightsScreenState extends State<InsightsScreen> with TickerProviderStateMixin {
   late AnimationController _blob1Controller;
   late AnimationController _blob2Controller;
-  late Animation<double>   _blob1Anim;
-  late Animation<double>   _blob2Anim;
+  late Animation<double> _blob1Anim;
+  late Animation<double> _blob2Anim;
   late AnimationController _appearController;
-  late Animation<double>   _appearAnim;
+  late Animation<double> _appearAnim;
   late AnimationController _donutController;
-  late Animation<double>   _donutAnim;
-
-  final _searchBarOpacity = ValueNotifier<double>(1.0);
+  late Animation<double> _donutAnim;
 
   @override
   void initState() {
     super.initState();
 
     _blob1Controller = AnimationController(
-      vsync: this, duration: const Duration(seconds: 25),
+      vsync: this,
+      duration: const Duration(seconds: 25),
     )..repeat(reverse: true);
     _blob2Controller = AnimationController(
-      vsync: this, duration: const Duration(seconds: 18),
+      vsync: this,
+      duration: const Duration(seconds: 18),
     )..repeat(reverse: true);
     _blob1Anim = CurvedAnimation(parent: _blob1Controller, curve: Curves.easeInOut);
     _blob2Anim = CurvedAnimation(parent: _blob2Controller, curve: Curves.easeInOut);
 
     _appearController = AnimationController(
-      vsync: this, duration: const Duration(milliseconds: 600),
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
     );
     _appearAnim = CurvedAnimation(
       parent: _appearController,
@@ -51,7 +49,8 @@ class _InsightsScreenState extends State<InsightsScreen>
     _appearController.forward();
 
     _donutController = AnimationController(
-      vsync: this, duration: const Duration(milliseconds: 900),
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
     );
     _donutAnim = CurvedAnimation(parent: _donutController, curve: Curves.easeOutCubic);
     Future.delayed(const Duration(milliseconds: 200), () {
@@ -65,7 +64,6 @@ class _InsightsScreenState extends State<InsightsScreen>
     _blob2Controller.dispose();
     _appearController.dispose();
     _donutController.dispose();
-    _searchBarOpacity.dispose();
     super.dispose();
   }
 
@@ -73,96 +71,42 @@ class _InsightsScreenState extends State<InsightsScreen>
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
 
-    return CupertinoPageScaffold(
-      backgroundColor: AppColors.systemBackground,
-      child: Stack(
-        children: [
-          // ── Animated background ──────────────────────────────────
-          RepaintBoundary(
-            child: AnimatedBlobs(blob1Anim: _blob1Anim, blob2Anim: _blob2Anim),
-          ),
+    return Stack(
+      children: [
+        // ── Animated background ──────────────────────────────────
+        RepaintBoundary(
+          child: AnimatedBlobs(blob1Anim: _blob1Anim, blob2Anim: _blob2Anim),
+        ),
 
-          // ── Scrollable content ────────────────────────────────────
-          Positioned.fill(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: EdgeInsets.only(top: topPadding + 80, bottom: 120),
-              child: FadeTransition(
-                opacity: _appearAnim,
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0, 0.04), end: Offset.zero,
-                  ).animate(_appearAnim),
-                  child: Column(
-                    children: [
-                      _buildStatsGrid(),
-                      const SizedBox(height: 16),
-                      _buildOriginCard(),
-                      const SizedBox(height: 16),
-                      _buildCategoriesCard(),
-                      const SizedBox(height: 16),
-                      _buildSavingsGoalCard(),
-                    ],
-                  ),
+        // ── Scrollable content ────────────────────────────────────
+        Positioned.fill(
+          child: SingleChildScrollView(
+            controller: widget.scrollController,
+            physics: const BouncingScrollPhysics(),
+            padding: EdgeInsets.only(top: topPadding + 66, bottom: 120),
+            child: FadeTransition(
+              opacity: _appearAnim,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 0.04),
+                  end: Offset.zero,
+                ).animate(_appearAnim),
+                child: Column(
+                  children: [
+                    _buildStatsGrid(),
+                    const SizedBox(height: 16),
+                    _buildOriginCard(),
+                    const SizedBox(height: 16),
+                    _buildCategoriesCard(),
+                    const SizedBox(height: 16),
+                    _buildSavingsGoalCard(),
+                  ],
                 ),
               ),
             ),
           ),
-
-          // ── Frosted header chrome ─────────────────────────────────
-          Positioned(
-            top: 0, left: 0, right: 0,
-            child: IgnorePointer(child: _buildHeaderChrome(topPadding)),
-          ),
-          Positioned(
-            top: 0, left: 0, right: 0,
-            child: _buildFixedHeader(topPadding),
-          ),
-
-
-        ],
-      ),
-    );
-  }
-
-  // ─── Header chrome (blur + gradient) ──────────────────────────────────────
-  Widget _buildHeaderChrome(double topPadding) {
-    final chromeH = topPadding + 66.0;
-    return SizedBox(
-      height: chromeH,
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  stops: [0.0, 1.0],
-                  colors: [AppColors.frostedBlue, Color(0x00070D1A)],
-                ),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                child: const ColoredBox(color: Colors.transparent),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFixedHeader(double topPadding) {
-    return Padding(
-      padding: EdgeInsets.only(
-        top: topPadding + 10, bottom: 20, left: 16, right: 8,
-      ),
-      child: HeaderRow(searchBarOpacity: _searchBarOpacity),
+        ),
+      ],
     );
   }
 
@@ -287,7 +231,8 @@ class _InsightsScreenState extends State<InsightsScreen>
                 children: [
                   // ── Animated donut ─────────────────────────────
                   SizedBox(
-                    width: 120, height: 120,
+                    width: 120,
+                    height: 120,
                     child: AnimatedBuilder(
                       animation: _donutAnim,
                       builder: (_, __) => CustomPaint(
@@ -323,13 +268,17 @@ class _InsightsScreenState extends State<InsightsScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: const [
-                        _LegendRow(color: AppColors.systemBlue,   label: 'Comida',       percent: '40%'),
+                        _LegendRow(
+                            color: AppColors.systemOrange, label: 'Comida', percent: '40%'),
                         SizedBox(height: 12),
-                        _LegendRow(color: AppColors.systemIndigo, label: 'Ocio',          percent: '30%'),
+                        _LegendRow(
+                            color: AppColors.systemIndigo, label: 'Ocio', percent: '30%'),
                         SizedBox(height: 12),
-                        _LegendRow(color: AppColors.systemPurple, label: 'Transporte',    percent: '18%'),
+                        _LegendRow(
+                            color: AppColors.systemRed, label: 'Transporte', percent: '18%'),
                         SizedBox(height: 12),
-                        _LegendRow(color: AppColors.systemOrange, label: 'Otros',         percent: '12%'),
+                        _LegendRow(
+                            color: AppColors.systemGreen, label: 'Otros', percent: '12%'),
                       ],
                     ),
                   ),
@@ -351,17 +300,11 @@ class _InsightsScreenState extends State<InsightsScreen>
           color: AppColors.white05,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: AppColors.white07),
-          // Accent left border like the HTML version
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
           child: Stack(
             children: [
-              // Left accent bar
-              Positioned(
-                left: 0, top: 0, bottom: 0,
-                child: Container(width: 4, color: AppColors.systemBlue),
-              ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
                 child: Column(
@@ -404,7 +347,8 @@ class _InsightsScreenState extends State<InsightsScreen>
                         value: 0.225,
                         minHeight: 8,
                         backgroundColor: AppColors.tertiaryFill,
-                        valueColor: const AlwaysStoppedAnimation<Color>(AppColors.systemBlue),
+                        valueColor:
+                            const AlwaysStoppedAnimation<Color>(AppColors.systemBlue),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -434,13 +378,13 @@ class _InsightsScreenState extends State<InsightsScreen>
 
 // ─── Stat Card ────────────────────────────────────────────────────────────────
 class _StatCard extends StatelessWidget {
-  final String   label;
-  final String   amount;
-  final String   decimals;
+  final String label;
+  final String amount;
+  final String decimals;
   final IconData trendIcon;
-  final Color    trendColor;
-  final String   trendText;
-  final Color    glowColor;
+  final Color trendColor;
+  final String trendText;
+  final Color glowColor;
 
   const _StatCard({
     required this.label,
@@ -561,11 +505,11 @@ class _SectionLabel extends StatelessWidget {
 // ─── Origin Row (icon + label + progress bar) ─────────────────────────────────
 class _OriginRow extends StatelessWidget {
   final IconData icon;
-  final Color    iconColor;
-  final String   label;
-  final String   amount;
-  final double   progress;
-  final Color    progressColor;
+  final Color iconColor;
+  final String label;
+  final String amount;
+  final double progress;
+  final Color progressColor;
 
   const _OriginRow({
     required this.icon,
@@ -589,7 +533,8 @@ class _OriginRow extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: SizedBox(
-                width: 32, height: 32,
+                width: 32,
+                height: 32,
                 child: Icon(icon, color: iconColor, size: 17),
               ),
             ),
@@ -635,7 +580,7 @@ class _OriginRow extends StatelessWidget {
 
 // ─── Legend Row ───────────────────────────────────────────────────────────────
 class _LegendRow extends StatelessWidget {
-  final Color  color;
+  final Color color;
   final String label;
   final String percent;
 
@@ -650,7 +595,8 @@ class _LegendRow extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 8, height: 8,
+          width: 8,
+          height: 8,
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 8),
@@ -687,14 +633,14 @@ class _DonutPainter extends CustomPainter {
 
   // segments: [fraction, color]
   static const _segments = [
-    (0.40, AppColors.systemBlue),
+    (0.40, AppColors.systemOrange),
     (0.30, AppColors.systemIndigo),
-    (0.18, AppColors.systemPurple),
-    (0.12, AppColors.systemOrange),
+    (0.18, AppColors.systemRed),
+    (0.12, AppColors.systemGreen),
   ];
 
   static const _strokeWidth = 10.0;
-  static const _gap         = 0.025; // radians gap between segments
+  static const _gap = 0.025; // radians gap between segments
 
   _DonutPainter({required this.progress});
 
@@ -702,7 +648,7 @@ class _DonutPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.shortestSide - _strokeWidth) / 2;
-    final rect   = Rect.fromCircle(center: center, radius: radius);
+    final rect = Rect.fromCircle(center: center, radius: radius);
 
     // Background track
     canvas.drawArc(
@@ -711,13 +657,13 @@ class _DonutPainter extends CustomPainter {
       math.pi * 2,
       false,
       Paint()
-        ..style       = PaintingStyle.stroke
+        ..style = PaintingStyle.stroke
         ..strokeWidth = _strokeWidth
-        ..color       = AppColors.tertiaryFill,
+        ..color = AppColors.tertiaryFill,
     );
 
     double startAngle = -math.pi / 2;
-    final totalSweep  = math.pi * 2 * progress;
+    final totalSweep = math.pi * 2 * progress;
 
     for (final (fraction, color) in _segments) {
       final sweep = (fraction * math.pi * 2 - _gap).clamp(0.0, math.pi * 2);
@@ -729,10 +675,10 @@ class _DonutPainter extends CustomPainter {
         animatedSweep,
         false,
         Paint()
-          ..style         = PaintingStyle.stroke
-          ..strokeWidth   = _strokeWidth
-          ..strokeCap     = StrokeCap.round
-          ..color         = color,
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = _strokeWidth
+          ..strokeCap = StrokeCap.round
+          ..color = color,
       );
 
       startAngle += sweep + _gap;

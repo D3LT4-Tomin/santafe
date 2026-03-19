@@ -1,26 +1,23 @@
-import 'dart:ui' show ImageFilter;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../models/expense_data.dart';
 import '../theme/app_theme.dart';
-import '../widgets/add_expense_sheet.dart';
 import '../widgets/animated_blobs.dart';
 import '../widgets/balance_card.dart';
 import '../widgets/cards.dart';
 import '../widgets/expense_widgets.dart';
-import '../widgets/header_row.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  final ScrollController scrollController;
+  const DashboardScreen({super.key, required this.scrollController});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen>
-    with TickerProviderStateMixin {
+class _DashboardScreenState extends State<DashboardScreen> with TickerProviderStateMixin {
   bool _showMoreExpenses = false;
   String _selectedFilter = 'Todos';
 
@@ -35,26 +32,25 @@ class _DashboardScreenState extends State<DashboardScreen>
   late AnimationController _appearController;
   late Animation<double> _appearAnim;
 
-  final ScrollController _scrollController = ScrollController();
-  final _searchBarOpacity = ValueNotifier<double>(1.0);
-  double _lastScrollOffset = 0;
-
   @override
   void initState() {
     super.initState();
 
     _blob1Controller = AnimationController(
-      vsync: this, duration: const Duration(seconds: 25),
+      vsync: this,
+      duration: const Duration(seconds: 25),
     )..repeat(reverse: true);
     _blob2Controller = AnimationController(
-      vsync: this, duration: const Duration(seconds: 18),
+      vsync: this,
+      duration: const Duration(seconds: 18),
     )..repeat(reverse: true);
 
     _blob1Anim = CurvedAnimation(parent: _blob1Controller, curve: Curves.easeInOut);
     _blob2Anim = CurvedAnimation(parent: _blob2Controller, curve: Curves.easeInOut);
 
     _appearController = AnimationController(
-      vsync: this, duration: const Duration(milliseconds: 600),
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
     );
     _appearAnim = CurvedAnimation(
       parent: _appearController,
@@ -62,20 +58,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
     _appearController.forward();
 
-    _scrollController.addListener(_onScroll);
     _pillPageController = PageController();
-  }
-
-  void _onScroll() {
-    final offset = _scrollController.offset;
-    final delta  = offset - _lastScrollOffset;
-    _lastScrollOffset = offset;
-
-    if (offset < 20) {
-      if (_searchBarOpacity.value != 1.0) _searchBarOpacity.value = 1.0;
-    } else if (delta > 2 && _searchBarOpacity.value == 1.0) {
-      _searchBarOpacity.value = 0.0;
-    }
   }
 
   @override
@@ -83,9 +66,6 @@ class _DashboardScreenState extends State<DashboardScreen>
     _blob1Controller.dispose();
     _blob2Controller.dispose();
     _appearController.dispose();
-    _scrollController.removeListener(_onScroll);
-    _scrollController.dispose();
-    _searchBarOpacity.dispose();
     _pillPageController.dispose();
     super.dispose();
   }
@@ -107,8 +87,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
           ),
           padding: EdgeInsets.only(
-            bottom: MediaQuery.of(ctx).viewInsets.bottom +
-                MediaQuery.of(ctx).padding.bottom,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + MediaQuery.of(ctx).padding.bottom,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -131,8 +110,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                     CupertinoButton(
                       padding: EdgeInsets.zero,
                       onPressed: () => Navigator.pop(ctx),
-                      child: const Text('Cancelar',
-                          style: TextStyle(color: AppColors.systemBlue)),
+                      child:
+                          const Text('Cancelar', style: TextStyle(color: AppColors.systemBlue)),
                     ),
                     const Text('Nueva Categoria', style: AppTextStyles.headline),
                     CupertinoButton(
@@ -200,97 +179,41 @@ class _DashboardScreenState extends State<DashboardScreen>
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
 
-    return CupertinoPageScaffold(
-      backgroundColor: AppColors.systemBackground,
-      child: Stack(
-        children: [
-          RepaintBoundary(
-            child: AnimatedBlobs(blob1Anim: _blob1Anim, blob2Anim: _blob2Anim),
-          ),
-
-          Positioned.fill(
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              physics: const BouncingScrollPhysics(),
-              padding: EdgeInsets.only(top: topPadding + 80, bottom: 120),
-              child: FadeTransition(
-                opacity: _appearAnim,
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0, 0.04), end: Offset.zero,
-                  ).animate(_appearAnim),
-                  child: Column(
-                    children: [
-                      const BalanceCard(),
-                      const SizedBox(height: 16),
-                      const BankPromoCard(),
-                      const SizedBox(height: 28),
-                      const TipCard(),
-                      const SizedBox(height: 28),
-                      _buildRecentExpenses(),
-                      const SizedBox(height: 28),
-                      const WeeklySummaryCard(),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          Positioned(
-            top: 0, left: 0, right: 0,
-            child: IgnorePointer(child: _buildHeaderChrome(topPadding)),
-          ),
-          Positioned(
-            top: 0, left: 0, right: 0,
-            child: _buildFixedHeader(topPadding),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeaderChrome(double topPadding) {
-    final chromeH = topPadding + 66.0;
-    return SizedBox(
-      height: chromeH,
-      child: Stack(
-        children: [
-          const Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  stops: [0.0, 1.0, 1.0],
-                  colors: [
-                    AppColors.frostedBlue,
-                    AppColors.frostedBlue,
-                    Color(0x00070D1A),
+    return Stack(
+      children: [
+        RepaintBoundary(
+          child: AnimatedBlobs(blob1Anim: _blob1Anim, blob2Anim: _blob2Anim),
+        ),
+        Positioned.fill(
+          child: SingleChildScrollView(
+            controller: widget.scrollController,
+            physics: const BouncingScrollPhysics(),
+            padding: EdgeInsets.only(top: topPadding + 66, bottom: 120),
+            child: FadeTransition(
+              opacity: _appearAnim,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 0.04),
+                  end: Offset.zero,
+                ).animate(_appearAnim),
+                child: Column(
+                  children: [
+                    const BalanceCard(),
+                    const SizedBox(height: 16),
+                    const BankPromoCard(),
+                    const SizedBox(height: 28),
+                    const TipCard(),
+                    const SizedBox(height: 28),
+                    _buildRecentExpenses(),
+                    const SizedBox(height: 28),
+                    const WeeklySummaryCard(),
                   ],
                 ),
               ),
             ),
           ),
-          Positioned.fill(
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                child: const ColoredBox(color: Colors.transparent),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFixedHeader(double topPadding) {
-    return Padding(
-      padding: EdgeInsets.only(
-        top: topPadding + 10, bottom: 20, left: 16, right: 8,
-      ),
-      child: HeaderRow(searchBarOpacity: _searchBarOpacity),
+        ),
+      ],
     );
   }
 
@@ -349,8 +272,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   ? _buildEmptyState()
                   : Column(
                       children: [
-                        for (final data in visibleExpenses)
-                          ExpenseRow(data: data),
+                        for (final data in visibleExpenses) ExpenseRow(data: data),
                         if (hasMore)
                           ShowMoreButton(
                             expanded: _showMoreExpenses,

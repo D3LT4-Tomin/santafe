@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +11,7 @@ import '../screens/pagos_screen.dart';
 import '../theme/app_theme.dart';
 import '../widgets/add_expense_sheet.dart';
 import '../widgets/buttons.dart';
+import '../widgets/header_row.dart';
 import '../widgets/tab_bar.dart';
 
 // ─── App Shell ────────────────────────────────────────────────────────────────
@@ -23,30 +26,94 @@ class AppShell extends StatefulWidget {
 
 class _AppShellState extends State<AppShell> {
   int _selectedIndex = 0;
+  final PageController _pageController = PageController();
+  final List<ScrollController> _scrollControllers =
+      List.generate(4, (_) => ScrollController());
+  final _searchBarOpacity = ValueNotifier<double>(1.0);
+  double _lastScrollOffset = 0;
 
   // One navigator key per tab so each tab has its own navigation stack.
-  final List<GlobalKey<NavigatorState>> _navigatorKeys = List.generate(
-    4,
-    (_) => GlobalKey<NavigatorState>(),
-  );
+  final List<GlobalKey<NavigatorState>> _navigatorKeys =
+      List.generate(4, (_) => GlobalKey<NavigatorState>());
 
   // The four tab bodies — order matches AppTabBar tabs.
-  late final List<Widget> _screens = [
-    const DashboardScreen(),
-    const InsightsScreen(),
-    const PagosScreen(),
-    const AprenderScreen(),
-  ];
+  late final List<Widget> _screens;
+
+  @override
+  void initState() {
+    super.initState();
+    _screens = [
+      DashboardScreen(scrollController: _scrollControllers[0]),
+      InsightsScreen(scrollController: _scrollControllers[1]),
+      const PagosScreen(),
+      const AprenderScreen(),
+    ];
+
+    _pageController.addListener(() {
+      final newIndex = _pageController.page!.round();
+      if (newIndex != _selectedIndex) {
+        _setSelectedIndex(newIndex);
+      }
+    });
+
+    _scrollControllers[_selectedIndex].addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    for (var controller in _scrollControllers) {
+      controller.dispose();
+    }
+    _searchBarOpacity.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final controller = _scrollControllers[_selectedIndex];
+    final offset = controller.offset;
+    final delta = offset - _lastScrollOffset;
+    _lastScrollOffset = offset;
+
+    if (offset < 20) {
+      if (_searchBarOpacity.value != 1.0) _searchBarOpacity.value = 1.0;
+    } else if (delta > 2 && _searchBarOpacity.value == 1.0) {
+      _searchBarOpacity.value = 0.0;
+    } else if (delta < -2 && _searchBarOpacity.value == 0.0) {
+      _searchBarOpacity.value = 1.0;
+    }
+  }
+
+  void _setSelectedIndex(int index) {
+    if (_selectedIndex != index) {
+      _scrollControllers[_selectedIndex].removeListener(_onScroll);
+      setState(() {
+        _selectedIndex = index;
+        _lastScrollOffset = 0;
+      });
+      _scrollControllers[_selectedIndex].addListener(_onScroll);
+    }
+  }
 
   void _onTabSelected(int index) {
     HapticFeedback.selectionClick();
 
-    // Tapping the active tab pops to its root (like iOS behaviour).
     if (index == _selectedIndex) {
       _navigatorKeys[index].currentState?.popUntil((route) => route.isFirst);
+      _scrollControllers[index].animateTo(
+        0,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeOutCubic,
+      );
       return;
     }
-    setState(() => _selectedIndex = index);
+
+    _setSelectedIndex(index);
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
   }
 
   void _showAddExpenseSheet() {
@@ -57,7 +124,6 @@ class _AppShellState extends State<AppShell> {
     );
   }
 
-  // Handle Android back button — pop within the active tab's stack first.
   Future<bool> _onWillPop() async {
     final nav = _navigatorKeys[_selectedIndex].currentState;
     if (nav != null && nav.canPop()) {
@@ -69,28 +135,41 @@ class _AppShellState extends State<AppShell> {
 
   @override
   Widget build(BuildContext context) {
+    final topPadding = MediaQuery.of(context).padding.top;
     return WillPopScope(
       onWillPop: _onWillPop,
       child: CupertinoPageScaffold(
         backgroundColor: AppColors.systemBackground,
         child: Stack(
           children: [
-            // ── Tab bodies (all kept in tree, only active one is visible) ──
-            IndexedStack(
-              index: _selectedIndex,
-              children: _screens.map((screen) => _TabNavigator(screen: screen)).toList(),
+            PageView(
+              controller: _pageController,
+              children: _screens
+                  .map((screen) =>
+                      _TabNavigator(navigatorKey: _navigatorKeys[_screens.indexOf(screen)], screen: screen))
+                  .toList(),
             ),
-
-            // ── FAB (above tab bar, below nothing) ────────────────────────
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: IgnorePointer(child: _buildHeaderChrome(topPadding)),
+            ),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: _buildFixedHeader(topPadding),
+            ),
             Positioned(
               right: 20,
               bottom: MediaQuery.of(context).padding.bottom + 70,
               child: FabButton(onTap: _showAddExpenseSheet),
             ),
-
-            // ── Tab bar ───────────────────────────────────────────────────
             Positioned(
-              left: 0, right: 0, bottom: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
               child: RepaintBoundary(
                 child: AppTabBar(
                   selectedIndex: _selectedIndex,
@@ -103,17 +182,67 @@ class _AppShellState extends State<AppShell> {
       ),
     );
   }
+
+  Widget _buildHeaderChrome(double topPadding) {
+    final chromeH = topPadding + 66.0;
+    return SizedBox(
+      height: chromeH,
+      child: Stack(
+        children: [
+          const Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: [0.0, 1.0, 1.0],
+                  colors: [
+                    AppColors.frostedBlue,
+                    AppColors.frostedBlue,
+                    Color(0x00070D1A),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                child: const ColoredBox(color: Colors.transparent),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFixedHeader(double topPadding) {
+    return Padding(
+      padding: EdgeInsets.only(
+        top: topPadding + 10,
+        bottom: 20,
+        left: 16,
+        right: 8,
+      ),
+      child: HeaderRow(searchBarOpacity: _searchBarOpacity),
+    );
+  }
 }
 
 // ─── Per-tab Navigator wrapper ────────────────────────────────────────────────
 // Each tab gets its own Navigator so tabs can push routes independently.
 class _TabNavigator extends StatelessWidget {
+  final GlobalKey<NavigatorState> navigatorKey;
   final Widget screen;
-  const _TabNavigator({required this.screen});
+
+  const _TabNavigator({required this.navigatorKey, required this.screen});
 
   @override
   Widget build(BuildContext context) {
     return Navigator(
+      key: navigatorKey,
       onGenerateRoute: (_) => CupertinoPageRoute(builder: (_) => screen),
     );
   }
