@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
 import '../widgets/animated_blobs.dart';
+import '../widgets/cards.dart';
 
 class InsightsScreen extends StatefulWidget {
   final ScrollController scrollController;
@@ -13,7 +14,8 @@ class InsightsScreen extends StatefulWidget {
   State<InsightsScreen> createState() => _InsightsScreenState();
 }
 
-class _InsightsScreenState extends State<InsightsScreen> with TickerProviderStateMixin {
+class _InsightsScreenState extends State<InsightsScreen>
+    with TickerProviderStateMixin {
   late AnimationController _blob1Controller;
   late AnimationController _blob2Controller;
   late Animation<double> _blob1Anim;
@@ -35,8 +37,14 @@ class _InsightsScreenState extends State<InsightsScreen> with TickerProviderStat
       vsync: this,
       duration: const Duration(seconds: 18),
     )..repeat(reverse: true);
-    _blob1Anim = CurvedAnimation(parent: _blob1Controller, curve: Curves.easeInOut);
-    _blob2Anim = CurvedAnimation(parent: _blob2Controller, curve: Curves.easeInOut);
+    _blob1Anim = CurvedAnimation(
+      parent: _blob1Controller,
+      curve: Curves.easeInOut,
+    );
+    _blob2Anim = CurvedAnimation(
+      parent: _blob2Controller,
+      curve: Curves.easeInOut,
+    );
 
     _appearController = AnimationController(
       vsync: this,
@@ -52,7 +60,10 @@ class _InsightsScreenState extends State<InsightsScreen> with TickerProviderStat
       vsync: this,
       duration: const Duration(milliseconds: 900),
     );
-    _donutAnim = CurvedAnimation(parent: _donutController, curve: Curves.easeOutCubic);
+    _donutAnim = CurvedAnimation(
+      parent: _donutController,
+      curve: Curves.easeOutCubic,
+    );
     Future.delayed(const Duration(milliseconds: 200), () {
       if (mounted) _donutController.forward();
     });
@@ -83,7 +94,7 @@ class _InsightsScreenState extends State<InsightsScreen> with TickerProviderStat
           child: SingleChildScrollView(
             controller: widget.scrollController,
             physics: const BouncingScrollPhysics(),
-            padding: EdgeInsets.only(top: topPadding + 66, bottom: 120),
+            padding: EdgeInsets.only(top: topPadding + 76, bottom: 80),
             child: FadeTransition(
               opacity: _appearAnim,
               child: SlideTransition(
@@ -95,9 +106,11 @@ class _InsightsScreenState extends State<InsightsScreen> with TickerProviderStat
                   children: [
                     _buildStatsGrid(),
                     const SizedBox(height: 16),
-                    _buildOriginCard(),
-                    const SizedBox(height: 16),
                     _buildCategoriesCard(),
+                    const SizedBox(height: 16),
+                    const BankPromoCard(),
+                    const SizedBox(height: 16),
+                    _buildOriginCard(),
                     const SizedBox(height: 16),
                     _buildSavingsGoalCard(),
                   ],
@@ -208,10 +221,16 @@ class _InsightsScreenState extends State<InsightsScreen> with TickerProviderStat
                     decoration: BoxDecoration(
                       color: AppColors.blueTipBg,
                       borderRadius: BorderRadius.circular(999),
-                      border: Border.all(color: AppColors.blueTipBorder, width: 0.5),
+                      border: Border.all(
+                        color: AppColors.blueTipBorder,
+                        width: 0.5,
+                      ),
                     ),
                     child: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       child: Text(
                         'SMART INSIGHTS',
                         style: TextStyle(
@@ -269,16 +288,28 @@ class _InsightsScreenState extends State<InsightsScreen> with TickerProviderStat
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: const [
                         _LegendRow(
-                            color: AppColors.systemOrange, label: 'Comida', percent: '40%'),
+                          color: AppColors.systemOrange,
+                          label: 'Comida',
+                          percent: '40%',
+                        ),
                         SizedBox(height: 12),
                         _LegendRow(
-                            color: AppColors.systemIndigo, label: 'Ocio', percent: '30%'),
+                          color: AppColors.systemIndigo,
+                          label: 'Ocio',
+                          percent: '30%',
+                        ),
                         SizedBox(height: 12),
                         _LegendRow(
-                            color: AppColors.systemRed, label: 'Transporte', percent: '18%'),
+                          color: AppColors.systemRed,
+                          label: 'Transporte',
+                          percent: '18%',
+                        ),
                         SizedBox(height: 12),
                         _LegendRow(
-                            color: AppColors.systemGreen, label: 'Otros', percent: '12%'),
+                          color: AppColors.systemGreen,
+                          label: 'Otros',
+                          percent: '12%',
+                        ),
                       ],
                     ),
                   ),
@@ -347,8 +378,9 @@ class _InsightsScreenState extends State<InsightsScreen> with TickerProviderStat
                         value: 0.225,
                         minHeight: 8,
                         backgroundColor: AppColors.tertiaryFill,
-                        valueColor:
-                            const AlwaysStoppedAnimation<Color>(AppColors.systemBlue),
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                          AppColors.systemBlue,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -677,7 +709,6 @@ class _DonutPainter extends CustomPainter {
         Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = _strokeWidth
-          ..strokeCap = StrokeCap.round
           ..color = color,
       );
 

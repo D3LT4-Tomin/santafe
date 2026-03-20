@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import '../screens/aprender_screen.dart';
 import '../screens/dashboard_screen.dart';
 import '../screens/insights_screen.dart';
-import '../screens/pagos_screen.dart';
+import '../screens/cuenta_screen.dart';
 import '../theme/app_theme.dart';
 import '../widgets/add_expense_sheet.dart';
 import '../widgets/buttons.dart';
@@ -27,14 +27,18 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
-  final List<ScrollController> _scrollControllers =
-      List.generate(4, (_) => ScrollController());
+  final List<ScrollController> _scrollControllers = List.generate(
+    4,
+    (_) => ScrollController(),
+  );
   final _searchBarOpacity = ValueNotifier<double>(1.0);
   double _lastScrollOffset = 0;
 
   // One navigator key per tab so each tab has its own navigation stack.
-  final List<GlobalKey<NavigatorState>> _navigatorKeys =
-      List.generate(4, (_) => GlobalKey<NavigatorState>());
+  final List<GlobalKey<NavigatorState>> _navigatorKeys = List.generate(
+    4,
+    (_) => GlobalKey<NavigatorState>(),
+  );
 
   // The four tab bodies — order matches AppTabBar tabs.
   late final List<Widget> _screens;
@@ -45,7 +49,7 @@ class _AppShellState extends State<AppShell> {
     _screens = [
       DashboardScreen(scrollController: _scrollControllers[0]),
       InsightsScreen(scrollController: _scrollControllers[1]),
-      const PagosScreen(),
+      CuentaScreen(scrollController: _scrollControllers[2]),
       const AprenderScreen(),
     ];
 
@@ -72,6 +76,7 @@ class _AppShellState extends State<AppShell> {
   void _onScroll() {
     final controller = _scrollControllers[_selectedIndex];
     final offset = controller.offset;
+    final maxScroll = controller.position.maxScrollExtent;
     final delta = offset - _lastScrollOffset;
     _lastScrollOffset = offset;
 
@@ -79,7 +84,9 @@ class _AppShellState extends State<AppShell> {
       if (_searchBarOpacity.value != 1.0) _searchBarOpacity.value = 1.0;
     } else if (delta > 2 && _searchBarOpacity.value == 1.0) {
       _searchBarOpacity.value = 0.0;
-    } else if (delta < -2 && _searchBarOpacity.value == 0.0) {
+    } else if (delta < -2 &&
+        _searchBarOpacity.value == 0.0 &&
+        offset < maxScroll - 20) {
       _searchBarOpacity.value = 1.0;
     }
   }
@@ -145,8 +152,12 @@ class _AppShellState extends State<AppShell> {
             PageView(
               controller: _pageController,
               children: _screens
-                  .map((screen) =>
-                      _TabNavigator(navigatorKey: _navigatorKeys[_screens.indexOf(screen)], screen: screen))
+                  .map(
+                    (screen) => _TabNavigator(
+                      navigatorKey: _navigatorKeys[_screens.indexOf(screen)],
+                      screen: screen,
+                    ),
+                  )
                   .toList(),
             ),
             Positioned(
@@ -161,11 +172,12 @@ class _AppShellState extends State<AppShell> {
               right: 0,
               child: _buildFixedHeader(topPadding),
             ),
-            Positioned(
-              right: 20,
-              bottom: MediaQuery.of(context).padding.bottom + 70,
-              child: FabButton(onTap: _showAddExpenseSheet),
-            ),
+            if (_selectedIndex == 0) // Only show add button on Dashboard tab
+              Positioned(
+                right: 20,
+                bottom: MediaQuery.of(context).padding.bottom + 70,
+                child: FabButton(onTap: _showAddExpenseSheet),
+              ),
             Positioned(
               left: 0,
               right: 0,

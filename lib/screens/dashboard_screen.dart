@@ -17,7 +17,8 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> with TickerProviderStateMixin {
+class _DashboardScreenState extends State<DashboardScreen>
+    with TickerProviderStateMixin {
   bool _showMoreExpenses = false;
   String _selectedFilter = 'Todos';
 
@@ -45,8 +46,14 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       duration: const Duration(seconds: 18),
     )..repeat(reverse: true);
 
-    _blob1Anim = CurvedAnimation(parent: _blob1Controller, curve: Curves.easeInOut);
-    _blob2Anim = CurvedAnimation(parent: _blob2Controller, curve: Curves.easeInOut);
+    _blob1Anim = CurvedAnimation(
+      parent: _blob1Controller,
+      curve: Curves.easeInOut,
+    );
+    _blob2Anim = CurvedAnimation(
+      parent: _blob2Controller,
+      curve: Curves.easeInOut,
+    );
 
     _appearController = AnimationController(
       vsync: this,
@@ -87,7 +94,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
             borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
           ),
           padding: EdgeInsets.only(
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + MediaQuery.of(ctx).padding.bottom,
+            bottom:
+                MediaQuery.of(ctx).viewInsets.bottom +
+                MediaQuery.of(ctx).padding.bottom,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -103,17 +112,25 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     CupertinoButton(
                       padding: EdgeInsets.zero,
                       onPressed: () => Navigator.pop(ctx),
-                      child:
-                          const Text('Cancelar', style: TextStyle(color: AppColors.systemBlue)),
+                      child: const Text(
+                        'Cancelar',
+                        style: TextStyle(color: AppColors.systemBlue),
+                      ),
                     ),
-                    const Text('Nueva Categoria', style: AppTextStyles.headline),
+                    const Text(
+                      'Nueva Categoria',
+                      style: AppTextStyles.headline,
+                    ),
                     CupertinoButton(
                       padding: EdgeInsets.zero,
                       onPressed: () {
@@ -135,11 +152,13 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                           });
                         });
                       },
-                      child: const Text('Listo',
-                          style: TextStyle(
-                            color: AppColors.systemBlue,
-                            fontWeight: FontWeight.w700,
-                          )),
+                      child: const Text(
+                        'Listo',
+                        style: TextStyle(
+                          color: AppColors.systemBlue,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -154,7 +173,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   controller: controller,
                   autofocus: true,
                   placeholder: 'Nombre de categoria',
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
                   decoration: const BoxDecoration(
                     color: AppColors.tertiaryBackground,
                     borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -188,7 +210,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           child: SingleChildScrollView(
             controller: widget.scrollController,
             physics: const BouncingScrollPhysics(),
-            padding: EdgeInsets.only(top: topPadding + 66, bottom: 120),
+            padding: EdgeInsets.only(top: topPadding + 76, bottom: 80),
             child: FadeTransition(
               opacity: _appearAnim,
               child: SlideTransition(
@@ -200,7 +222,6 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   children: [
                     const BalanceCard(),
                     const SizedBox(height: 16),
-                    const BankPromoCard(),
                     const SizedBox(height: 28),
                     const TipCard(),
                     const SizedBox(height: 28),
@@ -221,7 +242,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     final filtered = _filteredExpenses;
     const initialCount = 5;
     final showingAll = _showMoreExpenses || filtered.length <= initialCount;
-    final visibleExpenses = showingAll ? filtered : filtered.take(initialCount).toList();
+    final visibleExpenses = showingAll
+        ? filtered
+        : filtered.take(initialCount).toList();
     final hasMore = filtered.length > initialCount;
 
     return Column(
@@ -272,13 +295,16 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   ? _buildEmptyState()
                   : Column(
                       children: [
-                        for (final data in visibleExpenses) ExpenseRow(data: data),
+                        for (final data in visibleExpenses)
+                          ExpenseRow(data: data),
                         if (hasMore)
                           ShowMoreButton(
                             expanded: _showMoreExpenses,
                             onTap: () {
                               HapticFeedback.selectionClick();
-                              setState(() => _showMoreExpenses = !_showMoreExpenses);
+                              setState(
+                                () => _showMoreExpenses = !_showMoreExpenses,
+                              );
                             },
                           ),
                       ],
@@ -295,7 +321,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       padding: const EdgeInsets.symmetric(vertical: 36),
       child: Column(
         children: [
-          const Icon(CupertinoIcons.tray, color: AppColors.tertiaryLabel, size: 32),
+          const Icon(
+            CupertinoIcons.tray,
+            color: AppColors.tertiaryLabel,
+            size: 32,
+          ),
           const SizedBox(height: 10),
           Text(
             'Sin gastos en "$_selectedFilter"',

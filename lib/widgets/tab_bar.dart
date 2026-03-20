@@ -22,7 +22,9 @@ class AppTabBar extends StatelessWidget {
         child: DecoratedBox(
           decoration: const BoxDecoration(
             color: AppColors.frostedBlue85,
-            border: Border(top: BorderSide(color: Color(0x14FFFFFF), width: 0.5)),
+            border: Border(
+              top: BorderSide(color: Color(0x14FFFFFF), width: 0.5),
+            ),
           ),
           child: Padding(
             padding: EdgeInsets.only(
@@ -31,10 +33,34 @@ class AppTabBar extends StatelessWidget {
             ),
             child: Row(
               children: [
-                TabItem(icon: CupertinoIcons.house_fill,      label: 'Inicio',   index: 0, selectedIndex: selectedIndex, onTap: onTabSelected),
-                TabItem(icon: CupertinoIcons.chart_bar_fill,  label: 'Insights', index: 1, selectedIndex: selectedIndex, onTap: onTabSelected),
-                TabItem(icon: CupertinoIcons.creditcard_fill, label: 'Pagos',    index: 2, selectedIndex: selectedIndex, onTap: onTabSelected),
-                TabItem(icon: CupertinoIcons.book_fill,       label: 'Aprender', index: 3, selectedIndex: selectedIndex, onTap: onTabSelected),
+                TabItem(
+                  icon: CupertinoIcons.house_fill,
+                  label: 'Inicio',
+                  index: 0,
+                  selectedIndex: selectedIndex,
+                  onTap: onTabSelected,
+                ),
+                TabItem(
+                  icon: CupertinoIcons.chart_bar_fill,
+                  label: 'Insights',
+                  index: 1,
+                  selectedIndex: selectedIndex,
+                  onTap: onTabSelected,
+                ),
+                TabItem(
+                  icon: CupertinoIcons.creditcard_fill,
+                  label: 'Cuenta',
+                  index: 2,
+                  selectedIndex: selectedIndex,
+                  onTap: onTabSelected,
+                ),
+                TabItem(
+                  icon: CupertinoIcons.book_fill,
+                  label: 'Aprender',
+                  index: 3,
+                  selectedIndex: selectedIndex,
+                  onTap: onTabSelected,
+                ),
               ],
             ),
           ),
@@ -47,9 +73,9 @@ class AppTabBar extends StatelessWidget {
 // ─── Tab Item ─────────────────────────────────────────────────────────────────
 class TabItem extends StatelessWidget {
   final IconData icon;
-  final String   label;
-  final int      index;
-  final int      selectedIndex;
+  final String label;
+  final int index;
+  final int selectedIndex;
   final ValueChanged<int> onTap;
 
   const TabItem({
@@ -64,7 +90,7 @@ class TabItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final selected = selectedIndex == index;
-    final color    = selected ? AppColors.systemBlue : AppColors.secondaryLabel;
+    final color = selected ? AppColors.systemBlue : AppColors.secondaryLabel;
     return Expanded(
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,

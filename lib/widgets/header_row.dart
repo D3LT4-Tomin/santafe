@@ -15,16 +15,25 @@ class HeaderRow extends StatelessWidget {
     return ValueListenableBuilder<double>(
       valueListenable: searchBarOpacity,
       builder: (context, opacity, _) {
-        final t      = 1.0 - opacity;
+        final t = 1.0 - opacity;
         final radius = 999.0 - t * (999.0 - 18.0);
         return LayoutBuilder(
           builder: (context, constraints) {
-            const avatarW   = 36.0;
+            const avatarW = 36.0;
             const avatarGap = 10.0;
-            const bellW     = 44.0;
-            const bellGap   = 6.0;
-            final maxSearchW = constraints.maxWidth - avatarW - avatarGap - bellW - bellGap;
-            final searchW   = 36.0 + (maxSearchW - 36.0) * (1.0 - t);
+            const bellW = 44.0;
+            const bellGap = 6.0;
+            final maxSearchW =
+                constraints.maxWidth -
+                avatarW -
+                avatarGap -
+                bellW -
+                bellGap -
+                10.0;
+            final searchW = (40.0 + (maxSearchW - 40.0) * (1.0 - t)).clamp(
+              40.0,
+              maxSearchW,
+            );
 
             return Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -32,7 +41,8 @@ class HeaderRow extends StatelessWidget {
                 GestureDetector(
                   onTap: () => HapticFeedback.lightImpact(),
                   child: Container(
-                    width: avatarW, height: avatarW,
+                    width: avatarW,
+                    height: avatarW,
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.fromBorderSide(
@@ -45,7 +55,8 @@ class HeaderRow extends StatelessWidget {
                         fit: BoxFit.cover,
                         errorBuilder: (_, _, _) => const Icon(
                           CupertinoIcons.person_fill,
-                          color: AppColors.secondaryLabel, size: 18,
+                          color: AppColors.secondaryLabel,
+                          size: 18,
                         ),
                       ),
                     ),
@@ -73,60 +84,84 @@ class HeaderRow extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(radius),
                       child: Stack(
-                        alignment: Alignment.center,
+                        alignment: Alignment.centerLeft,
                         children: [
-                          Opacity(
-                            opacity: (1.0 - t * 2.2).clamp(0.0, 1.0),
-                            child: const Row(
-                              children: [
-                                SizedBox(width: 10),
-                                Icon(CupertinoIcons.search,
-                                    color: AppColors.secondaryLabel, size: 15),
-                                SizedBox(width: 6),
-                                Expanded(
-                                  child: Text(
-                                    'Buscar',
-                                    overflow: TextOverflow.clip,
-                                    maxLines: 1,
-                                    style: AppTextStyles.subheadline,
-                                  ),
+                          OverflowBox(
+                            alignment: Alignment.centerLeft,
+                            maxWidth: double.infinity,
+                            child: SizedBox(
+                              width: maxSearchW,
+                              child: Opacity(
+                                opacity: (1.0 - t * 2.2).clamp(0.0, 1.0),
+                                child: const Row(
+                                  children: [
+                                    SizedBox(width: 12),
+                                    Icon(
+                                      CupertinoIcons.search,
+                                      color: AppColors.secondaryLabel,
+                                      size: 16,
+                                    ),
+                                    SizedBox(width: 6),
+                                    Expanded(
+                                      child: Text(
+                                        'Buscar',
+                                        overflow: TextOverflow.fade,
+                                        maxLines: 1,
+                                        softWrap: false,
+                                        style: AppTextStyles.subheadline,
+                                      ),
+                                    ),
+                                    SizedBox(width: 12),
+                                  ],
                                 ),
-                                SizedBox(width: 10),
-                              ],
+                              ),
                             ),
                           ),
                           if (t == 0.0)
-                            const SizedBox.expand(
-                              child: Row(
-                                children: [
-                                  SizedBox(width: 10),
-                                  Icon(CupertinoIcons.search,
-                                      color: AppColors.secondaryLabel, size: 15),
-                                  SizedBox(width: 6),
-                                  Expanded(
-                                    child: CupertinoTextField(
-                                      placeholder: 'Buscar',
-                                      placeholderStyle: AppTextStyles.subheadline,
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        letterSpacing: -0.24,
-                                        color: AppColors.label,
-                                        height: 1.33,
-                                      ),
-                                      decoration: BoxDecoration(),
-                                      padding: EdgeInsets.zero,
+                            OverflowBox(
+                              alignment: Alignment.centerLeft,
+                              maxWidth: double.infinity,
+                              child: SizedBox(
+                                width: maxSearchW,
+                                child: const Row(
+                                  children: [
+                                    SizedBox(width: 12),
+                                    Icon(
+                                      CupertinoIcons.search,
+                                      color: AppColors.secondaryLabel,
+                                      size: 16,
                                     ),
-                                  ),
-                                  SizedBox(width: 10),
-                                ],
+                                    SizedBox(width: 6),
+                                    Expanded(
+                                      child: CupertinoTextField(
+                                        placeholder: 'Buscar',
+                                        placeholderStyle:
+                                            AppTextStyles.subheadline,
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          letterSpacing: -0.24,
+                                          color: AppColors.label,
+                                          height: 1.33,
+                                        ),
+                                        decoration: BoxDecoration(),
+                                        padding: EdgeInsets.zero,
+                                      ),
+                                    ),
+                                    SizedBox(width: 12),
+                                  ],
+                                ),
                               ),
                             ),
                           Opacity(
                             opacity: ((t * 2.0) - 1.0).clamp(0.0, 1.0),
-                            child: const Icon(
-                              CupertinoIcons.search,
-                              color: AppColors.systemBlue,
-                              size: 16,
+                            child: Container(
+                              width: 40,
+                              alignment: Alignment.center,
+                              child: const Icon(
+                                CupertinoIcons.search,
+                                color: AppColors.systemBlue,
+                                size: 20,
+                              ),
                             ),
                           ),
                         ],
@@ -157,14 +192,16 @@ class NavButton extends StatelessWidget {
     return GestureDetector(
       onTap: () => HapticFeedback.lightImpact(),
       child: SizedBox(
-        width: 44, height: 44,
+        width: 44,
+        height: 44,
         child: Stack(
           alignment: Alignment.center,
           children: [
             Icon(icon, color: AppColors.systemBlue, size: 22),
             if (badgeCount != null && badgeCount! > 0)
               const Positioned(
-                top: 8, right: 8,
+                top: 8,
+                right: 8,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: AppColors.systemRed,
