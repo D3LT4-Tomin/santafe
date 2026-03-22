@@ -1,11 +1,11 @@
 import 'dart:ui' show ImageFilter;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../theme/app_theme.dart';
 import '../widgets/animated_blobs.dart';
 import '../widgets/header_row.dart';
-import '../widgets/buttons.dart';
 
 class AprenderScreen extends StatefulWidget {
   final ScrollController scrollController;
@@ -37,14 +37,8 @@ class _AprenderScreenState extends State<AprenderScreen>
       vsync: this,
       duration: const Duration(seconds: 18),
     )..repeat(reverse: true);
-    _blob1Anim = CurvedAnimation(
-      parent: _blob1Controller,
-      curve: Curves.easeInOut,
-    );
-    _blob2Anim = CurvedAnimation(
-      parent: _blob2Controller,
-      curve: Curves.easeInOut,
-    );
+    _blob1Anim = CurvedAnimation(parent: _blob1Controller, curve: Curves.easeInOut);
+    _blob2Anim = CurvedAnimation(parent: _blob2Controller, curve: Curves.easeInOut);
 
     _appearController = AnimationController(
       vsync: this,
@@ -75,16 +69,11 @@ class _AprenderScreenState extends State<AprenderScreen>
         RepaintBoundary(
           child: AnimatedBlobs(blob1Anim: _blob1Anim, blob2Anim: _blob2Anim),
         ),
-
-        // ── Scrollable content ────────────────────────────────────
         Positioned.fill(
           child: SingleChildScrollView(
             controller: widget.scrollController,
             physics: const BouncingScrollPhysics(),
-            padding: EdgeInsets.only(
-              top: topPadding + 76,
-              bottom: 160,
-            ), // Increased bottom padding to accommodate fixed FAB
+            padding: EdgeInsets.only(top: topPadding + 76, bottom: 80),
             child: FadeTransition(
               opacity: _appearAnim,
               child: SlideTransition(
@@ -94,7 +83,7 @@ class _AprenderScreenState extends State<AprenderScreen>
                 ).animate(_appearAnim),
                 child: const Column(
                   children: [
-                    _EducationHeader(),
+                    _ProgressCard(),
                     SizedBox(height: 28),
                     _RecommendationCard(),
                     SizedBox(height: 28),
@@ -105,8 +94,6 @@ class _AprenderScreenState extends State<AprenderScreen>
             ),
           ),
         ),
-
-        // ── Header ───────────────────────────────────────────────
         Positioned(
           top: 0,
           left: 0,
@@ -130,38 +117,6 @@ class _AprenderScreenState extends State<AprenderScreen>
             ),
           ),
         ),
-
-        // ── Always visible Start Lesson FAB ────────────────────────────────────────
-        Positioned(
-          bottom: 48,
-          right: 20,
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF0A84FF), Color(0xFF409CFF)],
-              ),
-              shape: BoxShape.circle,
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x330A84FF),
-                  blurRadius: 12,
-                  spreadRadius: 0,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-            child: IconButton(
-              icon: const Icon(
-                CupertinoIcons.play,
-                color: CupertinoColors.white,
-                size: 24,
-              ),
-              onPressed: () {},
-            ),
-          ),
-        ),
       ],
     );
   }
@@ -177,7 +132,6 @@ class _AprenderScreenState extends State<AprenderScreen>
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  stops: [0.0, 1.0],
                   colors: [AppColors.frostedBlue, Color(0x00070D1A)],
                 ),
               ),
@@ -197,43 +151,135 @@ class _AprenderScreenState extends State<AprenderScreen>
   }
 }
 
-// ─── Education Header ─────────────────────────────────────────────────────────────
-class _EducationHeader extends StatelessWidget {
-  const _EducationHeader();
+// ─── Progress Card ────────────────────────────────────────────────────────────
+// Replaces the floating START LESSON button with contextual progress
+// that lives naturally in the scroll flow.
+class _ProgressCard extends StatelessWidget {
+  const _ProgressCard();
 
   @override
   Widget build(BuildContext context) {
+    const double progress = 2 / 6; // 2 of 6 lessons complete
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        children: [
-          Text(
-            'PATH',
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: AppColors.label,
-              height: 1.1,
-            ),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.white05,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.white07),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppColors.systemBlue.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      CupertinoIcons.book_fill,
+                      color: AppColors.systemBlue,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          'MAESTRÍA FINANCIERA',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1.0,
+                            color: AppColors.secondaryLabel,
+                          ),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          'Comer fuera vs. Cocinar',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.label,
+                            height: 1.33,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Text(
+                    '2 / 6',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.secondaryLabel,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: progress,
+                  minHeight: 5,
+                  backgroundColor: AppColors.white07,
+                  valueColor: const AlwaysStoppedAnimation(AppColors.systemBlue),
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                height: 44,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFF0A84FF), Color(0xFF409CFF)],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x330A84FF),
+                        blurRadius: 12,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () => HapticFeedback.mediumImpact(),
+                    child: const Text(
+                      'Continuar lección',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: CupertinoColors.white,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            'MAESTRÍA FINANCIERA',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 2.0,
-              color: AppColors.systemBlue.withOpacity(0.6),
-              height: 1.2,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 }
 
-// ─── Recommendation Card ──────────────────────────────────────────────────────────
+// ─── Recommendation Card ──────────────────────────────────────────────────────
 class _RecommendationCard extends StatelessWidget {
   const _RecommendationCard();
 
@@ -250,18 +296,19 @@ class _RecommendationCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 48,
-                height: 48,
+                width: 40,
+                height: 40,
                 decoration: BoxDecoration(
-                  color: AppColors.systemBlue.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  color: AppColors.systemPurple.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
-                  CupertinoIcons.home,
-                  color: AppColors.systemBlue,
-                  size: 24,
+                  CupertinoIcons.sparkles,
+                  color: AppColors.systemPurple,
+                  size: 20,
                 ),
               ),
               const SizedBox(width: 12),
@@ -269,23 +316,36 @@ class _RecommendationCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'RECOMENDACIÓN IA',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 1.0,
-                        color: AppColors.systemBlue,
-                        height: 1.4,
+                        color: AppColors.systemPurple,
                       ),
                     ),
                     const SizedBox(height: 6),
-                    Text(
-                      'Basado en tus gastos en Tacos El Güero, te recomendamos: \nComer fuera vs. Cocinar',
+                    const Text(
+                      'Basado en tus gastos en Tacos El Güero, te recomendamos aprender sobre comer fuera vs. cocinar en casa.',
                       style: TextStyle(
                         fontSize: 13,
                         color: AppColors.label,
-                        height: 1.4,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      minSize: 0,
+                      onPressed: () => HapticFeedback.selectionClick(),
+                      child: const Text(
+                        'Ver lección →',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.systemPurple,
+                        ),
                       ),
                     ),
                   ],
@@ -299,140 +359,124 @@ class _RecommendationCard extends StatelessWidget {
   }
 }
 
-// ─── Learning Roadmap ─────────────────────────────────────────────────────────────
+// ─── Learning Roadmap ─────────────────────────────────────────────────────────
+enum _NodeStatus { completed, active, locked }
+
+class _NodeData {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final Color color;
+  final _NodeStatus status;
+  const _NodeData({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.color,
+    required this.status,
+  });
+}
+
 class _LearningRoadmap extends StatelessWidget {
   const _LearningRoadmap();
+
+  static const _nodes = [
+    _NodeData(
+      title: 'Conceptos Base',
+      subtitle: 'Fundamentos del dinero',
+      icon: CupertinoIcons.checkmark_seal_fill,
+      color: AppColors.systemGreen,
+      status: _NodeStatus.completed,
+    ),
+    _NodeData(
+      title: 'Ahorro Activo',
+      subtitle: 'Hábitos que funcionan',
+      icon: CupertinoIcons.checkmark_seal_fill,
+      color: AppColors.systemBlue,
+      status: _NodeStatus.completed,
+    ),
+    _NodeData(
+      title: 'Comer fuera vs. Cocinar',
+      subtitle: '5 min · Lección actual',
+      icon: CupertinoIcons.flame_fill,
+      color: AppColors.systemOrange,
+      status: _NodeStatus.active,
+    ),
+    _NodeData(
+      title: 'Inversión 101',
+      subtitle: 'Tu dinero trabajando',
+      icon: CupertinoIcons.graph_circle_fill,
+      color: AppColors.systemPurple,
+      status: _NodeStatus.locked,
+    ),
+    _NodeData(
+      title: 'Crédito Inteligente',
+      subtitle: 'Usar sin endeudarse',
+      icon: CupertinoIcons.creditcard_fill,
+      color: AppColors.systemIndigo,
+      status: _NodeStatus.locked,
+    ),
+    _NodeData(
+      title: 'Libertad Financiera',
+      subtitle: 'El objetivo final',
+      icon: CupertinoIcons.star_fill,
+      color: AppColors.systemOrange,
+      status: _NodeStatus.locked,
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Path visualization
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppColors.white05,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.white07),
-            ),
-            child: Column(
+          // Section label
+          Padding(
+            padding: const EdgeInsets.only(left: 4, bottom: 14),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Node 1: Conceptos Base (Completed)
-                _RoadmapNode(
-                  title: 'Conceptos Base',
-                  status: _NodeStatus.completed,
-                  icon: CupertinoIcons.check_mark_circled,
-                  color: AppColors.systemBlue,
-                ),
-
-                // Curved connection line
-                Container(
-                  height: 40,
-                  child: Center(
-                    child: CustomPaint(
-                      size: Size(4, 30),
-                      painter: _CurvedLinePainter(
-                        color: AppColors.systemBlue.withOpacity(0.3),
-                      ),
-                    ),
+                const Text(
+                  'RUTA DE APRENDIZAJE',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.6,
+                    color: AppColors.secondaryLabel,
+                    height: 1.33,
                   ),
                 ),
-
-                // Node 2: Ahorro Activo (Completed)
-                _RoadmapNode(
-                  title: 'Ahorro Activo',
-                  status: _NodeStatus.completed,
-                  icon: CupertinoIcons.check_mark_circled,
-                  color: AppColors.systemBlue,
-                ),
-
-                // Curved connection line
                 Container(
-                  height: 40,
-                  child: Center(
-                    child: CustomPaint(
-                      size: Size(4, 30),
-                      painter: _CurvedLinePainter(
-                        color: AppColors.systemBlue.withOpacity(0.3),
-                      ),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: AppColors.systemBlue.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    '2 de 6',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.systemBlue,
                     ),
                   ),
-                ),
-
-                // Node 3: Current (Comer fuera vs. Cocinar)
-                _RoadmapNode(
-                  title: 'Comer fuera vs. Cocinar',
-                  status: _NodeStatus.active,
-                  icon: CupertinoIcons.home,
-                  color: AppColors.systemBlue,
-                ),
-
-                // Curved connection line
-                Container(
-                  height: 40,
-                  child: Center(
-                    child: CustomPaint(
-                      size: Size(4, 30),
-                      painter: _CurvedLinePainter(
-                        color: AppColors.tertiaryLabel.withOpacity(0.3),
-                      ),
-                    ),
-                  ),
-                ),
-
-                // Node 4: Inversión 101 (Locked)
-                _RoadmapNode(
-                  title: 'Inversión 101',
-                  status: _NodeStatus.locked,
-                  icon: CupertinoIcons.lock,
-                  color: AppColors.tertiaryLabel,
-                ),
-
-                // Curved connection line
-                Container(
-                  height: 40,
-                  child: Center(
-                    child: CustomPaint(
-                      size: Size(4, 30),
-                      painter: _CurvedLinePainter(
-                        color: AppColors.tertiaryLabel.withOpacity(0.3),
-                      ),
-                    ),
-                  ),
-                ),
-
-                // Node 5: Crédito Inteligente (Locked)
-                _RoadmapNode(
-                  title: 'Crédito Inteligente',
-                  status: _NodeStatus.locked,
-                  icon: CupertinoIcons.creditcard_fill,
-                  color: AppColors.tertiaryLabel,
-                ),
-
-                // Curved connection line
-                Container(
-                  height: 40,
-                  child: Center(
-                    child: CustomPaint(
-                      size: Size(4, 30),
-                      painter: _CurvedLinePainter(
-                        color: AppColors.tertiaryLabel.withOpacity(0.3),
-                      ),
-                    ),
-                  ),
-                ),
-
-                // Node 6: Final Boss (Libertad Financiera)
-                _RoadmapNode(
-                  title: 'Libertad Financiera',
-                  status: _NodeStatus.locked,
-                  icon: CupertinoIcons.star,
-                  color: AppColors.tertiaryLabel,
                 ),
               ],
             ),
+          ),
+          // 2-column grid
+          GridView.count(
+            crossAxisCount: 2,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 1.05,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: _nodes
+                .map((node) => _LessonCard(node: node))
+                .toList(),
           ),
         ],
       ),
@@ -440,112 +484,119 @@ class _LearningRoadmap extends StatelessWidget {
   }
 }
 
-// ─── Curved Line Painter ──────────────────────────────────────────────────────────
-class _CurvedLinePainter extends CustomPainter {
-  final Color color;
-
-  _CurvedLinePainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 4
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
-
-    final path = Path();
-    path.moveTo(size.width / 2, 0);
-    path.quadraticBezierTo(
-      size.width / 2,
-      size.height / 2,
-      size.width / 2,
-      size.height,
-    );
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(_CurvedLinePainter oldDelegate) =>
-      oldDelegate.color != color;
-}
-
-// ─── Roadmap Node Status Enum ─────────────────────────────────────────────────────
-enum _NodeStatus { completed, active, locked }
-
-// ─── Roadmap Node ─────────────────────────────────────────────────────────────────
-class _RoadmapNode extends StatelessWidget {
-  final String title;
-  final _NodeStatus status;
-  final IconData icon;
-  final Color color;
-
-  const _RoadmapNode({
-    required this.title,
-    required this.status,
-    required this.icon,
-    required this.color,
-  });
+// ─── Lesson Card ──────────────────────────────────────────────────────────────
+class _LessonCard extends StatelessWidget {
+  final _NodeData node;
+  const _LessonCard({required this.node});
 
   @override
   Widget build(BuildContext context) {
-    Color bgColor;
-    Color borderColor;
-    bool isInteractive = false;
+    final isCompleted = node.status == _NodeStatus.completed;
+    final isActive    = node.status == _NodeStatus.active;
+    final isLocked    = node.status == _NodeStatus.locked;
 
-    switch (status) {
-      case _NodeStatus.completed:
-        bgColor = AppColors.systemBlue.withOpacity(0.15);
-        borderColor = AppColors.systemBlue.withOpacity(0.3);
-        break;
-      case _NodeStatus.active:
-        bgColor = AppColors.systemBlue.withOpacity(0.25);
-        borderColor = AppColors.systemBlue;
-        isInteractive = true;
-        break;
-      case _NodeStatus.locked:
-        bgColor = AppColors.tertiaryBackground;
-        borderColor = AppColors.separator;
-        break;
-    }
+    final Color cardColor   = isLocked ? AppColors.white05 : node.color.withOpacity(0.10);
+    final Color borderColor = isLocked ? AppColors.white07 : node.color.withOpacity(0.22);
+    final Color iconBg      = isLocked ? AppColors.white07 : node.color.withOpacity(0.18);
+    final Color iconColor   = isLocked ? AppColors.tertiaryLabel : node.color;
+    final Color titleColor  = isLocked ? AppColors.secondaryLabel : AppColors.label;
+    final Color subColor    = isLocked ? AppColors.tertiaryLabel : node.color;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Column(
-        children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: bgColor,
-              border: Border.all(color: borderColor),
-              borderRadius: BorderRadius.circular(32),
-            ),
-            child: Center(
-              child: Icon(
-                icon,
-                color: status == _NodeStatus.active
-                    ? AppColors.systemBlue
-                    : color,
-                size: status == _NodeStatus.active ? 28 : 24,
+    return CupertinoButton(
+      padding: EdgeInsets.zero,
+      onPressed: isLocked ? null : () => HapticFeedback.selectionClick(),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isActive ? node.color.withOpacity(0.55) : borderColor,
+            width: isActive ? 1.5 : 1,
+          ),
+          boxShadow: isActive
+              ? [
+                  BoxShadow(
+                    color: node.color.withOpacity(0.18),
+                    blurRadius: 14,
+                    spreadRadius: 1,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : null,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: iconBg,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(node.icon, color: iconColor, size: 18),
+                  ),
+                  if (isCompleted)
+                    const Icon(
+                      CupertinoIcons.checkmark_circle_fill,
+                      color: AppColors.systemGreen,
+                      size: 18,
+                    )
+                  else if (isActive)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: node.color.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        'Ahora',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: node.color,
+                        ),
+                      ),
+                    )
+                  else
+                    Icon(
+                      CupertinoIcons.lock_fill,
+                      color: AppColors.tertiaryLabel,
+                      size: 14,
+                    ),
+                ],
               ),
-            ),
+              const Spacer(),
+              Text(
+                node.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: titleColor,
+                  height: 1.3,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                node.subtitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: subColor,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
-              color: status == _NodeStatus.locked
-                  ? AppColors.tertiaryLabel
-                  : color,
-              height: 1.2,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
