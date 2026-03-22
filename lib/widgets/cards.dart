@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../screens/insights_screen.dart';
 
 // ─── Tip Card ─────────────────────────────────────────────────────────────────
 class TipCard extends StatelessWidget {
@@ -29,9 +30,13 @@ class TipCard extends StatelessWidget {
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
                 child: SizedBox(
-                  width: 36, height: 36,
-                  child: Icon(CupertinoIcons.lightbulb_fill,
-                      color: AppColors.systemBlue, size: 18),
+                  width: 36,
+                  height: 36,
+                  child: Icon(
+                    CupertinoIcons.lightbulb_fill,
+                    color: AppColors.systemBlue,
+                    size: 18,
+                  ),
                 ),
               ),
               SizedBox(width: 12),
@@ -64,8 +69,11 @@ class TipCard extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 8),
-              Icon(CupertinoIcons.chevron_right,
-                  size: 14, color: AppColors.secondaryLabel),
+              Icon(
+                CupertinoIcons.chevron_right,
+                size: 14,
+                color: AppColors.secondaryLabel,
+              ),
             ],
           ),
         ),
@@ -104,9 +112,11 @@ class BankPromoCard extends StatelessWidget {
           child: Stack(
             children: [
               Positioned(
-                right: -30, top: -30,
+                right: -30,
+                top: -30,
                 child: Container(
-                  width: 130, height: 130,
+                  width: 130,
+                  height: 130,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     color: Color(0x1A0A84FF),
@@ -114,9 +124,11 @@ class BankPromoCard extends StatelessWidget {
                 ),
               ),
               Positioned(
-                right: 20, bottom: -40,
+                right: 20,
+                bottom: -40,
                 child: Container(
-                  width: 100, height: 100,
+                  width: 100,
+                  height: 100,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     color: Color(0x120A84FF),
@@ -133,10 +145,15 @@ class BankPromoCard extends StatelessWidget {
                         color: const Color(0x330A84FF),
                         borderRadius: BorderRadius.circular(999),
                         border: Border.all(
-                            color: const Color(0x4D0A84FF), width: 0.5),
+                          color: const Color(0x4D0A84FF),
+                          width: 0.5,
+                        ),
                       ),
                       child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         child: Text(
                           'NUEVO · CUENTA DIGITAL',
                           style: TextStyle(
@@ -189,7 +206,10 @@ class BankPromoCard extends StatelessWidget {
                             ],
                           ),
                           child: const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 18,
+                              vertical: 10,
+                            ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -203,8 +223,11 @@ class BankPromoCard extends StatelessWidget {
                                   ),
                                 ),
                                 SizedBox(width: 6),
-                                Icon(CupertinoIcons.arrow_right,
-                                    size: 12, color: AppColors.label),
+                                Icon(
+                                  CupertinoIcons.arrow_right,
+                                  size: 12,
+                                  color: AppColors.label,
+                                ),
                               ],
                             ),
                           ),
@@ -253,63 +276,78 @@ class WeeklySummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.white05,
-          borderRadius: BorderRadius.all(Radius.circular(16)),
-          border: Border.fromBorderSide(BorderSide(color: AppColors.white07)),
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'RESUMEN SEMANAL',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.6,
-                  color: AppColors.secondaryLabel,
-                  height: 1.33,
+    return GestureDetector(
+      onTap: () {
+        // Navigate to insights tab (index 1)
+        // We need to access the AppShell state to change the tab
+        // For simplicity, we'll navigate to the insights screen directly
+        Navigator.of(context).push(
+          CupertinoPageRoute(
+            builder: (context) =>
+                InsightsScreen(scrollController: ScrollController()),
+          ),
+        );
+      },
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.white05,
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+            border: Border.fromBorderSide(BorderSide(color: AppColors.white07)),
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'RESUMEN SEMANAL',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.6,
+                    color: AppColors.secondaryLabel,
+                    height: 1.33,
+                  ),
                 ),
-              ),
-              SizedBox(height: 8),
-              Text('Vas por buen camino 🚀', style: AppTextStyles.title3),
-              SizedBox(height: 4),
-              Text(
-                'Ahorraste \$240 más que la semana pasada.',
-                style: AppTextStyles.subheadline,
-              ),
-              SizedBox(height: 16),
-              ClipRRect(
-                borderRadius: BorderRadius.all(Radius.circular(999)),
-                child: LinearProgressIndicator(
-                  value: 0.68,
-                  minHeight: 6,
-                  backgroundColor: AppColors.tertiaryFill,
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.systemGreen),
+                SizedBox(height: 8),
+                Text('Vas por buen camino 🚀', style: AppTextStyles.title3),
+                SizedBox(height: 4),
+                Text(
+                  'Ahorraste \$240 más que la semana pasada.',
+                  style: AppTextStyles.subheadline,
                 ),
-              ),
-              SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Meta semanal', style: AppTextStyles.caption1),
-                  Text(
-                    '68%',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.systemGreen,
-                      height: 1.33,
+                SizedBox(height: 16),
+                ClipRRect(
+                  borderRadius: BorderRadius.all(Radius.circular(999)),
+                  child: LinearProgressIndicator(
+                    value: 0.68,
+                    minHeight: 6,
+                    backgroundColor: AppColors.tertiaryFill,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.systemGreen,
                     ),
                   ),
-                ],
-              ),
-            ],
+                ),
+                SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Meta semanal', style: AppTextStyles.caption1),
+                    Text(
+                      '68%',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.systemGreen,
+                        height: 1.33,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

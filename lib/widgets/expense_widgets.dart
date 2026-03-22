@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../models/expense_data.dart';
 import '../theme/app_theme.dart';
+import '../screens/expense_detail_screen.dart';
 
 // ─── Expense Row ──────────────────────────────────────────────────────────────
 class ExpenseRow extends StatelessWidget {
@@ -11,76 +12,87 @@ class ExpenseRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(
-          height: 60,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(
-                      (data.iconColor.r * 255.0).round().clamp(0, 255),
-                      (data.iconColor.g * 255.0).round().clamp(0, 255),
-                      (data.iconColor.b * 255.0).round().clamp(0, 255),
-                      0.15,
-                    ),
-                    borderRadius: const BorderRadius.all(Radius.circular(9)),
-                  ),
-                  child: SizedBox(
-                    width: 36, height: 36,
-                    child: Icon(data.icon, color: data.iconColor, size: 18),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        data.title,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: -0.32,
-                          color: AppColors.label,
-                          height: 1.31,
-                        ),
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          CupertinoPageRoute(builder: (context) => const ExpenseDetailScreen()),
+        );
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            height: 60,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(
+                        (data.iconColor.r * 255.0).round().clamp(0, 255),
+                        (data.iconColor.g * 255.0).round().clamp(0, 255),
+                        (data.iconColor.b * 255.0).round().clamp(0, 255),
+                        0.15,
                       ),
-                      const SizedBox(height: 1),
-                      Text(data.subtitle, style: AppTextStyles.caption1),
-                    ],
+                      borderRadius: const BorderRadius.all(Radius.circular(9)),
+                    ),
+                    child: SizedBox(
+                      width: 36,
+                      height: 36,
+                      child: Icon(data.icon, color: data.iconColor, size: 18),
+                    ),
                   ),
-                ),
-                Text(
-                  data.amount,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: -0.32,
-                    color: AppColors.label,
-                    height: 1.31,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          data.title,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: -0.32,
+                            color: AppColors.label,
+                            height: 1.31,
+                          ),
+                        ),
+                        const SizedBox(height: 1),
+                        Text(data.subtitle, style: AppTextStyles.caption1),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(width: 4),
-                const Icon(CupertinoIcons.chevron_right,
-                    size: 13, color: AppColors.tertiaryLabel),
-              ],
+                  Text(
+                    data.amount,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: -0.32,
+                      color: AppColors.label,
+                      height: 1.31,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(
+                    CupertinoIcons.chevron_right,
+                    size: 13,
+                    color: AppColors.tertiaryLabel,
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        const Padding(
-          padding: EdgeInsets.only(left: 64),
-          child: ColoredBox(
-            color: AppColors.separator,
-            child: SizedBox(height: 0.5, width: double.infinity),
+          const Padding(
+            padding: EdgeInsets.only(left: 64),
+            child: ColoredBox(
+              color: AppColors.separator,
+              child: SizedBox(height: 0.5, width: double.infinity),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -90,7 +102,11 @@ class ShowMoreButton extends StatelessWidget {
   final bool expanded;
   final VoidCallback onTap;
 
-  const ShowMoreButton({super.key, required this.expanded, required this.onTap});
+  const ShowMoreButton({
+    super.key,
+    required this.expanded,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +115,9 @@ class ShowMoreButton extends StatelessWidget {
       onTap: onTap,
       child: DecoratedBox(
         decoration: const BoxDecoration(
-          border: Border(top: BorderSide(color: AppColors.separator, width: 0.5)),
+          border: Border(
+            top: BorderSide(color: AppColors.separator, width: 0.5),
+          ),
         ),
         child: SizedBox(
           height: 48,
@@ -135,8 +153,11 @@ class ShowMoreButton extends StatelessWidget {
                 turns: expanded ? 0.5 : 0.0,
                 duration: const Duration(milliseconds: 280),
                 curve: Curves.easeOutCubic,
-                child: const Icon(CupertinoIcons.chevron_down,
-                    size: 12, color: AppColors.systemBlue),
+                child: const Icon(
+                  CupertinoIcons.chevron_down,
+                  size: 12,
+                  color: AppColors.systemBlue,
+                ),
               ),
             ],
           ),
@@ -148,10 +169,10 @@ class ShowMoreButton extends StatelessWidget {
 
 // ─── Filter Pill ──────────────────────────────────────────────────────────────
 class FilterPill extends StatelessWidget {
-  final String       label;
-  final bool         selected;
+  final String label;
+  final bool selected;
   final VoidCallback onTap;
-  final double?      width;
+  final double? width;
 
   const FilterPill({
     super.key,
@@ -209,19 +230,19 @@ class FilterPill extends StatelessWidget {
 
 // ─── Filter Pill Pager ────────────────────────────────────────────────────────
 class PillPager extends StatelessWidget {
-  final List<String>         categories;
-  final String               selectedFilter;
-  final PageController       pageController;
-  final int                  currentPage;
-  final ValueChanged<int>    onPageChanged;
+  final List<String> categories;
+  final String selectedFilter;
+  final PageController pageController;
+  final int currentPage;
+  final ValueChanged<int> onPageChanged;
   final ValueChanged<String> onFilterSelected;
-  final VoidCallback         onAddCategory;
+  final VoidCallback onAddCategory;
 
-  static const int    _pillsPerPage = 3;
-  static const double _pillGap      = 8.0;
-  static const double _addBtnWidth  = 32.0;
-  static const double _addBtnGap    = 8.0;
-  static const double _pillHeight   = 32.0;
+  static const int _pillsPerPage = 3;
+  static const double _pillGap = 8.0;
+  static const double _addBtnWidth = 32.0;
+  static const double _addBtnGap = 8.0;
+  static const double _pillHeight = 32.0;
 
   const PillPager({
     super.key,
@@ -242,9 +263,13 @@ class PillPager extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final pageViewWidth = constraints.maxWidth - _addBtnWidth - _addBtnGap;
+          final pageViewWidth =
+              constraints.maxWidth - _addBtnWidth - _addBtnGap;
           const interPageGap = 16.0;
-          final pillWidth = ((pageViewWidth - interPageGap) - (_pillsPerPage - 1) * _pillGap) / _pillsPerPage;
+          final pillWidth =
+              ((pageViewWidth - interPageGap) -
+                  (_pillsPerPage - 1) * _pillGap) /
+              _pillsPerPage;
           final pageCount = _pageCount();
 
           return Column(
@@ -262,8 +287,11 @@ class PillPager extends StatelessWidget {
                       onPageChanged: onPageChanged,
                       physics: const BouncingScrollPhysics(),
                       itemBuilder: (context, pageIndex) {
-                        final start    = pageIndex * _pillsPerPage;
-                        final end      = (start + _pillsPerPage).clamp(0, categories.length);
+                        final start = pageIndex * _pillsPerPage;
+                        final end = (start + _pillsPerPage).clamp(
+                          0,
+                          categories.length,
+                        );
                         final pageCats = categories.sublist(start, end);
 
                         return Padding(

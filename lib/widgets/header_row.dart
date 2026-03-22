@@ -3,12 +3,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../theme/app_theme.dart';
+import '../screens/user_account_screen.dart';
+import '../screens/notification_screen.dart';
 
 // ─── Header Row ───────────────────────────────────────────────────────────────
 class HeaderRow extends StatelessWidget {
   final ValueNotifier<double> searchBarOpacity;
+  final VoidCallback? onSearchPressed;
 
-  const HeaderRow({super.key, required this.searchBarOpacity});
+  const HeaderRow({
+    super.key,
+    required this.searchBarOpacity,
+    this.onSearchPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +46,15 @@ class HeaderRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 GestureDetector(
-                  onTap: () => HapticFeedback.lightImpact(),
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    // Navigate to user account screen
+                    Navigator.of(context).push(
+                      CupertinoPageRoute(
+                        builder: (context) => const UserAccountScreen(),
+                      ),
+                    );
+                  },
                   child: Container(
                     width: avatarW,
                     height: avatarW,
@@ -102,16 +117,7 @@ class HeaderRow extends StatelessWidget {
                                       size: 16,
                                     ),
                                     SizedBox(width: 6),
-                                    Expanded(
-                                      child: Text(
-                                        'Buscar',
-                                        overflow: TextOverflow.fade,
-                                        maxLines: 1,
-                                        softWrap: false,
-                                        style: AppTextStyles.subheadline,
-                                      ),
-                                    ),
-                                    SizedBox(width: 12),
+                                    SizedBox(width: 16),
                                   ],
                                 ),
                               ),
@@ -123,18 +129,18 @@ class HeaderRow extends StatelessWidget {
                               maxWidth: double.infinity,
                               child: SizedBox(
                                 width: maxSearchW,
-                                child: const Row(
+                                child: Row(
                                   children: [
-                                    SizedBox(width: 12),
-                                    Icon(
+                                    const SizedBox(width: 12),
+                                    const Icon(
                                       CupertinoIcons.search,
                                       color: AppColors.secondaryLabel,
                                       size: 16,
                                     ),
-                                    SizedBox(width: 6),
+                                    const SizedBox(width: 6),
                                     Expanded(
                                       child: CupertinoTextField(
-                                        placeholder: 'Buscar',
+                                        placeholder: 'Chatear con tu asistente',
                                         placeholderStyle:
                                             AppTextStyles.subheadline,
                                         style: TextStyle(
@@ -145,9 +151,11 @@ class HeaderRow extends StatelessWidget {
                                         ),
                                         decoration: BoxDecoration(),
                                         padding: EdgeInsets.zero,
+                                        onTap:
+                                            onSearchPressed, // Use the callback passed from parent
                                       ),
                                     ),
-                                    SizedBox(width: 12),
+                                    const SizedBox(width: 12),
                                   ],
                                 ),
                               ),
@@ -190,7 +198,16 @@ class NavButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => HapticFeedback.lightImpact(),
+      onTap: () {
+        HapticFeedback.lightImpact();
+        if (icon == CupertinoIcons.bell) {
+          Navigator.of(context).push(
+            CupertinoPageRoute(
+              builder: (context) => const NotificationScreen(),
+            ),
+          );
+        }
+      },
       child: SizedBox(
         width: 44,
         height: 44,

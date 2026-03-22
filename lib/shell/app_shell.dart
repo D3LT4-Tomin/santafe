@@ -4,10 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../screens/aprender_screen.dart';
+import '../screens/cuenta_screen.dart';
 import '../screens/dashboard_screen.dart';
 import '../screens/insights_screen.dart';
-import '../screens/cuenta_screen.dart';
+import '../screens/aprender_screen.dart';
 import '../theme/app_theme.dart';
 import '../widgets/add_expense_sheet.dart';
 import '../widgets/buttons.dart';
@@ -50,7 +50,7 @@ class _AppShellState extends State<AppShell> {
       DashboardScreen(scrollController: _scrollControllers[0]),
       InsightsScreen(scrollController: _scrollControllers[1]),
       CuentaScreen(scrollController: _scrollControllers[2]),
-      const AprenderScreen(),
+      AprenderScreen(scrollController: _scrollControllers[3]),
     ];
 
     _pageController.addListener(() {
@@ -116,11 +116,7 @@ class _AppShellState extends State<AppShell> {
     }
 
     _setSelectedIndex(index);
-    _pageController.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-    );
+    _pageController.jumpToPage(index);
   }
 
   void _showAddExpenseSheet() {
@@ -129,6 +125,13 @@ class _AppShellState extends State<AppShell> {
       context: context,
       builder: (_) => const AddExpenseSheet(),
     );
+  }
+
+  void _showSearchChat() {
+    HapticFeedback.mediumImpact();
+    // For now just print the action, but in the future this would
+    // show a chat interface that compresses the content
+    print('Opening chat with financial assistant');
   }
 
   Future<bool> _onWillPop() async {
@@ -238,7 +241,10 @@ class _AppShellState extends State<AppShell> {
         left: 16,
         right: 8,
       ),
-      child: HeaderRow(searchBarOpacity: _searchBarOpacity),
+      child: HeaderRow(
+        searchBarOpacity: _searchBarOpacity,
+        onSearchPressed: () => _showSearchChat(),
+      ),
     );
   }
 }
