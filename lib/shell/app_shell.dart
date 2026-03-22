@@ -8,6 +8,7 @@ import '../screens/cuenta_screen.dart';
 import '../screens/dashboard_screen.dart';
 import '../screens/insights_screen.dart';
 import '../screens/aprender_screen.dart';
+import '../screens/user_account_screen.dart';
 import '../theme/app_theme.dart';
 import '../widgets/add_expense_sheet.dart';
 import '../widgets/buttons.dart';
@@ -115,8 +116,24 @@ class _AppShellState extends State<AppShell> {
       return;
     }
 
+    // Save the current tab index before changing
+    final previousTabIndex = _selectedIndex;
+
     _setSelectedIndex(index);
     _pageController.jumpToPage(index);
+
+    // Pass the previous tab index to the user account screen if navigating there
+    if (index == 2) {
+      // Assuming user account is tab 2
+      _navigatorKeys[index].currentState?.push(
+        CupertinoPageRoute(
+          builder: (context) => UserAccountScreen(
+            scrollController: _scrollControllers[index],
+            previousTabIndex: previousTabIndex,
+          ),
+        ),
+      );
+    }
   }
 
   void _showAddExpenseSheet() {
