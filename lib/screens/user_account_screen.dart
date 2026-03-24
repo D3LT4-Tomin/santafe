@@ -8,12 +8,7 @@ import '../widgets/animated_blobs.dart';
 
 class UserAccountScreen extends StatefulWidget {
   final ScrollController? scrollController;
-  final int? previousTabIndex;
-  const UserAccountScreen({
-    super.key,
-    this.scrollController,
-    this.previousTabIndex,
-  });
+  const UserAccountScreen({super.key, this.scrollController});
 
   @override
   State<UserAccountScreen> createState() => _UserAccountScreenState();
@@ -29,9 +24,9 @@ class _UserAccountScreenState extends State<UserAccountScreen>
   late Animation<double> _appearAnim;
 
   // Notification toggles
-  bool _notifGastos = true;
-  bool _notifMetas = true;
-  bool _notifResumen = false;
+  bool _notifGastos      = true;
+  bool _notifMetas       = true;
+  bool _notifResumen     = false;
   bool _notifPromociones = false;
 
   @override
@@ -45,14 +40,8 @@ class _UserAccountScreenState extends State<UserAccountScreen>
       vsync: this,
       duration: const Duration(seconds: 18),
     )..repeat(reverse: true);
-    _blob1Anim = CurvedAnimation(
-      parent: _blob1Controller,
-      curve: Curves.easeInOut,
-    );
-    _blob2Anim = CurvedAnimation(
-      parent: _blob2Controller,
-      curve: Curves.easeInOut,
-    );
+    _blob1Anim = CurvedAnimation(parent: _blob1Controller, curve: Curves.easeInOut);
+    _blob2Anim = CurvedAnimation(parent: _blob2Controller, curve: Curves.easeInOut);
 
     _appearController = AnimationController(
       vsync: this,
@@ -97,11 +86,11 @@ class _UserAccountScreenState extends State<UserAccountScreen>
                 child: Column(
                   children: [
                     // ── Avatar header ─────────────────────────────────
-                    _AvatarHeader(),
+                    const _AvatarHeader(),
                     const SizedBox(height: 28),
 
                     // ── Suscripción ───────────────────────────────────
-                    _SubscriptionCard(),
+                    const _SubscriptionCard(),
                     const SizedBox(height: 28),
 
                     // ── Configuración general ─────────────────────────
@@ -206,8 +195,7 @@ class _UserAccountScreenState extends State<UserAccountScreen>
                           label: 'Promociones',
                           subtitle: 'Ofertas y novedades de Finanzas',
                           value: _notifPromociones,
-                          onChanged: (v) =>
-                              setState(() => _notifPromociones = v),
+                          onChanged: (v) => setState(() => _notifPromociones = v),
                           isLast: true,
                         ),
                       ],
@@ -215,7 +203,7 @@ class _UserAccountScreenState extends State<UserAccountScreen>
                     const SizedBox(height: 28),
 
                     // ── Cerrar sesión ─────────────────────────────────
-                    _SignOutButton(),
+                    const _SignOutButton(),
                     const SizedBox(height: 12),
 
                     // ── Version ───────────────────────────────────────
@@ -234,6 +222,609 @@ class _UserAccountScreenState extends State<UserAccountScreen>
           ),
         ),
       ],
+    );
+  }
+}
+
+// ─── Avatar Header ────────────────────────────────────────────────────────────
+class _AvatarHeader extends StatelessWidget {
+  const _AvatarHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.white05,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.white07),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            children: [
+              // Avatar
+              Stack(
+                children: [
+                  Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Color(0xFF0A84FF), Color(0xFF409CFF)],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.systemBlue.withOpacity(0.3),
+                          blurRadius: 14,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Center(
+                      child: Text(
+                        'JF',
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w700,
+                          color: CupertinoColors.white,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Edit badge
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: AppColors.secondaryBackground,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.white07, width: 1.5),
+                      ),
+                      child: const Icon(
+                        CupertinoIcons.pencil,
+                        size: 12,
+                        color: AppColors.secondaryLabel,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 16),
+              // Name + email
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Jovany Flores',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.label,
+                        height: 1.2,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    const Text(
+                      'jovany@ejemplo.com',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppColors.secondaryLabel,
+                        height: 1.33,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      minSize: 0,
+                      onPressed: () => HapticFeedback.selectionClick(),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.systemBlue.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: AppColors.systemBlue.withOpacity(0.2),
+                          ),
+                        ),
+                        child: const Text(
+                          'Editar perfil',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.systemBlue,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Subscription Card ────────────────────────────────────────────────────────
+class _SubscriptionCard extends StatelessWidget {
+  const _SubscriptionCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF1A1040), Color(0xFF0D1F40)],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: AppColors.systemPurple.withOpacity(0.3),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.systemPurple.withOpacity(0.15),
+              blurRadius: 20,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: AppColors.systemPurple.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          CupertinoIcons.sparkles,
+                          color: AppColors.systemPurple,
+                          size: 16,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      const Text(
+                        'Finanzas Pro',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: CupertinoColors.white,
+                          letterSpacing: -0.2,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.systemPurple.withOpacity(0.25),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: AppColors.systemPurple.withOpacity(0.4),
+                      ),
+                    ),
+                    child: const Text(
+                      'ACTIVO',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.8,
+                        color: AppColors.systemPurple,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              const ColoredBox(
+                color: Color(0x1AFFFFFF),
+                child: SizedBox(height: 0.5, width: double.infinity),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  _PlanFeature(
+                    icon: CupertinoIcons.checkmark_circle_fill,
+                    label: 'Cuentas ilimitadas',
+                  ),
+                  const SizedBox(width: 16),
+                  _PlanFeature(
+                    icon: CupertinoIcons.checkmark_circle_fill,
+                    label: 'IA personalizada',
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  _PlanFeature(
+                    icon: CupertinoIcons.checkmark_circle_fill,
+                    label: 'Exportar datos',
+                  ),
+                  const SizedBox(width: 16),
+                  _PlanFeature(
+                    icon: CupertinoIcons.checkmark_circle_fill,
+                    label: 'Sin anuncios',
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Se renueva el 15 de abril',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Color(0x99FFFFFF),
+                    ),
+                  ),
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    minSize: 0,
+                    onPressed: () => HapticFeedback.selectionClick(),
+                    child: const Text(
+                      'Gestionar',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.systemPurple,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PlanFeature extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  const _PlanFeature({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Row(
+        children: [
+          Icon(icon, color: AppColors.systemPurple, size: 13),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 12,
+                color: Color(0xCCFFFFFF),
+                height: 1.3,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Settings Section ─────────────────────────────────────────────────────────
+class _SettingsSection extends StatelessWidget {
+  final String title;
+  final List<Widget> rows;
+  const _SettingsSection({required this.title, required this.rows});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 4, bottom: 10),
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.6,
+                color: AppColors.secondaryLabel,
+                height: 1.33,
+              ),
+            ),
+          ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.white05,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.white07),
+            ),
+            child: Column(children: rows),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Shared row separator ─────────────────────────────────────────────────────
+class _RowSeparator extends StatelessWidget {
+  const _RowSeparator();
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.only(left: 56),
+      child: ColoredBox(
+        color: AppColors.separator,
+        child: SizedBox(height: 0.5, width: double.infinity),
+      ),
+    );
+  }
+}
+
+// ─── Settings Row ─────────────────────────────────────────────────────────────
+class _SettingsRow extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String label;
+  final Widget trailing;
+  final VoidCallback onTap;
+  final bool isDestructive;
+  final bool isLast;
+
+  const _SettingsRow({
+    required this.icon,
+    required this.color,
+    required this.label,
+    required this.trailing,
+    required this.onTap,
+    this.isDestructive = false,
+    this.isLast = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: () {
+            HapticFeedback.selectionClick();
+            onTap();
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+            child: Row(
+              children: [
+                Container(
+                  width: 30,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    color: isDestructive
+                        ? AppColors.systemRed.withOpacity(0.12)
+                        : color.withOpacity(0.14),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    icon,
+                    size: 16,
+                    color: isDestructive ? AppColors.systemRed : color,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: isDestructive
+                          ? AppColors.systemRed
+                          : AppColors.label,
+                      height: 1.33,
+                    ),
+                  ),
+                ),
+                trailing,
+              ],
+            ),
+          ),
+        ),
+        if (!isLast) const _RowSeparator(),
+      ],
+    );
+  }
+}
+
+// ─── Toggle Row ───────────────────────────────────────────────────────────────
+class _ToggleRow extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String label;
+  final String subtitle;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+  final bool isLast;
+
+  const _ToggleRow({
+    required this.icon,
+    required this.color,
+    required this.label,
+    required this.subtitle,
+    required this.value,
+    required this.onChanged,
+    this.isLast = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.14),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, size: 16, color: color),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.label,
+                        height: 1.33,
+                      ),
+                    ),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.secondaryLabel,
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              CupertinoSwitch(
+                value: value,
+                activeColor: AppColors.systemBlue,
+                onChanged: (v) {
+                  HapticFeedback.selectionClick();
+                  onChanged(v);
+                },
+              ),
+            ],
+          ),
+        ),
+        if (!isLast) const _RowSeparator(),
+      ],
+    );
+  }
+}
+
+// ─── Trailing helpers ─────────────────────────────────────────────────────────
+class _TrailingChevron extends StatelessWidget {
+  const _TrailingChevron();
+  @override
+  Widget build(BuildContext context) {
+    return const Icon(
+      CupertinoIcons.chevron_right,
+      size: 14,
+      color: AppColors.tertiaryLabel,
+    );
+  }
+}
+
+class _TrailingValue extends StatelessWidget {
+  final String value;
+  const _TrailingValue(this.value);
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 14,
+            color: AppColors.secondaryLabel,
+          ),
+        ),
+        const SizedBox(width: 4),
+        const Icon(
+          CupertinoIcons.chevron_right,
+          size: 14,
+          color: AppColors.tertiaryLabel,
+        ),
+      ],
+    );
+  }
+}
+
+// ─── Sign Out Button ──────────────────────────────────────────────────────────
+class _SignOutButton extends StatelessWidget {
+  const _SignOutButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: CupertinoButton(
+        padding: EdgeInsets.zero,
+        onPressed: () => HapticFeedback.mediumImpact(),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.systemRed.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: AppColors.systemRed.withOpacity(0.18),
+            ),
+          ),
+          child: const SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: Center(
+              child: Text(
+                'Cerrar sesión',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.systemRed,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
