@@ -16,8 +16,6 @@ import '../widgets/header_row.dart';
 import '../widgets/tab_bar.dart';
 
 // ─── App Shell ────────────────────────────────────────────────────────────────
-// Owns the bottom tab bar and FAB. Each tab body is kept alive via IndexedStack
-// so scroll position and animation state persist when switching tabs.
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
 
@@ -29,19 +27,17 @@ class _AppShellState extends State<AppShell> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
   final List<ScrollController> _scrollControllers = List.generate(
-    4,
+    5,
     (_) => ScrollController(),
   );
   final _searchBarOpacity = ValueNotifier<double>(1.0);
   double _lastScrollOffset = 0;
 
-  // One navigator key per tab so each tab has its own navigation stack.
   final List<GlobalKey<NavigatorState>> _navigatorKeys = List.generate(
-    4,
+    5,
     (_) => GlobalKey<NavigatorState>(),
   );
 
-  // The four tab bodies — order matches AppTabBar tabs.
   late final List<Widget> _screens;
 
   @override
@@ -52,6 +48,7 @@ class _AppShellState extends State<AppShell> {
       InsightsScreen(scrollController: _scrollControllers[1]),
       CuentaScreen(scrollController: _scrollControllers[2]),
       AprenderScreen(scrollController: _scrollControllers[3]),
+      UserAccountScreen(scrollController: _scrollControllers[4]),
     ];
 
     _pageController.addListener(() {
@@ -116,24 +113,8 @@ class _AppShellState extends State<AppShell> {
       return;
     }
 
-    // Save the current tab index before changing
-    final previousTabIndex = _selectedIndex;
-
     _setSelectedIndex(index);
     _pageController.jumpToPage(index);
-
-    // Pass the previous tab index to the user account screen if navigating there
-    if (index == 2) {
-      // Assuming user account is tab 2
-      _navigatorKeys[index].currentState?.push(
-        CupertinoPageRoute(
-          builder: (context) => UserAccountScreen(
-            scrollController: _scrollControllers[index],
-            previousTabIndex: previousTabIndex,
-          ),
-        ),
-      );
-    }
   }
 
   void _showAddExpenseSheet() {
@@ -146,8 +127,6 @@ class _AppShellState extends State<AppShell> {
 
   void _showSearchChat() {
     HapticFeedback.mediumImpact();
-    // For now just print the action, but in the future this would
-    // show a chat interface that compresses the content
     print('Opening chat with financial assistant');
   }
 
@@ -192,7 +171,7 @@ class _AppShellState extends State<AppShell> {
               right: 0,
               child: _buildFixedHeader(topPadding),
             ),
-            if (_selectedIndex == 0) // Only show add button on Dashboard tab
+            if (_selectedIndex == 0)
               Positioned(
                 right: 20,
                 bottom: MediaQuery.of(context).padding.bottom + 70,
@@ -267,7 +246,6 @@ class _AppShellState extends State<AppShell> {
 }
 
 // ─── Per-tab Navigator wrapper ────────────────────────────────────────────────
-// Each tab gets its own Navigator so tabs can push routes independently.
 class _TabNavigator extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
   final Widget screen;

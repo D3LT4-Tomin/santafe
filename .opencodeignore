@@ -1,0 +1,18 @@
+# Opencode ignore file to optimize token usage
+# Directories to ignore
+.git/
+build/
+.dart_tool/
+ios/
+android/
+linux/
+macos/
+windows/
+web/
+
+# Files to ignore
+*.lock
+*.log
+*.tmp
+.DS_Store
+pubspec.lock

@@ -6,6 +6,9 @@ import 'package:flutter/services.dart';
 import '../theme/app_theme.dart';
 import '../widgets/animated_blobs.dart';
 import '../widgets/header_row.dart';
+import 'conceptos_base_lesson.dart';
+import 'ahorro_activo_lesson.dart';
+import 'comer_fuera_vs_cocinar_lesson.dart';
 
 class AprenderScreen extends StatefulWidget {
   final ScrollController scrollController;
@@ -37,8 +40,14 @@ class _AprenderScreenState extends State<AprenderScreen>
       vsync: this,
       duration: const Duration(seconds: 18),
     )..repeat(reverse: true);
-    _blob1Anim = CurvedAnimation(parent: _blob1Controller, curve: Curves.easeInOut);
-    _blob2Anim = CurvedAnimation(parent: _blob2Controller, curve: Curves.easeInOut);
+    _blob1Anim = CurvedAnimation(
+      parent: _blob1Controller,
+      curve: Curves.easeInOut,
+    );
+    _blob2Anim = CurvedAnimation(
+      parent: _blob2Controller,
+      curve: Curves.easeInOut,
+    );
 
     _appearController = AnimationController(
       vsync: this,
@@ -233,7 +242,9 @@ class _ProgressCard extends StatelessWidget {
                   value: progress,
                   minHeight: 5,
                   backgroundColor: AppColors.white07,
-                  valueColor: const AlwaysStoppedAnimation(AppColors.systemBlue),
+                  valueColor: const AlwaysStoppedAnimation(
+                    AppColors.systemBlue,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -258,7 +269,11 @@ class _ProgressCard extends StatelessWidget {
                   ),
                   child: CupertinoButton(
                     padding: EdgeInsets.zero,
-                    onPressed: () => HapticFeedback.mediumImpact(),
+                    onPressed: () => Navigator.of(context).push(
+                      CupertinoPageRoute(
+                        builder: (_) => const ComerFueraVsCocinarLesson(),
+                      ),
+                    ),
                     child: const Text(
                       'Continuar lección',
                       style: TextStyle(
@@ -338,7 +353,11 @@ class _RecommendationCard extends StatelessWidget {
                     CupertinoButton(
                       padding: EdgeInsets.zero,
                       minSize: 0,
-                      onPressed: () => HapticFeedback.selectionClick(),
+                      onPressed: () => Navigator.of(context).push(
+                        CupertinoPageRoute(
+                          builder: (_) => const ComerFueraVsCocinarLesson(),
+                        ),
+                      ),
                       child: const Text(
                         'Ver lección →',
                         style: TextStyle(
@@ -449,7 +468,10 @@ class _LearningRoadmap extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.systemBlue.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(8),
@@ -474,9 +496,7 @@ class _LearningRoadmap extends StatelessWidget {
             childAspectRatio: 1.05,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            children: _nodes
-                .map((node) => _LessonCard(node: node))
-                .toList(),
+            children: _nodes.map((node) => _LessonCard(node: node)).toList(),
           ),
         ],
       ),
@@ -489,22 +509,47 @@ class _LessonCard extends StatelessWidget {
   final _NodeData node;
   const _LessonCard({required this.node});
 
+  Widget _getLessonPage(String title) {
+    switch (title) {
+      case 'Conceptos Base':
+        return const ConceptosBaseLesson();
+      case 'Ahorro Activo':
+        return const AhorroActivoLesson();
+      case 'Comer fuera vs. Cocinar':
+        return const ComerFueraVsCocinarLesson();
+      default:
+        return const ConceptosBaseLesson();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isCompleted = node.status == _NodeStatus.completed;
-    final isActive    = node.status == _NodeStatus.active;
-    final isLocked    = node.status == _NodeStatus.locked;
+    final isActive = node.status == _NodeStatus.active;
+    final isLocked = node.status == _NodeStatus.locked;
 
-    final Color cardColor   = isLocked ? AppColors.white05 : node.color.withOpacity(0.10);
-    final Color borderColor = isLocked ? AppColors.white07 : node.color.withOpacity(0.22);
-    final Color iconBg      = isLocked ? AppColors.white07 : node.color.withOpacity(0.18);
-    final Color iconColor   = isLocked ? AppColors.tertiaryLabel : node.color;
-    final Color titleColor  = isLocked ? AppColors.secondaryLabel : AppColors.label;
-    final Color subColor    = isLocked ? AppColors.tertiaryLabel : node.color;
+    final Color cardColor = isLocked
+        ? AppColors.white05
+        : node.color.withOpacity(0.10);
+    final Color borderColor = isLocked
+        ? AppColors.white07
+        : node.color.withOpacity(0.22);
+    final Color iconBg = isLocked
+        ? AppColors.white07
+        : node.color.withOpacity(0.18);
+    final Color iconColor = isLocked ? AppColors.tertiaryLabel : node.color;
+    final Color titleColor = isLocked
+        ? AppColors.secondaryLabel
+        : AppColors.label;
+    final Color subColor = isLocked ? AppColors.tertiaryLabel : node.color;
 
     return CupertinoButton(
       padding: EdgeInsets.zero,
-      onPressed: isLocked ? null : () => HapticFeedback.selectionClick(),
+      onPressed: isLocked
+          ? null
+          : () => Navigator.of(context).push(
+              CupertinoPageRoute(builder: (_) => _getLessonPage(node.title)),
+            ),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: cardColor,
@@ -549,7 +594,10 @@ class _LessonCard extends StatelessWidget {
                     )
                   else if (isActive)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 7,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: node.color.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(6),
