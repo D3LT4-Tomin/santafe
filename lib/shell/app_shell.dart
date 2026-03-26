@@ -8,16 +8,12 @@ import '../screens/cuenta_screen.dart';
 import '../screens/dashboard_screen.dart';
 import '../screens/insights_screen.dart';
 import '../screens/aprender_screen.dart';
-import '../screens/user_account_screen.dart';
 import '../theme/app_theme.dart';
 import '../widgets/add_expense_sheet.dart';
 import '../widgets/buttons.dart';
 import '../widgets/header_row.dart';
 import '../widgets/tab_bar.dart';
 
-// ─── App Shell ────────────────────────────────────────────────────────────────
-// Owns the bottom tab bar and FAB. Each tab body is kept alive via IndexedStack
-// so scroll position and animation state persist when switching tabs.
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
 
@@ -28,25 +24,22 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
-  final List<ScrollController> _scrollControllers = List.generate(
-    4,
-    (_) => ScrollController(),
-  );
+
+  final List<ScrollController> _scrollControllers =
+      List.generate(4, (_) => ScrollController());
+
   final _searchBarOpacity = ValueNotifier<double>(1.0);
   double _lastScrollOffset = 0;
 
-  // One navigator key per tab so each tab has its own navigation stack.
-  final List<GlobalKey<NavigatorState>> _navigatorKeys = List.generate(
-    4,
-    (_) => GlobalKey<NavigatorState>(),
-  );
+  final List<GlobalKey<NavigatorState>> _navigatorKeys =
+      List.generate(4, (_) => GlobalKey<NavigatorState>());
 
-  // The four tab bodies — order matches AppTabBar tabs.
   late final List<Widget> _screens;
 
   @override
   void initState() {
     super.initState();
+
     _screens = [
       DashboardScreen(scrollController: _scrollControllers[0]),
       InsightsScreen(scrollController: _scrollControllers[1]),
@@ -82,7 +75,7 @@ class _AppShellState extends State<AppShell> {
     _lastScrollOffset = offset;
 
     if (offset < 20) {
-      if (_searchBarOpacity.value != 1.0) _searchBarOpacity.value = 1.0;
+      _searchBarOpacity.value = 1.0;
     } else if (delta > 2 && _searchBarOpacity.value == 1.0) {
       _searchBarOpacity.value = 0.0;
     } else if (delta < -2 &&
@@ -95,10 +88,12 @@ class _AppShellState extends State<AppShell> {
   void _setSelectedIndex(int index) {
     if (_selectedIndex != index) {
       _scrollControllers[_selectedIndex].removeListener(_onScroll);
+
       setState(() {
         _selectedIndex = index;
         _lastScrollOffset = 0;
       });
+
       _scrollControllers[_selectedIndex].addListener(_onScroll);
     }
   }
@@ -108,6 +103,7 @@ class _AppShellState extends State<AppShell> {
 
     if (index == _selectedIndex) {
       _navigatorKeys[index].currentState?.popUntil((route) => route.isFirst);
+
       _scrollControllers[index].animateTo(
         0,
         duration: const Duration(milliseconds: 400),
@@ -116,24 +112,8 @@ class _AppShellState extends State<AppShell> {
       return;
     }
 
-    // Save the current tab index before changing
-    final previousTabIndex = _selectedIndex;
-
     _setSelectedIndex(index);
     _pageController.jumpToPage(index);
-
-    // Pass the previous tab index to the user account screen if navigating there
-    if (index == 2) {
-      // Assuming user account is tab 2
-      _navigatorKeys[index].currentState?.push(
-        CupertinoPageRoute(
-          builder: (context) => UserAccountScreen(
-            scrollController: _scrollControllers[index],
-            previousTabIndex: previousTabIndex,
-          ),
-        ),
-      );
-    }
   }
 
   void _showAddExpenseSheet() {
@@ -146,9 +126,7 @@ class _AppShellState extends State<AppShell> {
 
   void _showSearchChat() {
     HapticFeedback.mediumImpact();
-    // For now just print the action, but in the future this would
-    // show a chat interface that compresses the content
-    print('Opening chat with financial assistant');
+    debugPrint('Opening chat with financial assistant');
   }
 
   Future<bool> _onWillPop() async {
@@ -163,6 +141,7 @@ class _AppShellState extends State<AppShell> {
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
+
     return WillPopScope(
       onWillPop: _onWillPop,
       child: CupertinoPageScaffold(
@@ -171,33 +150,35 @@ class _AppShellState extends State<AppShell> {
           children: [
             PageView(
               controller: _pageController,
-              children: _screens
-                  .map(
-                    (screen) => _TabNavigator(
-                      navigatorKey: _navigatorKeys[_screens.indexOf(screen)],
-                      screen: screen,
-                    ),
-                  )
-                  .toList(),
+              children: List.generate(_screens.length, (index) {
+                return _TabNavigator(
+                  navigatorKey: _navigatorKeys[index],
+                  screen: _screens[index],
+                );
+              }),
             ),
+
             Positioned(
               top: 0,
               left: 0,
               right: 0,
               child: IgnorePointer(child: _buildHeaderChrome(topPadding)),
             ),
+
             Positioned(
               top: 0,
               left: 0,
               right: 0,
               child: _buildFixedHeader(topPadding),
             ),
-            if (_selectedIndex == 0) // Only show add button on Dashboard tab
+
+            if (_selectedIndex == 0)
               Positioned(
                 right: 20,
                 bottom: MediaQuery.of(context).padding.bottom + 70,
                 child: FabButton(onTap: _showAddExpenseSheet),
               ),
+
             Positioned(
               left: 0,
               right: 0,
@@ -217,6 +198,7 @@ class _AppShellState extends State<AppShell> {
 
   Widget _buildHeaderChrome(double topPadding) {
     final chromeH = topPadding + 66.0;
+
     return SizedBox(
       height: chromeH,
       child: Stack(
@@ -227,7 +209,6 @@ class _AppShellState extends State<AppShell> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  stops: [0.0, 1.0, 1.0],
                   colors: [
                     AppColors.frostedBlue,
                     AppColors.frostedBlue,
@@ -260,25 +241,27 @@ class _AppShellState extends State<AppShell> {
       ),
       child: HeaderRow(
         searchBarOpacity: _searchBarOpacity,
-        onSearchPressed: () => _showSearchChat(),
+        onSearchPressed: _showSearchChat,
       ),
     );
   }
 }
 
-// ─── Per-tab Navigator wrapper ────────────────────────────────────────────────
-// Each tab gets its own Navigator so tabs can push routes independently.
 class _TabNavigator extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
   final Widget screen;
 
-  const _TabNavigator({required this.navigatorKey, required this.screen});
+  const _TabNavigator({
+    required this.navigatorKey,
+    required this.screen,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Navigator(
       key: navigatorKey,
-      onGenerateRoute: (_) => CupertinoPageRoute(builder: (_) => screen),
+      onGenerateRoute: (_) =>
+          CupertinoPageRoute(builder: (_) => screen),
     );
   }
 }
