@@ -70,11 +70,11 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
+            // ── Header — Expanded title prevents pill overflow on wiggle ──────
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const _SectionLabel('PROYECCIÓN DE AHORRO'),
+                const Expanded(child: _SectionLabel('PROYECCIÓN DE AHORRO')),
+                const SizedBox(width: 8),
                 _SmartBadge(),
               ],
             ),
@@ -111,11 +111,14 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
                       border: Border.all(color: const Color(0x30FFFFFF)),
                     ),
                     child: const Center(
-                      child: Text('?',
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFFAAAAAA))),
+                      child: Text(
+                        '?',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFFAAAAAA),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -130,16 +133,19 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Rango esperado',
-                          style: TextStyle(fontSize: 12, color: Color(0xFF8E8E93))),
+                      const Text(
+                        'Rango esperado',
+                        style: TextStyle(fontSize: 12, color: Color(0xFF8E8E93)),
+                      ),
                       const SizedBox(height: 3),
                       Text(
                         '\$${_formatK(d.rangeMin)} – \$${_formatK(d.rangeMax)}',
                         style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFFFFFFFF),
-                            letterSpacing: -0.3),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFFFFFFFF),
+                          letterSpacing: -0.3,
+                        ),
                       ),
                     ],
                   ),
@@ -148,16 +154,19 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Hoy llevas',
-                          style: TextStyle(fontSize: 12, color: Color(0xFF8E8E93))),
+                      const Text(
+                        'Hoy llevas',
+                        style: TextStyle(fontSize: 12, color: Color(0xFF8E8E93)),
+                      ),
                       const SizedBox(height: 3),
                       Text(
                         '\$${d.currentSavings.toStringAsFixed(0)}',
                         style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFFFFFFFF),
-                            letterSpacing: -0.3),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFFFFFFFF),
+                          letterSpacing: -0.3,
+                        ),
                       ),
                     ],
                   ),
@@ -166,9 +175,10 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
             ),
             const SizedBox(height: 20),
 
-            // Chart
+            // ── Chart — SizedBox with no width constraint → fills card ────────
             SizedBox(
               height: 150,
+              width: double.infinity,
               child: AnimatedBuilder(
                 animation: _chartAnim,
                 builder: (_, __) => CustomPaint(
@@ -216,8 +226,10 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF1C1C1E),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        title: const Text('¿Cómo se calcula?',
-            style: TextStyle(color: Colors.white, fontSize: 16)),
+        title: const Text(
+          '¿Cómo se calcula?',
+          style: TextStyle(color: Colors.white, fontSize: 16),
+        ),
         content: const Text(
           'Basado en tu ahorro actual de \$450/mes con un retorno anual estimado del 7%, compuesto mensualmente desde los 20 hasta los 65 años.',
           style: TextStyle(color: Color(0xFF8E8E93), fontSize: 14, height: 1.5),
@@ -225,7 +237,10 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Entendido', style: TextStyle(color: Color(0xFF0A84FF))),
+            child: const Text(
+              'Entendido',
+              style: TextStyle(color: Color(0xFF0A84FF)),
+            ),
           ),
         ],
       ),
@@ -265,11 +280,9 @@ class _SavingsChartPainter extends CustomPainter {
     final years = targetAge - currentAge;
     final points = years + 1;
 
-    // Generate main curve (compound growth + realistic noise)
     final mainValues = List.generate(points, (i) {
       final t = i.toDouble();
       final base = currentSavings * math.pow(1.07, t / 1);
-      // Add monthly contributions compounded
       final contributions = 450 * 12 * (math.pow(1.07, t / 1) - 1) / 0.07;
       final wave = math.sin(t * 0.85) * (t * 6);
       return (base + contributions + wave).clamp(0.0, double.infinity);
@@ -289,7 +302,6 @@ class _SavingsChartPainter extends CustomPainter {
     final highPts = toPoints(mainValues.map((v) => v * 1.09).toList());
     final lowPts = toPoints(mainValues.map((v) => v * 0.93).toList());
 
-    // Clip to progress
     final clipWidth = size.width * progress;
     canvas.save();
     canvas.clipRect(Rect.fromLTWH(0, 0, clipWidth, size.height));
@@ -311,10 +323,11 @@ class _SavingsChartPainter extends CustomPainter {
     bandPath.close();
 
     canvas.drawPath(
-        bandPath,
-        Paint()
-          ..color = const Color(0xFF0A84FF).withOpacity(0.15)
-          ..style = PaintingStyle.fill);
+      bandPath,
+      Paint()
+        ..color = const Color(0xFF0A84FF).withOpacity(0.15)
+        ..style = PaintingStyle.fill,
+    );
 
     // Main line
     final linePath = Path();
@@ -325,12 +338,13 @@ class _SavingsChartPainter extends CustomPainter {
       linePath.cubicTo(cp1.dx, cp1.dy, cp2.dx, cp2.dy, mainPts[i].dx, mainPts[i].dy);
     }
     canvas.drawPath(
-        linePath,
-        Paint()
-          ..color = const Color(0xFF1D5FB8)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.5
-          ..strokeCap = StrokeCap.round);
+      linePath,
+      Paint()
+        ..color = const Color(0xFF1D5FB8)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.5
+        ..strokeCap = StrokeCap.round,
+    );
 
     canvas.restore();
   }

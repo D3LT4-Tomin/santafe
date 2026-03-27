@@ -3,8 +3,9 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show LinearProgressIndicator, Colors;
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/app_theme.dart';
-import '../widgets/animated_blobs.dart'; // ← same blob layer as DashboardScreen
+import '../widgets/animated_blobs.dart';
 
 class AhorroActivoLesson extends StatefulWidget {
   const AhorroActivoLesson({super.key});
@@ -117,11 +118,33 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
   ];
 
   List<_ExpenseItem> _shuffledExpenses = [];
+  static const _progressKey = 'ahorro_activo_progress';
+
+  Future<void> _loadProgress() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedIndex = prefs.getInt(_progressKey) ?? 0;
+      if (savedIndex > 0 && savedIndex < _expenses.length) {
+        setState(() {
+          _currentCardIndex = savedIndex;
+          _totalAnswered = savedIndex;
+        });
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _saveProgress() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(_progressKey, _currentCardIndex);
+    } catch (_) {}
+  }
 
   @override
   void initState() {
     super.initState();
     _shuffledExpenses = List.from(_expenses)..shuffle(Random());
+    _loadProgress();
 
     // ── Blobs (25 s / 18 s, same as DashboardScreen) ──────────────────────
     _blob1Controller = AnimationController(
@@ -201,15 +224,19 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
       if (_totalAnswered >= _shuffledExpenses.length || _timeRemaining <= 0) {
         _gameComplete = true;
         _timer?.cancel();
+        _saveProgress();
       } else {
         _currentCardIndex = _totalAnswered;
         _cardController.reset();
         _cardController.forward();
+        _saveProgress();
       }
     });
   }
 
-  void _restartGame() {
+  Future<void> _restartGame() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_progressKey, 0);
     setState(() {
       _score = 0;
       _timeRemaining = 60;

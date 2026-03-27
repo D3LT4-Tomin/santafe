@@ -1,7 +1,7 @@
+import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../theme/app_theme.dart';
 import '../widgets/animated_blobs.dart';
@@ -82,7 +82,7 @@ class _AprenderScreenState extends State<AprenderScreen>
           child: SingleChildScrollView(
             controller: widget.scrollController,
             physics: const BouncingScrollPhysics(),
-            padding: EdgeInsets.only(top: topPadding + 76, bottom: 80),
+            padding: EdgeInsets.only(top: topPadding + 76, bottom: 100),
             child: FadeTransition(
               opacity: _appearAnim,
               child: SlideTransition(
@@ -91,12 +91,17 @@ class _AprenderScreenState extends State<AprenderScreen>
                   end: Offset.zero,
                 ).animate(_appearAnim),
                 child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _ProgressCard(),
-                    SizedBox(height: 28),
-                    _RecommendationCard(),
-                    SizedBox(height: 28),
-                    _LearningRoadmap(),
+                    // ── Progreso ──────────────────────────────────────────
+                    _ActivityCard(),
+                    SizedBox(height: 12),
+                    _WeekStrip(),
+                    SizedBox(height: 32),
+
+                    // ── Módulos ───────────────────────────────────────────
+                    _ModulesSection(),
+                    SizedBox(height: 8),
                   ],
                 ),
               ),
@@ -160,16 +165,67 @@ class _AprenderScreenState extends State<AprenderScreen>
   }
 }
 
-// ─── Progress Card ────────────────────────────────────────────────────────────
-// Replaces the floating START LESSON button with contextual progress
-// that lives naturally in the scroll flow.
-class _ProgressCard extends StatelessWidget {
-  const _ProgressCard();
+// ─── Section title — large, matches reference ─────────────────────────────────
+
+class _SectionTitle extends StatelessWidget {
+  final String text;
+  const _SectionTitle(this.text);
 
   @override
   Widget build(BuildContext context) {
-    const double progress = 2 / 6; // 2 of 6 lessons complete
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.w700,
+          color: AppColors.label,
+          letterSpacing: -0.5,
+          height: 1.2,
+        ),
+      ),
+    );
+  }
+}
 
+// ─── Activity card ────────────────────────────────────────────────────────────
+
+class _ActivityCard extends StatefulWidget {
+  const _ActivityCard();
+
+  @override
+  State<_ActivityCard> createState() => _ActivityCardState();
+}
+
+class _ActivityCardState extends State<_ActivityCard>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _anim;
+
+  static const double _progress = 0.10;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+    _anim = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) _controller.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: DecoratedBox(
@@ -179,108 +235,44 @@ class _ProgressCard extends StatelessWidget {
           border: Border.all(color: AppColors.white07),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
+          child: Row(
             children: [
-              Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: AppColors.systemBlue.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(10),
+              // Left text
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Tu actividad\nactual',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.label,
+                        height: 1.3,
+                        letterSpacing: -0.3,
+                      ),
                     ),
-                    child: const Icon(
-                      CupertinoIcons.book_fill,
-                      color: AppColors.systemBlue,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          'MAESTRÍA FINANCIERA',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.0,
-                            color: AppColors.secondaryLabel,
-                          ),
-                        ),
-                        SizedBox(height: 2),
-                        Text(
-                          'Comer fuera vs. Cocinar',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.label,
-                            height: 1.33,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Text(
-                    '2 / 6',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.secondaryLabel,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: progress,
-                  minHeight: 5,
-                  backgroundColor: AppColors.white07,
-                  valueColor: const AlwaysStoppedAnimation(
-                    AppColors.systemBlue,
-                  ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                height: 44,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [Color(0xFF0A84FF), Color(0xFF409CFF)],
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x330A84FF),
-                        blurRadius: 12,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () => Navigator.of(context).push(
-                      CupertinoPageRoute(
-                        builder: (_) => const ComerFueraVsCocinarLesson(),
-                      ),
-                    ),
-                    child: const Text(
-                      'Continuar lección',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: CupertinoColors.white,
-                        letterSpacing: 0.2,
+              // Circular progress ring
+              AnimatedBuilder(
+                animation: _anim,
+                builder: (_, __) => SizedBox(
+                  width: 90,
+                  height: 90,
+                  child: CustomPaint(
+                    painter: _RingPainter(progress: _progress * _anim.value),
+                    child: Center(
+                      child: Text(
+                        '${(_progress * 100).toInt()}%',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.label,
+                          letterSpacing: -0.5,
+                        ),
                       ),
                     ),
                   ),
@@ -294,9 +286,58 @@ class _ProgressCard extends StatelessWidget {
   }
 }
 
-// ─── Recommendation Card ──────────────────────────────────────────────────────
-class _RecommendationCard extends StatelessWidget {
-  const _RecommendationCard();
+class _RingPainter extends CustomPainter {
+  final double progress;
+  const _RingPainter({required this.progress});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = size.center(Offset.zero);
+    final radius = (size.shortestSide - 10) / 2;
+    final rect = Rect.fromCircle(center: center, radius: radius);
+
+    // Track
+    canvas.drawArc(
+      rect,
+      0,
+      math.pi * 2,
+      false,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 7
+        ..color = AppColors.white07,
+    );
+
+    // Progress arc — starts at top (−π/2)
+    if (progress > 0) {
+      canvas.drawArc(
+        rect,
+        -math.pi / 2,
+        math.pi * 2 * progress,
+        false,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 7
+          ..strokeCap = StrokeCap.round
+          ..color = AppColors.systemBlue,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_RingPainter old) => old.progress != progress;
+}
+
+// ─── Week strip ───────────────────────────────────────────────────────────────
+
+class _WeekStrip extends StatelessWidget {
+  const _WeekStrip();
+
+  // Thursday (index 3) is "today" per the reference
+  static const _days = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+  static const _todayIndex = 3;
+  // L M done, X done, J = today, rest = future
+  static const _doneUpTo = 3; // 0..2 completed, 3 = today
 
   @override
   Widget build(BuildContext context) {
@@ -305,72 +346,58 @@ class _RecommendationCard extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: AppColors.white05,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(999),
           border: Border.all(color: AppColors.white07),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 40,
-                height: 40,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: List.generate(_days.length, (i) {
+              final isToday = i == _todayIndex;
+              final isDone = i < _doneUpTo;
+              final isFuture = i > _todayIndex;
+
+              Color bg;
+              Color fg;
+              Border? border;
+
+              if (isToday) {
+                bg = AppColors.systemBlue;
+                fg = Colors.white;
+              } else if (isDone) {
+                bg = Colors.transparent;
+                fg = AppColors.label;
+                border = Border.all(color: AppColors.white07);
+              } else {
+                bg = AppColors.white05;
+                fg = AppColors.tertiaryLabel;
+              }
+
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+                width: 38,
+                height: 38,
                 decoration: BoxDecoration(
-                  color: AppColors.systemPurple.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(10),
+                  color: bg,
+                  shape: BoxShape.circle,
+                  border: border,
                 ),
-                child: const Icon(
-                  CupertinoIcons.sparkles,
-                  color: AppColors.systemPurple,
-                  size: 20,
+                child: Center(
+                  child: Text(
+                    _days[i],
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: isToday || isDone
+                          ? FontWeight.w600
+                          : FontWeight.w400,
+                      color: fg,
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'RECOMENDACIÓN IA',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1.0,
-                        color: AppColors.systemPurple,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    const Text(
-                      'Basado en tus gastos en Tacos El Güero, te recomendamos aprender sobre comer fuera vs. cocinar en casa.',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: AppColors.label,
-                        height: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      minSize: 0,
-                      onPressed: () => Navigator.of(context).push(
-                        CupertinoPageRoute(
-                          builder: (_) => const ComerFueraVsCocinarLesson(),
-                        ),
-                      ),
-                      child: const Text(
-                        'Ver lección →',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.systemPurple,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+              );
+            }),
           ),
         ),
       ),
@@ -378,274 +405,484 @@ class _RecommendationCard extends StatelessWidget {
   }
 }
 
-// ─── Learning Roadmap ─────────────────────────────────────────────────────────
-enum _NodeStatus { completed, active, locked }
+// ─── Modules section ──────────────────────────────────────────────────────────
 
-class _NodeData {
+class _ModuleCategory {
+  final String label;
+  final List<_ModuleData> modules;
+  const _ModuleCategory({required this.label, required this.modules});
+}
+
+class _ModuleData {
   final String title;
-  final String subtitle;
+  final int minutes;
   final IconData icon;
   final Color color;
-  final _NodeStatus status;
-  const _NodeData({
+  final bool recommended;
+  final bool locked;
+  const _ModuleData({
     required this.title,
-    required this.subtitle,
+    required this.minutes,
     required this.icon,
     required this.color,
-    required this.status,
+    this.recommended = false,
+    this.locked = false,
   });
 }
 
-class _LearningRoadmap extends StatelessWidget {
-  const _LearningRoadmap();
+class _ModulesSection extends StatelessWidget {
+  const _ModulesSection();
 
-  static const _nodes = [
-    _NodeData(
-      title: 'Conceptos Base',
-      subtitle: 'Fundamentos del dinero',
-      icon: CupertinoIcons.checkmark_seal_fill,
-      color: AppColors.systemGreen,
-      status: _NodeStatus.completed,
+  static const _categories = [
+    _ModuleCategory(
+      label: 'Gestión',
+      modules: [
+        _ModuleData(
+          title: '¿A dónde se va\ntu dinero?',
+          minutes: 5,
+          icon: CupertinoIcons.money_dollar_circle_fill,
+          color: AppColors.systemBlue,
+          recommended: true,
+        ),
+        _ModuleData(
+          title: 'Presupuesto\nsemanal',
+          minutes: 7,
+          icon: CupertinoIcons.chart_bar_fill,
+          color: AppColors.systemIndigo,
+        ),
+        _ModuleData(
+          title: 'Control de\ngastos',
+          minutes: 6,
+          icon: CupertinoIcons.list_bullet,
+          color: AppColors.systemPurple,
+        ),
+        _ModuleData(
+          title: 'Análisis de\ncategorías',
+          minutes: 8,
+          icon: CupertinoIcons.chart_pie,
+          color: AppColors.systemOrange,
+        ),
+        _ModuleData(
+          title: 'Tendencias\nmensuales',
+          minutes: 10,
+          icon: CupertinoIcons.graph_circle_fill,
+          color: AppColors.systemGreen,
+        ),
+      ],
     ),
-    _NodeData(
-      title: 'Ahorro Activo',
-      subtitle: 'Hábitos que funcionan',
-      icon: CupertinoIcons.checkmark_seal_fill,
-      color: AppColors.systemBlue,
-      status: _NodeStatus.completed,
+    _ModuleCategory(
+      label: 'Planeación',
+      modules: [
+        _ModuleData(
+          title: 'Gastos\nhormiga',
+          minutes: 8,
+          icon: CupertinoIcons.ant_fill,
+          color: AppColors.systemOrange,
+        ),
+        _ModuleData(
+          title: 'Metas a\ncorto plazo',
+          minutes: 6,
+          icon: CupertinoIcons.flag_fill,
+          color: AppColors.systemRed,
+          locked: true,
+        ),
+        _ModuleData(
+          title: 'Planificación\nanual',
+          minutes: 12,
+          icon: CupertinoIcons.calendar,
+          color: AppColors.systemBlue,
+        ),
+        _ModuleData(
+          title: 'Emergencias\ny ahorros',
+          minutes: 7,
+          icon: CupertinoIcons.shield_fill,
+          color: AppColors.systemGreen,
+        ),
+        _ModuleData(
+          title: 'Finanzas\nfamiliares',
+          minutes: 10,
+          icon: CupertinoIcons.person_2_fill,
+          color: AppColors.systemPurple,
+        ),
+      ],
     ),
-    _NodeData(
-      title: 'Comer fuera vs. Cocinar',
-      subtitle: '5 min · Lección actual',
-      icon: CupertinoIcons.flame_fill,
-      color: AppColors.systemOrange,
-      status: _NodeStatus.active,
+    _ModuleCategory(
+      label: 'Ahorro',
+      modules: [
+        _ModuleData(
+          title: 'Ahorro\nbásico',
+          minutes: 6,
+          icon: CupertinoIcons.star_circle_fill,
+          color: AppColors.systemGreen,
+        ),
+        _ModuleData(
+          title: 'El método\n50/30/20',
+          minutes: 9,
+          icon: CupertinoIcons.chart_pie_fill,
+          color: AppColors.systemTeal,
+          locked: true,
+        ),
+        _ModuleData(
+          title: 'Reducir\ngastos',
+          minutes: 8,
+          icon: CupertinoIcons.arrow_down_circle_fill,
+          color: AppColors.systemOrange,
+        ),
+        _ModuleData(
+          title: 'Ahorrar en\ncomida',
+          minutes: 7,
+          icon: CupertinoIcons.cart_fill,
+          color: AppColors.systemRed,
+        ),
+        _ModuleData(
+          title: 'Inversión\npara niños',
+          minutes: 15,
+          icon: CupertinoIcons.book_fill,
+          color: AppColors.systemIndigo,
+        ),
+      ],
     ),
-    _NodeData(
-      title: 'Inversión 101',
-      subtitle: 'Tu dinero trabajando',
-      icon: CupertinoIcons.graph_circle_fill,
-      color: AppColors.systemPurple,
-      status: _NodeStatus.locked,
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: _categories.map((cat) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 32, bottom: 12),
+              child: Text(
+                cat.label,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.label,
+                  letterSpacing: -0.2,
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 130,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.only(left: 24, right: 16),
+                separatorBuilder: (_, __) => const SizedBox(width: 12),
+                itemCount: cat.modules.length,
+                itemBuilder: (_, i) => _ModuleCard(data: cat.modules[i]),
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _ModuleCard extends StatelessWidget {
+  final _ModuleData data;
+  const _ModuleCard({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    final locked = data.locked;
+    final iconColor = locked ? AppColors.tertiaryLabel : data.color;
+    final textColor = locked ? AppColors.secondaryLabel : AppColors.label;
+
+    return SizedBox(
+      width: 160,
+      child: CupertinoButton(
+        padding: EdgeInsets.zero,
+        onPressed: locked ? null : () {},
+        child: Stack(
+          children: [
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: locked
+                    ? AppColors.white05
+                    : data.color.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: locked
+                      ? AppColors.white07
+                      : data.color.withOpacity(0.22),
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Icon
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: locked
+                            ? AppColors.white07
+                            : data.color.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(data.icon, color: iconColor, size: 18),
+                    ),
+                    const Spacer(),
+                    // Title
+                    Text(
+                      data.title,
+                      maxLines: 2,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: textColor,
+                        height: 1.3,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    // Duration row
+                    Row(
+                      children: [
+                        Icon(
+                          CupertinoIcons.clock,
+                          size: 11,
+                          color: locked
+                              ? AppColors.tertiaryLabel
+                              : AppColors.secondaryLabel,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${data.minutes} minutos',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: locked
+                                ? AppColors.tertiaryLabel
+                                : AppColors.secondaryLabel,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // "Recomendado por IA" floating label
+            if (data.recommended)
+              Positioned(
+                top: 0,
+                right: 0,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: AppColors.systemPurple.withOpacity(0.15),
+                    borderRadius: const BorderRadius.only(
+                      topRight: Radius.circular(18),
+                      bottomLeft: Radius.circular(10),
+                    ),
+                    border: Border.all(
+                      color: AppColors.systemPurple.withOpacity(0.3),
+                      width: 0.5,
+                    ),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    child: Text(
+                      'Recomendado por IA',
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.systemPurple,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+            // Lock overlay
+            if (locked)
+              Positioned(
+                top: 12,
+                right: 12,
+                child: Icon(
+                  CupertinoIcons.lock_fill,
+                  size: 13,
+                  color: AppColors.tertiaryLabel,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Achievements grid ────────────────────────────────────────────────────────
+
+class _Achievement {
+  final String label;
+  final IconData icon;
+  final bool earned;
+  const _Achievement({
+    required this.label,
+    required this.icon,
+    required this.earned,
+  });
+}
+
+class _AchievementsGrid extends StatelessWidget {
+  const _AchievementsGrid();
+
+  static const _achievements = [
+    _Achievement(
+      label: 'Primer\nlección',
+      icon: CupertinoIcons.pencil,
+      earned: true,
     ),
-    _NodeData(
-      title: 'Crédito Inteligente',
-      subtitle: 'Usar sin endeudarse',
-      icon: CupertinoIcons.creditcard_fill,
-      color: AppColors.systemIndigo,
-      status: _NodeStatus.locked,
+    _Achievement(
+      label: 'Primer\nahorro',
+      icon: CupertinoIcons.money_dollar,
+      earned: true,
     ),
-    _NodeData(
-      title: 'Libertad Financiera',
-      subtitle: 'El objetivo final',
-      icon: CupertinoIcons.star_fill,
-      color: AppColors.systemOrange,
-      status: _NodeStatus.locked,
+    _Achievement(
+      label: 'Una semana\nde racha',
+      icon: CupertinoIcons.rocket_fill,
+      earned: true,
     ),
+    _Achievement(
+      label: '5 lecciones\nseguidas',
+      icon: CupertinoIcons.pencil_slash,
+      earned: true,
+    ),
+    _Achievement(
+      label: 'Un mes\nde racha',
+      icon: CupertinoIcons.calendar,
+      earned: false,
+    ),
+    _Achievement(
+      label: '365 días\nde racha',
+      icon: CupertinoIcons.gift_fill,
+      earned: false,
+    ),
+    _Achievement(
+      label: 'Noche\nestudiosa',
+      icon: CupertinoIcons.moon_fill,
+      earned: false,
+    ),
+    _Achievement(
+      label: 'Explorador',
+      icon: CupertinoIcons.cube_box_fill,
+      earned: false,
+    ),
+    _Achievement(label: 'Constante', icon: CupertinoIcons.link, earned: false),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Section label
-          Padding(
-            padding: const EdgeInsets.only(left: 4, bottom: 14),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'RUTA DE APRENDIZAJE',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.6,
-                    color: AppColors.secondaryLabel,
-                    height: 1.33,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.systemBlue.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Text(
-                    '2 de 6',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.systemBlue,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // 2-column grid
-          GridView.count(
-            crossAxisCount: 2,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: 1.05,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            children: _nodes.map((node) => _LessonCard(node: node)).toList(),
-          ),
-        ],
+      child: GridView.count(
+        crossAxisCount: 3,
+        crossAxisSpacing: 14,
+        mainAxisSpacing: 14,
+        childAspectRatio: 0.85,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        children: _achievements.map((a) => _HexBadge(achievement: a)).toList(),
       ),
     );
   }
 }
 
-// ─── Lesson Card ──────────────────────────────────────────────────────────────
-class _LessonCard extends StatelessWidget {
-  final _NodeData node;
-  const _LessonCard({required this.node});
-
-  Widget _getLessonPage(String title) {
-    switch (title) {
-      case 'Conceptos Base':
-        return const ConceptosBaseLesson();
-      case 'Ahorro Activo':
-        return const AhorroActivoLesson();
-      case 'Comer fuera vs. Cocinar':
-        return const ComerFueraVsCocinarLesson();
-      default:
-        return const ConceptosBaseLesson();
-    }
-  }
+class _HexBadge extends StatelessWidget {
+  final _Achievement achievement;
+  const _HexBadge({required this.achievement});
 
   @override
   Widget build(BuildContext context) {
-    final isCompleted = node.status == _NodeStatus.completed;
-    final isActive = node.status == _NodeStatus.active;
-    final isLocked = node.status == _NodeStatus.locked;
+    final earned = achievement.earned;
+    final iconColor = earned ? AppColors.systemBlue : AppColors.tertiaryLabel;
+    final bgColor = earned
+        ? AppColors.systemBlue.withOpacity(0.12)
+        : AppColors.white05;
+    final borderColor = earned
+        ? AppColors.systemBlue.withOpacity(0.28)
+        : AppColors.white07;
+    final labelColor = earned ? AppColors.label : AppColors.tertiaryLabel;
 
-    final Color cardColor = isLocked
-        ? AppColors.white05
-        : node.color.withOpacity(0.10);
-    final Color borderColor = isLocked
-        ? AppColors.white07
-        : node.color.withOpacity(0.22);
-    final Color iconBg = isLocked
-        ? AppColors.white07
-        : node.color.withOpacity(0.18);
-    final Color iconColor = isLocked ? AppColors.tertiaryLabel : node.color;
-    final Color titleColor = isLocked
-        ? AppColors.secondaryLabel
-        : AppColors.label;
-    final Color subColor = isLocked ? AppColors.tertiaryLabel : node.color;
-
-    return CupertinoButton(
-      padding: EdgeInsets.zero,
-      onPressed: isLocked
-          ? null
-          : () => Navigator.of(context).push(
-              CupertinoPageRoute(builder: (_) => _getLessonPage(node.title)),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: 76,
+          height: 76,
+          child: CustomPaint(
+            painter: _HexPainter(fillColor: bgColor, borderColor: borderColor),
+            child: Center(
+              child: Icon(achievement.icon, color: iconColor, size: 26),
             ),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isActive ? node.color.withOpacity(0.55) : borderColor,
-            width: isActive ? 1.5 : 1,
-          ),
-          boxShadow: isActive
-              ? [
-                  BoxShadow(
-                    color: node.color.withOpacity(0.18),
-                    blurRadius: 14,
-                    spreadRadius: 1,
-                    offset: const Offset(0, 3),
-                  ),
-                ]
-              : null,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: iconBg,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(node.icon, color: iconColor, size: 18),
-                  ),
-                  if (isCompleted)
-                    const Icon(
-                      CupertinoIcons.checkmark_circle_fill,
-                      color: AppColors.systemGreen,
-                      size: 18,
-                    )
-                  else if (isActive)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 7,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: node.color.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        'Ahora',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          color: node.color,
-                        ),
-                      ),
-                    )
-                  else
-                    Icon(
-                      CupertinoIcons.lock_fill,
-                      color: AppColors.tertiaryLabel,
-                      size: 14,
-                    ),
-                ],
-              ),
-              const Spacer(),
-              Text(
-                node.title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: titleColor,
-                  height: 1.3,
-                ),
-              ),
-              const SizedBox(height: 3),
-              Text(
-                node.subtitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                  color: subColor,
-                ),
-              ),
-            ],
           ),
         ),
-      ),
+        const SizedBox(height: 6),
+        Text(
+          achievement.label,
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+            color: labelColor,
+            height: 1.3,
+          ),
+        ),
+      ],
     );
   }
+}
+
+class _HexPainter extends CustomPainter {
+  final Color fillColor;
+  final Color borderColor;
+  const _HexPainter({required this.fillColor, required this.borderColor});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final r = math.min(cx, cy) - 1.5;
+
+    final path = Path();
+    for (int i = 0; i < 6; i++) {
+      // flat-top hexagon: start at 30°
+      final angle = math.pi / 180 * (60 * i - 30);
+      final x = cx + r * math.cos(angle);
+      final y = cy + r * math.sin(angle);
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+    path.close();
+
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = fillColor
+        ..style = PaintingStyle.fill,
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = borderColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_HexPainter old) =>
+      old.fillColor != fillColor || old.borderColor != borderColor;
 }

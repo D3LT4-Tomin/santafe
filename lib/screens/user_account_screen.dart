@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../theme/app_theme.dart';
 import '../widgets/animated_blobs.dart';
+import 'user_settings_screen.dart';
 
 class UserAccountScreen extends StatefulWidget {
   final ScrollController? scrollController;
@@ -24,9 +26,9 @@ class _UserAccountScreenState extends State<UserAccountScreen>
   late Animation<double> _appearAnim;
 
   // Notification toggles
-  bool _notifGastos      = true;
-  bool _notifMetas       = true;
-  bool _notifResumen     = false;
+  bool _notifGastos = true;
+  bool _notifMetas = true;
+  bool _notifResumen = false;
   bool _notifPromociones = false;
 
   @override
@@ -40,8 +42,14 @@ class _UserAccountScreenState extends State<UserAccountScreen>
       vsync: this,
       duration: const Duration(seconds: 18),
     )..repeat(reverse: true);
-    _blob1Anim = CurvedAnimation(parent: _blob1Controller, curve: Curves.easeInOut);
-    _blob2Anim = CurvedAnimation(parent: _blob2Controller, curve: Curves.easeInOut);
+    _blob1Anim = CurvedAnimation(
+      parent: _blob1Controller,
+      curve: Curves.easeInOut,
+    );
+    _blob2Anim = CurvedAnimation(
+      parent: _blob2Controller,
+      curve: Curves.easeInOut,
+    );
 
     _appearController = AnimationController(
       vsync: this,
@@ -93,118 +101,26 @@ class _UserAccountScreenState extends State<UserAccountScreen>
                     const _SubscriptionCard(),
                     const SizedBox(height: 28),
 
-                    // ── Configuración general ─────────────────────────
-                    _SettingsSection(
-                      title: 'CONFIGURACIÓN',
-                      rows: [
-                        _SettingsRow(
-                          icon: CupertinoIcons.globe,
-                          color: AppColors.systemBlue,
-                          label: 'Moneda',
-                          trailing: const _TrailingValue('MXN — Peso'),
-                          onTap: () {},
-                        ),
-                        _SettingsRow(
-                          icon: CupertinoIcons.calendar,
-                          color: AppColors.systemOrange,
-                          label: 'Inicio de mes',
-                          trailing: const _TrailingValue('Día 1'),
-                          onTap: () {},
-                        ),
-                        _SettingsRow(
-                          icon: CupertinoIcons.cloud_download,
-                          color: AppColors.systemGreen,
-                          label: 'Exportar datos',
-                          trailing: const _TrailingChevron(),
-                          onTap: () {},
-                        ),
-                        _SettingsRow(
-                          icon: CupertinoIcons.trash,
-                          color: AppColors.systemRed,
-                          label: 'Eliminar cuenta',
-                          trailing: const _TrailingChevron(),
-                          isDestructive: true,
-                          onTap: () {},
-                          isLast: true,
-                        ),
-                      ],
-                    ),
+                    // ── Logros ────────────────────────────────────────
+                    const _AchievementsGrid(),
                     const SizedBox(height: 28),
 
-                    // ── Seguridad ─────────────────────────────────────
-                    _SettingsSection(
-                      title: 'SEGURIDAD',
-                      rows: [
-                        _SettingsRow(
-                          icon: CupertinoIcons.hand_raised_fill,
-                          color: AppColors.systemBlue,
-                          label: 'Face ID / Touch ID',
-                          trailing: const _TrailingChevron(),
-                          onTap: () {},
-                        ),
-                        _SettingsRow(
-                          icon: CupertinoIcons.lock_rotation,
-                          color: AppColors.systemPurple,
-                          label: 'Cambiar contraseña',
-                          trailing: const _TrailingChevron(),
-                          onTap: () {},
-                        ),
-                        _SettingsRow(
-                          icon: CupertinoIcons.device_phone_portrait,
-                          color: AppColors.systemIndigo,
-                          label: 'Dispositivos activos',
-                          trailing: const _TrailingValue('1 dispositivo'),
-                          onTap: () {},
-                          isLast: true,
-                        ),
-                      ],
+                    // ── Configuración ─────────────────────────────────
+                    _SettingsRow(
+                      icon: CupertinoIcons.gear_alt_fill,
+                      color: AppColors.systemBlue,
+                      label: 'Configuración',
+                      trailing: const _TrailingChevron(),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          CupertinoPageRoute(
+                            builder: (context) => const UserSettingsScreen(),
+                          ),
+                        );
+                      },
+                      isLast: true,
                     ),
                     const SizedBox(height: 28),
-
-                    // ── Notificaciones ────────────────────────────────
-                    _SettingsSection(
-                      title: 'NOTIFICACIONES',
-                      rows: [
-                        _ToggleRow(
-                          icon: CupertinoIcons.bell_fill,
-                          color: AppColors.systemRed,
-                          label: 'Alertas de gastos',
-                          subtitle: 'Cuando superes tu presupuesto',
-                          value: _notifGastos,
-                          onChanged: (v) => setState(() => _notifGastos = v),
-                        ),
-                        _ToggleRow(
-                          icon: CupertinoIcons.flag_fill,
-                          color: AppColors.systemGreen,
-                          label: 'Progreso de metas',
-                          subtitle: 'Hitos y recordatorios',
-                          value: _notifMetas,
-                          onChanged: (v) => setState(() => _notifMetas = v),
-                        ),
-                        _ToggleRow(
-                          icon: CupertinoIcons.chart_bar_fill,
-                          color: AppColors.systemBlue,
-                          label: 'Resumen semanal',
-                          subtitle: 'Cada lunes por la mañana',
-                          value: _notifResumen,
-                          onChanged: (v) => setState(() => _notifResumen = v),
-                        ),
-                        _ToggleRow(
-                          icon: CupertinoIcons.tag_fill,
-                          color: AppColors.systemOrange,
-                          label: 'Promociones',
-                          subtitle: 'Ofertas y novedades de Finanzas',
-                          value: _notifPromociones,
-                          onChanged: (v) => setState(() => _notifPromociones = v),
-                          isLast: true,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 28),
-
-                    // ── Cerrar sesión ─────────────────────────────────
-                    const _SignOutButton(),
-                    const SizedBox(height: 12),
 
                     // ── Version ───────────────────────────────────────
                     const Text(
@@ -287,7 +203,10 @@ class _AvatarHeader extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: AppColors.secondaryBackground,
                         shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.white07, width: 1.5),
+                        border: Border.all(
+                          color: AppColors.white07,
+                          width: 1.5,
+                        ),
                       ),
                       child: const Icon(
                         CupertinoIcons.pencil,
@@ -377,9 +296,7 @@ class _SubscriptionCard extends StatelessWidget {
             colors: [Color(0xFF1A1040), Color(0xFF0D1F40)],
           ),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: AppColors.systemPurple.withOpacity(0.3),
-          ),
+          border: Border.all(color: AppColors.systemPurple.withOpacity(0.3)),
           boxShadow: [
             BoxShadow(
               color: AppColors.systemPurple.withOpacity(0.15),
@@ -486,10 +403,7 @@ class _SubscriptionCard extends StatelessWidget {
                 children: [
                   const Text(
                     'Se renueva el 15 de abril',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Color(0x99FFFFFF),
-                    ),
+                    style: TextStyle(fontSize: 12, color: Color(0x99FFFFFF)),
                   ),
                   CupertinoButton(
                     padding: EdgeInsets.zero,
@@ -774,10 +688,7 @@ class _TrailingValue extends StatelessWidget {
       children: [
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 14,
-            color: AppColors.secondaryLabel,
-          ),
+          style: const TextStyle(fontSize: 14, color: AppColors.secondaryLabel),
         ),
         const SizedBox(width: 4),
         const Icon(
@@ -805,9 +716,7 @@ class _SignOutButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.systemRed.withOpacity(0.08),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: AppColors.systemRed.withOpacity(0.18),
-            ),
+            border: Border.all(color: AppColors.systemRed.withOpacity(0.18)),
           ),
           child: const SizedBox(
             width: double.infinity,
@@ -827,4 +736,168 @@ class _SignOutButton extends StatelessWidget {
       ),
     );
   }
+}
+
+// ─── Achievements grid ────────────────────────────────────────────────────────
+class _Achievement {
+  final String label;
+  final IconData icon;
+  final bool earned;
+  const _Achievement({
+    required this.label,
+    required this.icon,
+    required this.earned,
+  });
+}
+
+class _AchievementsGrid extends StatelessWidget {
+  const _AchievementsGrid();
+
+  static const _achievements = [
+    _Achievement(
+      label: 'Primer\nlección',
+      icon: CupertinoIcons.pencil,
+      earned: true,
+    ),
+    _Achievement(
+      label: 'Primer\nahorro',
+      icon: CupertinoIcons.money_dollar,
+      earned: true,
+    ),
+    _Achievement(
+      label: 'Una semana\nde racha',
+      icon: CupertinoIcons.rocket_fill,
+      earned: true,
+    ),
+    _Achievement(
+      label: '5 lecciones\nseguidas',
+      icon: CupertinoIcons.pencil_slash,
+      earned: true,
+    ),
+    _Achievement(
+      label: 'Un mes\nde racha',
+      icon: CupertinoIcons.calendar,
+      earned: false,
+    ),
+    _Achievement(
+      label: '365 días\nde racha',
+      icon: CupertinoIcons.gift_fill,
+      earned: false,
+    ),
+    _Achievement(
+      label: 'Noche\nestudiosa',
+      icon: CupertinoIcons.moon_fill,
+      earned: false,
+    ),
+    _Achievement(
+      label: 'Explorador',
+      icon: CupertinoIcons.cube_box_fill,
+      earned: false,
+    ),
+    _Achievement(label: 'Constante', icon: CupertinoIcons.link, earned: false),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: GridView.count(
+        crossAxisCount: 3,
+        crossAxisSpacing: 14,
+        mainAxisSpacing: 14,
+        childAspectRatio: 0.85,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        children: _achievements.map((a) => _HexBadge(achievement: a)).toList(),
+      ),
+    );
+  }
+}
+
+class _HexBadge extends StatelessWidget {
+  final _Achievement achievement;
+  const _HexBadge({required this.achievement});
+
+  @override
+  Widget build(BuildContext context) {
+    final earned = achievement.earned;
+    final iconColor = earned ? AppColors.systemBlue : AppColors.tertiaryLabel;
+    final bgColor = earned
+        ? AppColors.systemBlue.withOpacity(0.12)
+        : AppColors.white05;
+    final borderColor = earned
+        ? AppColors.systemBlue.withOpacity(0.28)
+        : AppColors.white07;
+    final labelColor = earned ? AppColors.label : AppColors.tertiaryLabel;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: 76,
+          height: 76,
+          child: CustomPaint(
+            painter: _HexPainter(fillColor: bgColor, borderColor: borderColor),
+            child: Center(
+              child: Icon(achievement.icon, color: iconColor, size: 26),
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          achievement.label,
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+            color: labelColor,
+            height: 1.3,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _HexPainter extends CustomPainter {
+  final Color fillColor;
+  final Color borderColor;
+  const _HexPainter({required this.fillColor, required this.borderColor});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final r = math.min(cx, cy) - 1.5;
+    final path = Path();
+    for (var i = 0; i < 6; i++) {
+      final angle = (i * 60 - 30) * math.pi / 180;
+      final x = cx + r * math.cos(angle);
+      final y = cy + r * math.sin(angle);
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+    path.close();
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = fillColor
+        ..style = PaintingStyle.fill,
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = borderColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_HexPainter old) =>
+      old.fillColor != fillColor || old.borderColor != borderColor;
 }
