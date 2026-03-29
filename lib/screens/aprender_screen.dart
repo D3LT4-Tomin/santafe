@@ -165,30 +165,6 @@ class _AprenderScreenState extends State<AprenderScreen>
   }
 }
 
-// ─── Section title — large, matches reference ─────────────────────────────────
-
-class _SectionTitle extends StatelessWidget {
-  final String text;
-  const _SectionTitle(this.text);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontSize: 28,
-          fontWeight: FontWeight.w700,
-          color: AppColors.label,
-          letterSpacing: -0.5,
-          height: 1.2,
-        ),
-      ),
-    );
-  }
-}
-
 // ─── Activity card ────────────────────────────────────────────────────────────
 
 class _ActivityCard extends StatefulWidget {
@@ -238,7 +214,6 @@ class _ActivityCardState extends State<_ActivityCard>
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
           child: Row(
             children: [
-              // Left text
               const Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -256,7 +231,6 @@ class _ActivityCardState extends State<_ActivityCard>
                   ],
                 ),
               ),
-              // Circular progress ring
               AnimatedBuilder(
                 animation: _anim,
                 builder: (_, __) => SizedBox(
@@ -296,25 +270,17 @@ class _RingPainter extends CustomPainter {
     final radius = (size.shortestSide - 10) / 2;
     final rect = Rect.fromCircle(center: center, radius: radius);
 
-    // Track
     canvas.drawArc(
-      rect,
-      0,
-      math.pi * 2,
-      false,
+      rect, 0, math.pi * 2, false,
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 7
         ..color = AppColors.white07,
     );
 
-    // Progress arc — starts at top (−π/2)
     if (progress > 0) {
       canvas.drawArc(
-        rect,
-        -math.pi / 2,
-        math.pi * 2 * progress,
-        false,
+        rect, -math.pi / 2, math.pi * 2 * progress, false,
         Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = 7
@@ -333,11 +299,9 @@ class _RingPainter extends CustomPainter {
 class _WeekStrip extends StatelessWidget {
   const _WeekStrip();
 
-  // Thursday (index 3) is "today" per the reference
   static const _days = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
   static const _todayIndex = 3;
-  // L M done, X done, J = today, rest = future
-  static const _doneUpTo = 3; // 0..2 completed, 3 = today
+  static const _doneUpTo = 3;
 
   @override
   Widget build(BuildContext context) {
@@ -356,7 +320,6 @@ class _WeekStrip extends StatelessWidget {
             children: List.generate(_days.length, (i) {
               final isToday = i == _todayIndex;
               final isDone = i < _doneUpTo;
-              final isFuture = i > _todayIndex;
 
               Color bg;
               Color fg;
@@ -420,6 +383,7 @@ class _ModuleData {
   final Color color;
   final bool recommended;
   final bool locked;
+  final bool completed;
   const _ModuleData({
     required this.title,
     required this.minutes,
@@ -427,16 +391,47 @@ class _ModuleData {
     required this.color,
     this.recommended = false,
     this.locked = false,
+    this.completed = false,
   });
 }
 
-class _ModulesSection extends StatelessWidget {
+class _ModulesSection extends StatefulWidget {
   const _ModulesSection();
 
+  @override
+  State<_ModulesSection> createState() => _ModulesSectionState();
+}
+
+class _ModulesSectionState extends State<_ModulesSection> {
+  final List<PageController> _controllers = [];
+
+  // ── Curriculum order (source of truth — edit freely) ─────────────────────
+  // completed / current / locked are properties on each item.
+  // Sorting into completed → current → locked happens at render time.
+  // Lesson order in each list doesn't matter for display —
+  // _sorted() arranges them: completed → current → locked.
+  // The carousel starts on page 1 so page 0 (the two completed lessons)
+  // is always one swipe back.
   static const _categories = [
     _ModuleCategory(
       label: 'Gestión',
       modules: [
+        // ── 2 completed ──────────────────────────────────────────────────────
+        _ModuleData(
+          title: 'Conceptos\nbásicos',
+          minutes: 4,
+          icon: CupertinoIcons.book_fill,
+          color: AppColors.systemIndigo,
+          completed: true,
+        ),
+        _ModuleData(
+          title: 'Presupuesto\nsemanal',
+          minutes: 7,
+          icon: CupertinoIcons.chart_bar_fill,
+          color: AppColors.systemIndigo,
+          completed: true,
+        ),
+        // ── Current ──────────────────────────────────────────────────────────
         _ModuleData(
           title: '¿A dónde se va\ntu dinero?',
           minutes: 5,
@@ -444,40 +439,70 @@ class _ModulesSection extends StatelessWidget {
           color: AppColors.systemBlue,
           recommended: true,
         ),
-        _ModuleData(
-          title: 'Presupuesto\nsemanal',
-          minutes: 7,
-          icon: CupertinoIcons.chart_bar_fill,
-          color: AppColors.systemIndigo,
-        ),
+        // ── Locked ───────────────────────────────────────────────────────────
         _ModuleData(
           title: 'Control de\ngastos',
           minutes: 6,
           icon: CupertinoIcons.list_bullet,
           color: AppColors.systemPurple,
+          locked: true,
         ),
         _ModuleData(
           title: 'Análisis de\ncategorías',
           minutes: 8,
           icon: CupertinoIcons.chart_pie,
           color: AppColors.systemOrange,
+          locked: true,
         ),
         _ModuleData(
           title: 'Tendencias\nmensuales',
           minutes: 10,
           icon: CupertinoIcons.graph_circle_fill,
           color: AppColors.systemGreen,
+          locked: true,
         ),
       ],
     ),
     _ModuleCategory(
       label: 'Planeación',
       modules: [
+        // ── 2 completed ──────────────────────────────────────────────────────
+        _ModuleData(
+          title: 'Intro a\nplaneación',
+          minutes: 5,
+          icon: CupertinoIcons.lightbulb_fill,
+          color: AppColors.systemBlue,
+          completed: true,
+        ),
+        _ModuleData(
+          title: 'Planificación\nanual',
+          minutes: 12,
+          icon: CupertinoIcons.calendar,
+          color: AppColors.systemBlue,
+          completed: true,
+        ),
+        // ── Current ──────────────────────────────────────────────────────────
         _ModuleData(
           title: 'Gastos\nhormiga',
           minutes: 8,
           icon: CupertinoIcons.ant_fill,
           color: AppColors.systemOrange,
+          recommended: true,
+        ),
+        // ── Locked ───────────────────────────────────────────────────────────
+        _ModuleData(
+          title: 'Emergencias\ny ahorros',
+          minutes: 7,
+          icon: CupertinoIcons.shield_fill,
+          color: AppColors.systemGreen,
+          locked: true,
+        ),
+        _ModuleData(
+          title: 'Finanzas\nfamiliares',
+          minutes: 10,
+          icon: CupertinoIcons.person_2_fill,
+          color: AppColors.systemPurple,
+          locked: true,
         ),
         _ModuleData(
           title: 'Metas a\ncorto plazo',
@@ -486,34 +511,48 @@ class _ModulesSection extends StatelessWidget {
           color: AppColors.systemRed,
           locked: true,
         ),
-        _ModuleData(
-          title: 'Planificación\nanual',
-          minutes: 12,
-          icon: CupertinoIcons.calendar,
-          color: AppColors.systemBlue,
-        ),
-        _ModuleData(
-          title: 'Emergencias\ny ahorros',
-          minutes: 7,
-          icon: CupertinoIcons.shield_fill,
-          color: AppColors.systemGreen,
-        ),
-        _ModuleData(
-          title: 'Finanzas\nfamiliares',
-          minutes: 10,
-          icon: CupertinoIcons.person_2_fill,
-          color: AppColors.systemPurple,
-        ),
       ],
     ),
     _ModuleCategory(
       label: 'Ahorro',
       modules: [
+        // ── 2 completed ──────────────────────────────────────────────────────
+        _ModuleData(
+          title: 'Por qué\nahorrar',
+          minutes: 4,
+          icon: CupertinoIcons.question_circle_fill,
+          color: AppColors.systemGreen,
+          completed: true,
+        ),
+        _ModuleData(
+          title: 'Reducir\ngastos',
+          minutes: 8,
+          icon: CupertinoIcons.arrow_down_circle_fill,
+          color: AppColors.systemOrange,
+          completed: true,
+        ),
+        // ── Current ──────────────────────────────────────────────────────────
         _ModuleData(
           title: 'Ahorro\nbásico',
           minutes: 6,
           icon: CupertinoIcons.star_circle_fill,
           color: AppColors.systemGreen,
+          recommended: true,
+        ),
+        // ── Locked ───────────────────────────────────────────────────────────
+        _ModuleData(
+          title: 'Ahorrar en\ncomida',
+          minutes: 7,
+          icon: CupertinoIcons.cart_fill,
+          color: AppColors.systemRed,
+          locked: true,
+        ),
+        _ModuleData(
+          title: 'Inversión\npara niños',
+          minutes: 15,
+          icon: CupertinoIcons.book_fill,
+          color: AppColors.systemIndigo,
+          locked: true,
         ),
         _ModuleData(
           title: 'El método\n50/30/20',
@@ -522,111 +561,205 @@ class _ModulesSection extends StatelessWidget {
           color: AppColors.systemTeal,
           locked: true,
         ),
-        _ModuleData(
-          title: 'Reducir\ngastos',
-          minutes: 8,
-          icon: CupertinoIcons.arrow_down_circle_fill,
-          color: AppColors.systemOrange,
-        ),
-        _ModuleData(
-          title: 'Ahorrar en\ncomida',
-          minutes: 7,
-          icon: CupertinoIcons.cart_fill,
-          color: AppColors.systemRed,
-        ),
-        _ModuleData(
-          title: 'Inversión\npara niños',
-          minutes: 15,
-          icon: CupertinoIcons.book_fill,
-          color: AppColors.systemIndigo,
-        ),
       ],
     ),
   ];
+
+  // ── Sort: completed(0) → current(1) → locked(2) ────────────────────────────
+  // Page 0 = [completed A | completed B]  ← one swipe back
+  // Page 1 = [current | first locked]     ← default view (initialPage: 1)
+  // Relative order within each group is preserved (stable sort).
+  static int _sortKey(_ModuleData m) {
+    if (m.completed) return 0; // page 0 — one swipe back
+    if (m.locked) return 2;    // after current
+    return 1;                  // current — always starts page 1
+  }
+
+  static List<_ModuleData> _sorted(List<_ModuleData> modules) {
+    final copy = [...modules];
+    copy.sort((a, b) => _sortKey(a).compareTo(_sortKey(b)));
+    return copy;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    for (var i = 0; i < _categories.length; i++) {
+      // Page 0 = two completed lessons (swipe back to revisit).
+      // Page 1 = current + first locked — the default landing view.
+      _controllers.add(
+        PageController(
+          viewportFraction: 1.0,
+          initialPage: 1,
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    for (final c in _controllers) {
+      c.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: _categories.map((cat) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 32, bottom: 12),
-              child: Text(
-                cat.label,
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.label,
-                  letterSpacing: -0.2,
+      children: [
+        for (var catIndex = 0; catIndex < _categories.length; catIndex++)
+          Builder(builder: (context) {
+            final sorted = _sorted(_categories[catIndex].modules);
+            // After sorting: [completed, completed, current, locked...].
+            // Current is always at index 2 (after the 2 completed lessons).
+            const currentIndex = 2;
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 32, bottom: 12),
+                  child: Text(
+                    _categories[catIndex].label,
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.label,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            SizedBox(
-              height: 130,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.only(left: 24, right: 16),
-                separatorBuilder: (_, __) => const SizedBox(width: 12),
-                itemCount: cat.modules.length,
-                itemBuilder: (_, i) => _ModuleCard(data: cat.modules[i]),
-              ),
-            ),
-            const SizedBox(height: 24),
-          ],
-        );
-      }).toList(),
+                SizedBox(
+                  height: 130,
+                  child: PageView.builder(
+                    controller: _controllers[catIndex],
+                    itemCount: (sorted.length / 2).ceil(),
+                    padEnds: false,
+                    itemBuilder: (_, pageIndex) {
+                      final leftIndex = pageIndex * 2;
+                      final rightIndex = leftIndex + 1;
+
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: _ModuleCard(
+                                data: sorted[leftIndex],
+                                isCurrent: leftIndex == currentIndex,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            if (rightIndex < sorted.length)
+                              Expanded(
+                                child: _ModuleCard(
+                                  data: sorted[rightIndex],
+                                  isCurrent: rightIndex == currentIndex,
+                                ),
+                              )
+                            else
+                              const Expanded(child: SizedBox.shrink()),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
+            );
+          }),
+      ],
     );
   }
 }
 
+// ─── Module card ──────────────────────────────────────────────────────────────
+
 class _ModuleCard extends StatelessWidget {
   final _ModuleData data;
-  const _ModuleCard({required this.data});
+
+  /// Whether this card is the lesson the user is currently on.
+  /// Draws a subtle blue ring so it's easy to spot at a glance.
+  final bool isCurrent;
+
+  const _ModuleCard({required this.data, this.isCurrent = false});
 
   @override
   Widget build(BuildContext context) {
     final locked = data.locked;
-    final iconColor = locked ? AppColors.tertiaryLabel : data.color;
-    final textColor = locked ? AppColors.secondaryLabel : AppColors.label;
+    final completed = data.completed;
 
-    return SizedBox(
-      width: 160,
-      child: CupertinoButton(
-        padding: EdgeInsets.zero,
-        onPressed: locked ? null : () {},
-        child: Stack(
-          children: [
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: locked
-                    ? AppColors.white05
-                    : data.color.withOpacity(0.08),
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                  color: locked
-                      ? AppColors.white07
-                      : data.color.withOpacity(0.22),
-                ),
+    // ── Colors per state ────────────────────────────────────────────────────
+    // locked  → fully gray, no color anywhere
+    // completed → color icon/border but dimmed, green checkmark overlay
+    // current → blue accent border + bg
+    // default → color tinted
+    final Color iconColor;
+    final Color textColor;
+    final Color borderColor;
+    final Color bgColor;
+    final Color iconBgColor;
+
+    if (locked) {
+      iconColor   = AppColors.tertiaryLabel;
+      textColor   = AppColors.tertiaryLabel;
+      borderColor = AppColors.white07;
+      bgColor     = AppColors.white05;
+      iconBgColor = AppColors.white07;
+    } else if (isCurrent) {
+      iconColor   = AppColors.systemBlue;
+      textColor   = AppColors.label;
+      borderColor = AppColors.systemBlue.withOpacity(0.55);
+      bgColor     = AppColors.systemBlue.withOpacity(0.08);
+      iconBgColor = AppColors.systemBlue.withOpacity(0.15);
+    } else if (completed) {
+      iconColor   = data.color.withOpacity(0.5);
+      textColor   = AppColors.secondaryLabel;
+      borderColor = AppColors.white07;
+      bgColor     = AppColors.white05;
+      iconBgColor = data.color.withOpacity(0.08);
+    } else {
+      iconColor   = data.color;
+      textColor   = AppColors.label;
+      borderColor = data.color.withOpacity(0.22);
+      bgColor     = data.color.withOpacity(0.08);
+      iconBgColor = data.color.withOpacity(0.15);
+    }
+
+    return CupertinoButton(
+      padding: EdgeInsets.zero,
+      onPressed: locked ? null : () {},
+      child: Stack(
+        children: [
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: borderColor,
+                width: isCurrent ? 1.5 : 1.0,
               ),
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              height: double.infinity,
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(14),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Icon
                     Container(
-                      width: 36,
-                      height: 36,
+                      width: 34,
+                      height: 34,
                       decoration: BoxDecoration(
-                        color: locked
-                            ? AppColors.white07
-                            : data.color.withOpacity(0.15),
+                        color: iconBgColor,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Icon(data.icon, color: iconColor, size: 18),
+                      child: Icon(data.icon, color: iconColor, size: 17),
                     ),
                     const Spacer(),
                     // Title
@@ -634,29 +767,29 @@ class _ModuleCard extends StatelessWidget {
                       data.title,
                       maxLines: 2,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: textColor,
                         height: 1.3,
                         letterSpacing: -0.2,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 5),
                     // Duration row
                     Row(
                       children: [
                         Icon(
                           CupertinoIcons.clock,
-                          size: 11,
+                          size: 10,
                           color: locked
                               ? AppColors.tertiaryLabel
                               : AppColors.secondaryLabel,
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 3),
                         Text(
-                          '${data.minutes} minutos',
+                          '${data.minutes} min',
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 10,
                             color: locked
                                 ? AppColors.tertiaryLabel
                                 : AppColors.secondaryLabel,
@@ -668,52 +801,103 @@ class _ModuleCard extends StatelessWidget {
                 ),
               ),
             ),
+          ),
 
-            // "Recomendado por IA" floating label
-            if (data.recommended)
-              Positioned(
-                top: 0,
-                right: 0,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: AppColors.systemPurple.withOpacity(0.15),
-                    borderRadius: const BorderRadius.only(
-                      topRight: Radius.circular(18),
-                      bottomLeft: Radius.circular(10),
-                    ),
-                    border: Border.all(
-                      color: AppColors.systemPurple.withOpacity(0.3),
-                      width: 0.5,
-                    ),
+          // ── AI badge — corner pill: wand + "IA" ────────────────────────
+          if (data.recommended && !completed)
+            Positioned(
+              top: 0,
+              right: 0,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: AppColors.systemPurple.withOpacity(0.18),
+                  borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(18),
+                    bottomLeft: Radius.circular(10),
                   ),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    child: Text(
-                      'Recomendado por IA',
-                      style: TextStyle(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w600,
+                  border: Border.all(
+                    color: AppColors.systemPurple.withOpacity(0.35),
+                    width: 0.5,
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        CupertinoIcons.wand_stars,
+                        size: 11,
                         color: AppColors.systemPurple,
-                        letterSpacing: 0.2,
                       ),
-                    ),
+                      const SizedBox(width: 4),
+                      const Text(
+                        'IA',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.systemPurple,
+                          letterSpacing: 0.2,
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
+            ),
 
-            // Lock overlay
-            if (locked)
-              Positioned(
-                top: 12,
-                right: 12,
-                child: Icon(
-                  CupertinoIcons.lock_fill,
-                  size: 13,
-                  color: AppColors.tertiaryLabel,
+          // ── Lock icon ───────────────────────────────────────────────────
+          if (locked)
+            const Positioned(
+              top: 10,
+              right: 10,
+              child: Icon(
+                CupertinoIcons.lock_fill,
+                size: 12,
+                color: AppColors.tertiaryLabel,
+              ),
+            ),
+
+          // ── Completed checkmark (top-right, replaces lock) ──────────────
+          if (completed)
+            Positioned(
+              top: 10,
+              right: 10,
+              child: Container(
+                width: 18,
+                height: 18,
+                decoration: BoxDecoration(
+                  color: AppColors.systemGreen.withOpacity(0.18),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppColors.systemGreen.withOpacity(0.40),
+                    width: 0.5,
+                  ),
+                ),
+                child: const Icon(
+                  CupertinoIcons.checkmark,
+                  size: 10,
+                  color: AppColors.systemGreen,
                 ),
               ),
-          ],
-        ),
+            ),
+
+          // ── Blue pulse dot for current lesson (bottom-right) ────────────
+          if (isCurrent)
+            Positioned(
+              bottom: 10,
+              right: 10,
+              child: Container(
+                width: 7,
+                height: 7,
+                decoration: const BoxDecoration(
+                  color: AppColors.systemBlue,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -736,46 +920,14 @@ class _AchievementsGrid extends StatelessWidget {
   const _AchievementsGrid();
 
   static const _achievements = [
-    _Achievement(
-      label: 'Primer\nlección',
-      icon: CupertinoIcons.pencil,
-      earned: true,
-    ),
-    _Achievement(
-      label: 'Primer\nahorro',
-      icon: CupertinoIcons.money_dollar,
-      earned: true,
-    ),
-    _Achievement(
-      label: 'Una semana\nde racha',
-      icon: CupertinoIcons.rocket_fill,
-      earned: true,
-    ),
-    _Achievement(
-      label: '5 lecciones\nseguidas',
-      icon: CupertinoIcons.pencil_slash,
-      earned: true,
-    ),
-    _Achievement(
-      label: 'Un mes\nde racha',
-      icon: CupertinoIcons.calendar,
-      earned: false,
-    ),
-    _Achievement(
-      label: '365 días\nde racha',
-      icon: CupertinoIcons.gift_fill,
-      earned: false,
-    ),
-    _Achievement(
-      label: 'Noche\nestudiosa',
-      icon: CupertinoIcons.moon_fill,
-      earned: false,
-    ),
-    _Achievement(
-      label: 'Explorador',
-      icon: CupertinoIcons.cube_box_fill,
-      earned: false,
-    ),
+    _Achievement(label: 'Primer\nlección', icon: CupertinoIcons.pencil, earned: true),
+    _Achievement(label: 'Primer\nahorro', icon: CupertinoIcons.money_dollar, earned: true),
+    _Achievement(label: 'Una semana\nde racha', icon: CupertinoIcons.rocket_fill, earned: true),
+    _Achievement(label: '5 lecciones\nseguidas', icon: CupertinoIcons.pencil_slash, earned: true),
+    _Achievement(label: 'Un mes\nde racha', icon: CupertinoIcons.calendar, earned: false),
+    _Achievement(label: '365 días\nde racha', icon: CupertinoIcons.gift_fill, earned: false),
+    _Achievement(label: 'Noche\nestudiosa', icon: CupertinoIcons.moon_fill, earned: false),
+    _Achievement(label: 'Explorador', icon: CupertinoIcons.cube_box_fill, earned: false),
     _Achievement(label: 'Constante', icon: CupertinoIcons.link, earned: false),
   ];
 
@@ -852,34 +1004,16 @@ class _HexPainter extends CustomPainter {
     final cx = size.width / 2;
     final cy = size.height / 2;
     final r = math.min(cx, cy) - 1.5;
-
     final path = Path();
     for (int i = 0; i < 6; i++) {
-      // flat-top hexagon: start at 30°
       final angle = math.pi / 180 * (60 * i - 30);
       final x = cx + r * math.cos(angle);
       final y = cy + r * math.sin(angle);
-      if (i == 0) {
-        path.moveTo(x, y);
-      } else {
-        path.lineTo(x, y);
-      }
+      if (i == 0) path.moveTo(x, y); else path.lineTo(x, y);
     }
     path.close();
-
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = fillColor
-        ..style = PaintingStyle.fill,
-    );
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = borderColor
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.5,
-    );
+    canvas.drawPath(path, Paint()..color = fillColor..style = PaintingStyle.fill);
+    canvas.drawPath(path, Paint()..color = borderColor..style = PaintingStyle.stroke..strokeWidth = 1.5);
   }
 
   @override
