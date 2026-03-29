@@ -8,6 +8,9 @@ import '../widgets/animated_blobs.dart';
 import '../widgets/header_row.dart';
 import 'conceptos_base_lesson.dart';
 import 'ahorro_activo_lesson.dart';
+import 'a_donde_se_va_tu_dinero_lesson.dart';
+import 'gastos_hormiga_lesson.dart';
+import 'ahorro_basico_lesson.dart';
 import 'comer_fuera_vs_cocinar_lesson.dart';
 
 class AprenderScreen extends StatefulWidget {
@@ -271,7 +274,10 @@ class _RingPainter extends CustomPainter {
     final rect = Rect.fromCircle(center: center, radius: radius);
 
     canvas.drawArc(
-      rect, 0, math.pi * 2, false,
+      rect,
+      0,
+      math.pi * 2,
+      false,
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 7
@@ -280,7 +286,10 @@ class _RingPainter extends CustomPainter {
 
     if (progress > 0) {
       canvas.drawArc(
-        rect, -math.pi / 2, math.pi * 2 * progress, false,
+        rect,
+        -math.pi / 2,
+        math.pi * 2 * progress,
+        false,
         Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = 7
@@ -384,6 +393,7 @@ class _ModuleData {
   final bool recommended;
   final bool locked;
   final bool completed;
+  final Widget? lessonScreen;
   const _ModuleData({
     required this.title,
     required this.minutes,
@@ -392,6 +402,7 @@ class _ModuleData {
     this.recommended = false,
     this.locked = false,
     this.completed = false,
+    this.lessonScreen,
   });
 }
 
@@ -438,6 +449,7 @@ class _ModulesSectionState extends State<_ModulesSection> {
           icon: CupertinoIcons.money_dollar_circle_fill,
           color: AppColors.systemBlue,
           recommended: true,
+          lessonScreen: const ADondeSeVaTuDineroLesson(),
         ),
         // ── Locked ───────────────────────────────────────────────────────────
         _ModuleData(
@@ -488,6 +500,7 @@ class _ModulesSectionState extends State<_ModulesSection> {
           icon: CupertinoIcons.ant_fill,
           color: AppColors.systemOrange,
           recommended: true,
+          lessonScreen: const GastosHormigaLesson(),
         ),
         // ── Locked ───────────────────────────────────────────────────────────
         _ModuleData(
@@ -538,6 +551,7 @@ class _ModulesSectionState extends State<_ModulesSection> {
           icon: CupertinoIcons.star_circle_fill,
           color: AppColors.systemGreen,
           recommended: true,
+          lessonScreen: const AhorroBasicoLesson(),
         ),
         // ── Locked ───────────────────────────────────────────────────────────
         _ModuleData(
@@ -571,8 +585,8 @@ class _ModulesSectionState extends State<_ModulesSection> {
   // Relative order within each group is preserved (stable sort).
   static int _sortKey(_ModuleData m) {
     if (m.completed) return 0; // page 0 — one swipe back
-    if (m.locked) return 2;    // after current
-    return 1;                  // current — always starts page 1
+    if (m.locked) return 2; // after current
+    return 1; // current — always starts page 1
   }
 
   static List<_ModuleData> _sorted(List<_ModuleData> modules) {
@@ -587,12 +601,7 @@ class _ModulesSectionState extends State<_ModulesSection> {
     for (var i = 0; i < _categories.length; i++) {
       // Page 0 = two completed lessons (swipe back to revisit).
       // Page 1 = current + first locked — the default landing view.
-      _controllers.add(
-        PageController(
-          viewportFraction: 1.0,
-          initialPage: 1,
-        ),
-      );
+      _controllers.add(PageController(viewportFraction: 1.0, initialPage: 1));
     }
   }
 
@@ -610,67 +619,69 @@ class _ModulesSectionState extends State<_ModulesSection> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         for (var catIndex = 0; catIndex < _categories.length; catIndex++)
-          Builder(builder: (context) {
-            final sorted = _sorted(_categories[catIndex].modules);
-            // After sorting: [completed, completed, current, locked...].
-            // Current is always at index 2 (after the 2 completed lessons).
-            const currentIndex = 2;
+          Builder(
+            builder: (context) {
+              final sorted = _sorted(_categories[catIndex].modules);
+              // After sorting: [completed, completed, current, locked...].
+              // Current is always at index 2 (after the 2 completed lessons).
+              const currentIndex = 2;
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 32, bottom: 12),
-                  child: Text(
-                    _categories[catIndex].label,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.label,
-                      letterSpacing: -0.2,
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 32, bottom: 12),
+                    child: Text(
+                      _categories[catIndex].label,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.label,
+                        letterSpacing: -0.2,
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  height: 130,
-                  child: PageView.builder(
-                    controller: _controllers[catIndex],
-                    itemCount: (sorted.length / 2).ceil(),
-                    padEnds: false,
-                    itemBuilder: (_, pageIndex) {
-                      final leftIndex = pageIndex * 2;
-                      final rightIndex = leftIndex + 1;
+                  SizedBox(
+                    height: 130,
+                    child: PageView.builder(
+                      controller: _controllers[catIndex],
+                      itemCount: (sorted.length / 2).ceil(),
+                      padEnds: false,
+                      itemBuilder: (_, pageIndex) {
+                        final leftIndex = pageIndex * 2;
+                        final rightIndex = leftIndex + 1;
 
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: _ModuleCard(
-                                data: sorted[leftIndex],
-                                isCurrent: leftIndex == currentIndex,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            if (rightIndex < sorted.length)
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
+                            children: [
                               Expanded(
                                 child: _ModuleCard(
-                                  data: sorted[rightIndex],
-                                  isCurrent: rightIndex == currentIndex,
+                                  data: sorted[leftIndex],
+                                  isCurrent: leftIndex == currentIndex,
                                 ),
-                              )
-                            else
-                              const Expanded(child: SizedBox.shrink()),
-                          ],
-                        ),
-                      );
-                    },
+                              ),
+                              const SizedBox(width: 8),
+                              if (rightIndex < sorted.length)
+                                Expanded(
+                                  child: _ModuleCard(
+                                    data: sorted[rightIndex],
+                                    isCurrent: rightIndex == currentIndex,
+                                  ),
+                                )
+                              else
+                                const Expanded(child: SizedBox.shrink()),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                ),
-                const SizedBox(height: 24),
-              ],
-            );
-          }),
+                  const SizedBox(height: 24),
+                ],
+              );
+            },
+          ),
       ],
     );
   }
@@ -680,12 +691,10 @@ class _ModulesSectionState extends State<_ModulesSection> {
 
 class _ModuleCard extends StatelessWidget {
   final _ModuleData data;
-
-  /// Whether this card is the lesson the user is currently on.
-  /// Draws a subtle blue ring so it's easy to spot at a glance.
   final bool isCurrent;
+  final VoidCallback? onTap;
 
-  const _ModuleCard({required this.data, this.isCurrent = false});
+  const _ModuleCard({required this.data, this.isCurrent = false, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -704,142 +713,105 @@ class _ModuleCard extends StatelessWidget {
     final Color iconBgColor;
 
     if (locked) {
-      iconColor   = AppColors.tertiaryLabel;
-      textColor   = AppColors.tertiaryLabel;
+      iconColor = AppColors.tertiaryLabel;
+      textColor = AppColors.tertiaryLabel;
       borderColor = AppColors.white07;
-      bgColor     = AppColors.white05;
+      bgColor = AppColors.white05;
       iconBgColor = AppColors.white07;
     } else if (isCurrent) {
-      iconColor   = AppColors.systemBlue;
-      textColor   = AppColors.label;
+      iconColor = AppColors.systemBlue;
+      textColor = AppColors.label;
       borderColor = AppColors.systemBlue.withOpacity(0.55);
-      bgColor     = AppColors.systemBlue.withOpacity(0.08);
+      bgColor = AppColors.systemBlue.withOpacity(0.08);
       iconBgColor = AppColors.systemBlue.withOpacity(0.15);
     } else if (completed) {
-      iconColor   = data.color.withOpacity(0.5);
-      textColor   = AppColors.secondaryLabel;
+      iconColor = data.color.withOpacity(0.5);
+      textColor = AppColors.secondaryLabel;
       borderColor = AppColors.white07;
-      bgColor     = AppColors.white05;
+      bgColor = AppColors.white05;
       iconBgColor = data.color.withOpacity(0.08);
     } else {
-      iconColor   = data.color;
-      textColor   = AppColors.label;
+      iconColor = data.color;
+      textColor = AppColors.label;
       borderColor = data.color.withOpacity(0.22);
-      bgColor     = data.color.withOpacity(0.08);
+      bgColor = data.color.withOpacity(0.08);
       iconBgColor = data.color.withOpacity(0.15);
     }
 
-    return CupertinoButton(
-      padding: EdgeInsets.zero,
-      onPressed: locked ? null : () {},
-      child: Stack(
-        children: [
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: borderColor,
-                width: isCurrent ? 1.5 : 1.0,
+    return Builder(
+      builder: (context) => CupertinoButton(
+        padding: EdgeInsets.zero,
+        onPressed: locked || data.lessonScreen == null
+            ? null
+            : () {
+                Navigator.of(
+                  context,
+                ).push(CupertinoPageRoute(builder: (_) => data.lessonScreen!));
+              },
+        child: Stack(
+          children: [
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: borderColor,
+                  width: isCurrent ? 1.5 : 1.0,
+                ),
               ),
-            ),
-            child: SizedBox(
-              width: double.infinity,
-              height: double.infinity,
-              child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Icon
-                    Container(
-                      width: 34,
-                      height: 34,
-                      decoration: BoxDecoration(
-                        color: iconBgColor,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(data.icon, color: iconColor, size: 17),
-                    ),
-                    const Spacer(),
-                    // Title
-                    Text(
-                      data.title,
-                      maxLines: 2,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: textColor,
-                        height: 1.3,
-                        letterSpacing: -0.2,
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    // Duration row
-                    Row(
-                      children: [
-                        Icon(
-                          CupertinoIcons.clock,
-                          size: 10,
-                          color: locked
-                              ? AppColors.tertiaryLabel
-                              : AppColors.secondaryLabel,
+              child: SizedBox(
+                width: double.infinity,
+                height: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Icon
+                      Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          color: iconBgColor,
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        const SizedBox(width: 3),
-                        Text(
-                          '${data.minutes} min',
-                          style: TextStyle(
-                            fontSize: 10,
+                        child: Icon(data.icon, color: iconColor, size: 17),
+                      ),
+                      const Spacer(),
+                      // Title
+                      Text(
+                        data.title,
+                        maxLines: 2,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: textColor,
+                          height: 1.3,
+                          letterSpacing: -0.2,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      // Duration row
+                      Row(
+                        children: [
+                          Icon(
+                            CupertinoIcons.clock,
+                            size: 10,
                             color: locked
                                 ? AppColors.tertiaryLabel
                                 : AppColors.secondaryLabel,
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          // ── AI badge — corner pill: wand + "IA" ────────────────────────
-          if (data.recommended && !completed)
-            Positioned(
-              top: 0,
-              right: 0,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: AppColors.systemPurple.withOpacity(0.18),
-                  borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(18),
-                    bottomLeft: Radius.circular(10),
-                  ),
-                  border: Border.all(
-                    color: AppColors.systemPurple.withOpacity(0.35),
-                    width: 0.5,
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        CupertinoIcons.wand_stars,
-                        size: 11,
-                        color: AppColors.systemPurple,
-                      ),
-                      const SizedBox(width: 4),
-                      const Text(
-                        'IA',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.systemPurple,
-                          letterSpacing: 0.2,
-                          height: 1.3,
-                        ),
+                          const SizedBox(width: 3),
+                          Text(
+                            '${data.minutes} min',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: locked
+                                  ? AppColors.tertiaryLabel
+                                  : AppColors.secondaryLabel,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -847,57 +819,105 @@ class _ModuleCard extends StatelessWidget {
               ),
             ),
 
-          // ── Lock icon ───────────────────────────────────────────────────
-          if (locked)
-            const Positioned(
-              top: 10,
-              right: 10,
-              child: Icon(
-                CupertinoIcons.lock_fill,
-                size: 12,
-                color: AppColors.tertiaryLabel,
-              ),
-            ),
-
-          // ── Completed checkmark (top-right, replaces lock) ──────────────
-          if (completed)
-            Positioned(
-              top: 10,
-              right: 10,
-              child: Container(
-                width: 18,
-                height: 18,
-                decoration: BoxDecoration(
-                  color: AppColors.systemGreen.withOpacity(0.18),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppColors.systemGreen.withOpacity(0.40),
-                    width: 0.5,
+            // ── AI badge — corner pill: wand + "IA" ────────────────────────
+            if (data.recommended && !completed)
+              Positioned(
+                top: 0,
+                right: 0,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: AppColors.systemPurple.withOpacity(0.18),
+                    borderRadius: const BorderRadius.only(
+                      topRight: Radius.circular(18),
+                      bottomLeft: Radius.circular(10),
+                    ),
+                    border: Border.all(
+                      color: AppColors.systemPurple.withOpacity(0.35),
+                      width: 0.5,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 5,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          CupertinoIcons.wand_stars,
+                          size: 11,
+                          color: AppColors.systemPurple,
+                        ),
+                        const SizedBox(width: 4),
+                        const Text(
+                          'IA',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.systemPurple,
+                            letterSpacing: 0.2,
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                child: const Icon(
-                  CupertinoIcons.checkmark,
-                  size: 10,
-                  color: AppColors.systemGreen,
-                ),
               ),
-            ),
 
-          // ── Blue pulse dot for current lesson (bottom-right) ────────────
-          if (isCurrent)
-            Positioned(
-              bottom: 10,
-              right: 10,
-              child: Container(
-                width: 7,
-                height: 7,
-                decoration: const BoxDecoration(
-                  color: AppColors.systemBlue,
-                  shape: BoxShape.circle,
+            // ── Lock icon ───────────────────────────────────────────────────
+            if (locked)
+              const Positioned(
+                top: 10,
+                right: 10,
+                child: Icon(
+                  CupertinoIcons.lock_fill,
+                  size: 12,
+                  color: AppColors.tertiaryLabel,
                 ),
               ),
-            ),
-        ],
+
+            // ── Completed checkmark (top-right, replaces lock) ──────────────
+            if (completed)
+              Positioned(
+                top: 10,
+                right: 10,
+                child: Container(
+                  width: 18,
+                  height: 18,
+                  decoration: BoxDecoration(
+                    color: AppColors.systemGreen.withOpacity(0.18),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColors.systemGreen.withOpacity(0.40),
+                      width: 0.5,
+                    ),
+                  ),
+                  child: const Icon(
+                    CupertinoIcons.checkmark,
+                    size: 10,
+                    color: AppColors.systemGreen,
+                  ),
+                ),
+              ),
+
+            // ── Blue pulse dot for current lesson (bottom-right) ────────────
+            if (isCurrent)
+              Positioned(
+                bottom: 10,
+                right: 10,
+                child: Container(
+                  width: 7,
+                  height: 7,
+                  decoration: const BoxDecoration(
+                    color: AppColors.systemBlue,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -920,14 +940,46 @@ class _AchievementsGrid extends StatelessWidget {
   const _AchievementsGrid();
 
   static const _achievements = [
-    _Achievement(label: 'Primer\nlección', icon: CupertinoIcons.pencil, earned: true),
-    _Achievement(label: 'Primer\nahorro', icon: CupertinoIcons.money_dollar, earned: true),
-    _Achievement(label: 'Una semana\nde racha', icon: CupertinoIcons.rocket_fill, earned: true),
-    _Achievement(label: '5 lecciones\nseguidas', icon: CupertinoIcons.pencil_slash, earned: true),
-    _Achievement(label: 'Un mes\nde racha', icon: CupertinoIcons.calendar, earned: false),
-    _Achievement(label: '365 días\nde racha', icon: CupertinoIcons.gift_fill, earned: false),
-    _Achievement(label: 'Noche\nestudiosa', icon: CupertinoIcons.moon_fill, earned: false),
-    _Achievement(label: 'Explorador', icon: CupertinoIcons.cube_box_fill, earned: false),
+    _Achievement(
+      label: 'Primer\nlección',
+      icon: CupertinoIcons.pencil,
+      earned: true,
+    ),
+    _Achievement(
+      label: 'Primer\nahorro',
+      icon: CupertinoIcons.money_dollar,
+      earned: true,
+    ),
+    _Achievement(
+      label: 'Una semana\nde racha',
+      icon: CupertinoIcons.rocket_fill,
+      earned: true,
+    ),
+    _Achievement(
+      label: '5 lecciones\nseguidas',
+      icon: CupertinoIcons.pencil_slash,
+      earned: true,
+    ),
+    _Achievement(
+      label: 'Un mes\nde racha',
+      icon: CupertinoIcons.calendar,
+      earned: false,
+    ),
+    _Achievement(
+      label: '365 días\nde racha',
+      icon: CupertinoIcons.gift_fill,
+      earned: false,
+    ),
+    _Achievement(
+      label: 'Noche\nestudiosa',
+      icon: CupertinoIcons.moon_fill,
+      earned: false,
+    ),
+    _Achievement(
+      label: 'Explorador',
+      icon: CupertinoIcons.cube_box_fill,
+      earned: false,
+    ),
     _Achievement(label: 'Constante', icon: CupertinoIcons.link, earned: false),
   ];
 
@@ -1009,11 +1061,25 @@ class _HexPainter extends CustomPainter {
       final angle = math.pi / 180 * (60 * i - 30);
       final x = cx + r * math.cos(angle);
       final y = cy + r * math.sin(angle);
-      if (i == 0) path.moveTo(x, y); else path.lineTo(x, y);
+      if (i == 0)
+        path.moveTo(x, y);
+      else
+        path.lineTo(x, y);
     }
     path.close();
-    canvas.drawPath(path, Paint()..color = fillColor..style = PaintingStyle.fill);
-    canvas.drawPath(path, Paint()..color = borderColor..style = PaintingStyle.stroke..strokeWidth = 1.5);
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = fillColor
+        ..style = PaintingStyle.fill,
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = borderColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5,
+    );
   }
 
   @override
