@@ -21,10 +21,14 @@ class _DashboardScreenState extends State<DashboardScreen>
     with TickerProviderStateMixin {
   bool _showMoreExpenses = false;
   String _selectedFilter = 'Todos';
+  String _selectedOrigin = 'Todos';
 
   final List<String> _filterCategories = List.from(kFilterCategories);
   late PageController _pillPageController;
   int _pillPage = 0;
+
+  late PageController _originPageController;
+  int _originPage = 0;
 
   late AnimationController _blob1Controller;
   late AnimationController _blob2Controller;
@@ -66,6 +70,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     _appearController.forward();
 
     _pillPageController = PageController();
+    _originPageController = PageController();
   }
 
   @override
@@ -74,12 +79,19 @@ class _DashboardScreenState extends State<DashboardScreen>
     _blob2Controller.dispose();
     _appearController.dispose();
     _pillPageController.dispose();
+    _originPageController.dispose();
     super.dispose();
   }
 
   List<ExpenseData> get _filteredExpenses {
-    if (_selectedFilter == 'Todos') return kAllExpenses;
-    return kAllExpenses.where((e) => e.category == _selectedFilter).toList();
+    var expenses = kAllExpenses;
+    if (_selectedFilter != 'Todos') {
+      expenses = expenses.where((e) => e.category == _selectedFilter).toList();
+    }
+    if (_selectedOrigin != 'Todos') {
+      expenses = expenses.where((e) => e.origin == _selectedOrigin).toList();
+    }
+    return expenses;
   }
 
   void _showAddCategorySheet() {
@@ -253,7 +265,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         const Padding(
           padding: EdgeInsets.fromLTRB(20, 0, 20, 12),
           child: Text(
-            'GASTOS RECIENTES',
+            'MOVIMIENTOS RECIENTES',
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
@@ -277,6 +289,21 @@ class _DashboardScreenState extends State<DashboardScreen>
             });
           },
           onAddCategory: _showAddCategorySheet,
+        ),
+        const SizedBox(height: 12),
+        OriginPager(
+          origins: kFilterOrigins,
+          selectedOrigin: _selectedOrigin,
+          pageController: _originPageController,
+          currentPage: _originPage,
+          onPageChanged: (p) => setState(() => _originPage = p),
+          onOriginSelected: (origin) {
+            HapticFeedback.selectionClick();
+            setState(() {
+              _selectedOrigin = origin;
+              _showMoreExpenses = false;
+            });
+          },
         ),
         const SizedBox(height: 12),
         Padding(
@@ -328,7 +355,13 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
           const SizedBox(height: 10),
           Text(
-            'Sin gastos en "$_selectedFilter"',
+            _selectedFilter == 'Todos' && _selectedOrigin == 'Todos'
+                ? 'Sin gastos'
+                : _selectedFilter == 'Todos'
+                ? 'Sin gastos en "$_selectedOrigin"'
+                : _selectedOrigin == 'Todos'
+                ? 'Sin gastos en "$_selectedFilter"'
+                : 'Sin gastos en "$_selectedFilter" con "$_selectedOrigin"',
             style: const TextStyle(
               fontSize: 14,
               color: AppColors.secondaryLabel,

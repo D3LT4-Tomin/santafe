@@ -9,6 +9,7 @@ import '../widgets/buttons.dart';
 import '../screens/add_bank_account_screen.dart';
 import '../screens/add_cash_account_screen.dart';
 import '../screens/add_investment_screen.dart';
+import '../screens/account_movements_screen.dart';
 
 class CuentaScreen extends StatefulWidget {
   final ScrollController scrollController;
@@ -471,7 +472,14 @@ class _BankAccountRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoButton(
       padding: EdgeInsets.zero,
-      onPressed: () => HapticFeedback.selectionClick(),
+      onPressed: () {
+        HapticFeedback.selectionClick();
+        Navigator.of(context).push(
+          CupertinoPageRoute(
+            builder: (context) => AccountMovementsScreen(originName: bankName),
+          ),
+        );
+      },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
@@ -663,7 +671,14 @@ class _CashRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoButton(
       padding: EdgeInsets.zero,
-      onPressed: () => HapticFeedback.selectionClick(),
+      onPressed: () {
+        HapticFeedback.selectionClick();
+        Navigator.of(context).push(
+          CupertinoPageRoute(
+            builder: (context) => AccountMovementsScreen(originName: name),
+          ),
+        );
+      },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
@@ -833,7 +848,14 @@ class _InvestmentRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoButton(
       padding: EdgeInsets.zero,
-      onPressed: () => HapticFeedback.selectionClick(),
+      onPressed: () {
+        HapticFeedback.selectionClick();
+        Navigator.of(context).push(
+          CupertinoPageRoute(
+            builder: (context) => AccountMovementsScreen(originName: name),
+          ),
+        );
+      },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(

@@ -367,3 +367,169 @@ class PillPager extends StatelessWidget {
     );
   }
 }
+
+// ─── Origin Filter Pill Pager ───────────────────────────────────────────────
+class OriginPager extends StatelessWidget {
+  final List<String> origins;
+  final String selectedOrigin;
+  final PageController pageController;
+  final int currentPage;
+  final ValueChanged<int> onPageChanged;
+  final ValueChanged<String> onOriginSelected;
+
+  static const int _pillsPerPage = 4;
+  static const double _pillGap = 8.0;
+  static const double _pillHeight = 28.0;
+
+  const OriginPager({
+    super.key,
+    required this.origins,
+    required this.selectedOrigin,
+    required this.pageController,
+    required this.currentPage,
+    required this.onPageChanged,
+    required this.onOriginSelected,
+  });
+
+  int _pageCount() => (origins.length / _pillsPerPage).ceil();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          const interPageGap = 16.0;
+          final pillWidth =
+              (constraints.maxWidth -
+                  interPageGap -
+                  (_pillsPerPage - 1) * _pillGap) /
+              _pillsPerPage;
+          final pageCount = _pageCount();
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: _pillHeight,
+                child: PageView.builder(
+                  controller: pageController,
+                  itemCount: pageCount,
+                  onPageChanged: onPageChanged,
+                  physics: const BouncingScrollPhysics(),
+                  itemBuilder: (context, pageIndex) {
+                    final start = pageIndex * _pillsPerPage;
+                    final end = (start + _pillsPerPage).clamp(
+                      0,
+                      origins.length,
+                    );
+                    final pageOrigins = origins.sublist(start, end);
+
+                    return Padding(
+                      padding: const EdgeInsets.only(right: interPageGap),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          for (int i = 0; i < pageOrigins.length; i++) ...[
+                            if (i > 0) const SizedBox(width: _pillGap),
+                            OriginPill(
+                              label: pageOrigins[i],
+                              selected: selectedOrigin == pageOrigins[i],
+                              width: pillWidth,
+                              onTap: () => onOriginSelected(pageOrigins[i]),
+                            ),
+                          ],
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              if (pageCount > 1) ...[
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    for (int i = 0; i < pageCount; i++) ...[
+                      if (i > 0) const SizedBox(width: 5),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 260),
+                        curve: Curves.easeOutCubic,
+                        width: 5,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: currentPage == i
+                              ? AppColors.systemBlue
+                              : const Color(0x3DFFFFFF),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+// ─── Origin Pill ─────────────────────────────────────────────────────────────
+class OriginPill extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  final double width;
+
+  const OriginPill({
+    super.key,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    required this.width,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutCubic,
+        width: width,
+        height: 28,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(
+          color: selected
+              ? AppColors.systemGreen.withOpacity(0.2)
+              : const Color(0x1AFFFFFF),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+            color: selected
+                ? AppColors.systemGreen.withOpacity(0.5)
+                : const Color(0x1FFFFFFF),
+            width: 0.5,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+              letterSpacing: -0.1,
+              color: selected
+                  ? AppColors.systemGreen
+                  : AppColors.secondaryLabel,
+              height: 1.3,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
