@@ -24,21 +24,36 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
+  bool _isInLesson = false;
 
-  final List<ScrollController> _scrollControllers =
-      List.generate(4, (_) => ScrollController());
+  final List<ScrollController> _scrollControllers = List.generate(
+    4,
+    (_) => ScrollController(),
+  );
 
   final _searchBarOpacity = ValueNotifier<double>(1.0);
   double _lastScrollOffset = 0;
 
-  final List<GlobalKey<NavigatorState>> _navigatorKeys =
-      List.generate(4, (_) => GlobalKey<NavigatorState>());
+  final List<GlobalKey<NavigatorState>> _navigatorKeys = List.generate(
+    4,
+    (_) => GlobalKey<NavigatorState>(),
+  );
 
+  late final List<NavigatorObserver> _navigatorObservers;
   late final List<Widget> _screens;
 
   @override
   void initState() {
     super.initState();
+
+    _navigatorObservers = List.generate(
+      4,
+      (index) => _ShellNavigatorObserver(() {
+        if (index == _selectedIndex) {
+          _updateLessonState();
+        }
+      }),
+    );
 
     _screens = [
       DashboardScreen(scrollController: _scrollControllers[0]),
@@ -55,6 +70,26 @@ class _AppShellState extends State<AppShell> {
     });
 
     _scrollControllers[_selectedIndex].addListener(_onScroll);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateLessonState();
+    });
+  }
+
+  void _updateLessonState() {
+    final key = _navigatorKeys[_selectedIndex];
+    final nav = key.currentState;
+    if (nav != null) {
+      final inLesson = nav.canPop();
+      if (inLesson != _isInLesson) {
+        setState(() => _isInLesson = inLesson);
+      }
+    } else {
+      // If navigator is not yet built, assume not in lesson
+      if (_isInLesson) {
+        setState(() => _isInLesson = false);
+      }
+    }
   }
 
   @override
@@ -95,6 +130,7 @@ class _AppShellState extends State<AppShell> {
       });
 
       _scrollControllers[_selectedIndex].addListener(_onScroll);
+      _updateLessonState();
     }
   }
 
@@ -154,42 +190,46 @@ class _AppShellState extends State<AppShell> {
                 return _TabNavigator(
                   navigatorKey: _navigatorKeys[index],
                   screen: _screens[index],
+                  observers: [_navigatorObservers[index]],
                 );
               }),
             ),
 
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: IgnorePointer(child: _buildHeaderChrome(topPadding)),
-            ),
+            if (!_isInLesson) ...[
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: IgnorePointer(child: _buildHeaderChrome(topPadding)),
+              ),
 
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: _buildFixedHeader(topPadding),
-            ),
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: _buildFixedHeader(topPadding),
+              ),
+            ],
 
-            if (_selectedIndex == 0)
+            if (_selectedIndex == 0 && !_isInLesson)
               Positioned(
                 right: 20,
                 bottom: MediaQuery.of(context).padding.bottom + 70,
                 child: FabButton(onTap: _showAddExpenseSheet),
               ),
 
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: RepaintBoundary(
-                child: AppTabBar(
-                  selectedIndex: _selectedIndex,
-                  onTabSelected: _onTabSelected,
+            if (!_isInLesson)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: RepaintBoundary(
+                  child: AppTabBar(
+                    selectedIndex: _selectedIndex,
+                    onTabSelected: _onTabSelected,
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),
@@ -250,18 +290,46 @@ class _AppShellState extends State<AppShell> {
 class _TabNavigator extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
   final Widget screen;
+  final List<NavigatorObserver> observers;
 
   const _TabNavigator({
     required this.navigatorKey,
     required this.screen,
+    this.observers = const [],
   });
 
   @override
   Widget build(BuildContext context) {
     return Navigator(
       key: navigatorKey,
-      onGenerateRoute: (_) =>
-          CupertinoPageRoute(builder: (_) => screen),
+      observers: observers,
+      onGenerateRoute: (_) => CupertinoPageRoute(builder: (_) => screen),
     );
+  }
+}
+
+class _ShellNavigatorObserver extends NavigatorObserver {
+  final VoidCallback onNavigation;
+
+  _ShellNavigatorObserver(this.onNavigation);
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    onNavigation();
+  }
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    onNavigation();
+  }
+
+  @override
+  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    onNavigation();
+  }
+
+  @override
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    onNavigation();
   }
 }

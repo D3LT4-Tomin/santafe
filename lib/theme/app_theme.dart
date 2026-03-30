@@ -15,6 +15,7 @@ class AppColors {
   static const systemTeal = Color(0xFF64D2FF);
   static const systemIndigo = Color(0xFF5E5CE6);
   static const systemPurple = Color(0xFFBF5AF2);
+  static const systemYellow = Color(0xFFFFD60A);
   static const separator = Color(0xFF38383A);
   static const tertiaryFill = Color(0x1F767680);
   static const frostedBlue = Color(0xFF070D1A);

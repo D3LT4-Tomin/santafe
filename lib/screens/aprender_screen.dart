@@ -1,17 +1,12 @@
 import 'dart:math' as math;
-import 'dart:ui' show ImageFilter;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
 import '../widgets/animated_blobs.dart';
-import '../widgets/header_row.dart';
-import 'conceptos_base_lesson.dart';
-import 'ahorro_activo_lesson.dart';
 import 'a_donde_se_va_tu_dinero_lesson.dart';
 import 'gastos_hormiga_lesson.dart';
 import 'ahorro_basico_lesson.dart';
-import 'comer_fuera_vs_cocinar_lesson.dart';
 
 class AprenderScreen extends StatefulWidget {
   final ScrollController scrollController;
@@ -29,8 +24,6 @@ class _AprenderScreenState extends State<AprenderScreen>
   late Animation<double> _blob2Anim;
   late AnimationController _appearController;
   late Animation<double> _appearAnim;
-
-  final _searchBarOpacity = ValueNotifier<double>(1.0);
 
   @override
   void initState() {
@@ -68,7 +61,6 @@ class _AprenderScreenState extends State<AprenderScreen>
     _blob1Controller.dispose();
     _blob2Controller.dispose();
     _appearController.dispose();
-    _searchBarOpacity.dispose();
     super.dispose();
   }
 
@@ -111,59 +103,7 @@ class _AprenderScreenState extends State<AprenderScreen>
             ),
           ),
         ),
-        Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          child: IgnorePointer(child: _buildHeaderChrome(topPadding)),
-        ),
-        Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          child: Padding(
-            padding: EdgeInsets.only(
-              top: topPadding + 10,
-              bottom: 20,
-              left: 16,
-              right: 8,
-            ),
-            child: HeaderRow(
-              searchBarOpacity: _searchBarOpacity,
-              onSearchPressed: () {},
-            ),
-          ),
-        ),
       ],
-    );
-  }
-
-  Widget _buildHeaderChrome(double topPadding) {
-    return SizedBox(
-      height: topPadding + 66.0,
-      child: Stack(
-        children: [
-          const Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [AppColors.frostedBlue, Color(0x00070D1A)],
-                ),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                child: const ColoredBox(color: Colors.transparent),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -449,7 +389,7 @@ class _ModulesSectionState extends State<_ModulesSection> {
           icon: CupertinoIcons.money_dollar_circle_fill,
           color: AppColors.systemBlue,
           recommended: true,
-          lessonScreen: const ADondeSeVaTuDineroLesson(),
+          lessonScreen: const DondeSeVanLesson(),
         ),
         // ── Locked ───────────────────────────────────────────────────────────
         _ModuleData(

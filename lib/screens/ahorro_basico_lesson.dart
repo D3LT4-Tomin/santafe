@@ -1,0 +1,104 @@
+import 'package:flutter/cupertino.dart';
+import '../theme/app_theme.dart';
+
+class AhorroBasicoLesson extends StatelessWidget {
+  const AhorroBasicoLesson({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      backgroundColor: AppColors.systemBackground,
+      child: Stack(
+        children: [
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 8,
+            left: 8,
+            child: CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: () => Navigator.of(context).pop(),
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: AppColors.systemBackground.withOpacity(0.8),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  CupertinoIcons.xmark,
+                  color: AppColors.label,
+                  size: 18,
+                ),
+              ),
+            ),
+          ),
+          SafeArea(
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                const SizedBox(height: 40),
+                const Text(
+                  '6 min',
+                  style: TextStyle(fontSize: 12, color: AppColors.systemGreen),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Ahorro Básico',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.label,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'El ahorro es la base de toda salud financiera. Aprender a ahorrar aunque sea poco puede cambiar tu futuro.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    height: 1.5,
+                    color: AppColors.label,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'La regla 50/30/20',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.label,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  '• 50% para necesidades (renta, servicios, comida)\n• 30% para deseos (entretenimiento, restaurantes)\n• 20% para ahorro e inversión',
+                  style: TextStyle(
+                    fontSize: 15,
+                    height: 1.6,
+                    color: AppColors.secondaryLabel,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'Tips para empezar',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.label,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  '1. Págate primero: guarda antes de gastar\n2. Automatiza tu ahorro\n3. Empieza con lo que te sobre, aunque sea poco\n4. Incrementa 1% cada mes\n5. No toques lo que ahorras',
+                  style: TextStyle(
+                    fontSize: 15,
+                    height: 1.5,
+                    color: AppColors.secondaryLabel,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
