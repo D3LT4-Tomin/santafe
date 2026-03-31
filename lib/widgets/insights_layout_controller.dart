@@ -5,7 +5,8 @@ import 'package:flutter/foundation.dart';
 enum InsightWidgetId {
   stats,
   savingsChart,
-  categories,
+  categoriesGastos,
+  categoriesIngresos,
   origin,
   bank,
   predictions,

@@ -140,73 +140,73 @@ class _InsightsScreenState extends State<InsightsScreen>
                       ? controller.exitReorderMode
                       : null,
                   child: SingleChildScrollView(
-              controller: widget.scrollController,
-              physics: const BouncingScrollPhysics(),
-              padding: EdgeInsets.only(top: topPadding + 76, bottom: 120),
-              child: FadeTransition(
-                opacity: _appearAnim,
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0, 0.04),
-                    end: Offset.zero,
-                  ).animate(_appearAnim),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // ── Dynamic widget list ─────────────────────────────
-                      Consumer<InsightsLayoutController>(
-                        builder: (context, controller, _) {
-                          final configs = controller.visibleConfigs;
+                    controller: widget.scrollController,
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.only(top: topPadding + 76, bottom: 120),
+                    child: FadeTransition(
+                      opacity: _appearAnim,
+                      child: SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(0, 0.04),
+                          end: Offset.zero,
+                        ).animate(_appearAnim),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // ── Dynamic widget list ─────────────────────────────
+                            Consumer<InsightsLayoutController>(
+                              builder: (context, controller, _) {
+                                final configs = controller.visibleConfigs;
 
-                          if (controller.isReorderMode) {
-                            return Localizations(
-                              locale: const Locale('en'),
-                              delegates: const [
-                                DefaultWidgetsLocalizations.delegate,
-                                DefaultMaterialLocalizations.delegate,
-                              ],
-                              child: Material(
-                                color: Colors.transparent,
-                                child: _buildReorderableList(
-                                  controller,
-                                  configs,
-                                ),
+                                if (controller.isReorderMode) {
+                                  return Localizations(
+                                    locale: const Locale('en'),
+                                    delegates: const [
+                                      DefaultWidgetsLocalizations.delegate,
+                                      DefaultMaterialLocalizations.delegate,
+                                    ],
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: _buildReorderableList(
+                                        controller,
+                                        configs,
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                return Column(
+                                  children: [
+                                    for (final config in configs) ...[
+                                      _buildWidgetById(
+                                        config.id,
+                                        isReorderMode: false,
+                                        controller: controller,
+                                      ),
+                                      const SizedBox(height: 16),
+                                    ],
+                                  ],
+                                );
+                              },
+                            ),
+
+                            // ── Add widgets button — same horizontal margins as cards ─
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                              child: _ScalingButton(
+                                listenTo: _layoutController,
+                                onPressed: _showAddWidgetSheet,
                               ),
-                            );
-                          }
-
-                          return Column(
-                            children: [
-                              for (final config in configs) ...[
-                                _buildWidgetById(
-                                  config.id,
-                                  isReorderMode: false,
-                                  controller: controller,
-                                ),
-                                const SizedBox(height: 16),
-                              ],
-                            ],
-                          );
-                        },
-                      ),
-
-                      // ── Add widgets button — same horizontal margins as cards ─
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                        child: _ScalingButton(
-                          listenTo: _layoutController,
-                          onPressed: _showAddWidgetSheet,
+                            ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
-          );
-        },
-      ),
-    ),
+          ),
 
           // ── "Done" pill (floats above content in reorder mode) ────────────
           Consumer<InsightsLayoutController>(
@@ -275,8 +275,10 @@ class _InsightsScreenState extends State<InsightsScreen>
           padding: EdgeInsets.symmetric(horizontal: 16),
           child: SavingsProjectionCard(),
         );
-      case InsightWidgetId.categories:
-        child = _buildCategoriesCard();
+      case InsightWidgetId.categoriesGastos:
+        child = _buildGastosCard();
+      case InsightWidgetId.categoriesIngresos:
+        child = _buildIngresosCard();
       case InsightWidgetId.origin:
         child = _buildOriginCard();
       case InsightWidgetId.bank:
@@ -415,7 +417,7 @@ class _InsightsScreenState extends State<InsightsScreen>
     );
   }
 
-  Widget _buildCategoriesCard() {
+  Widget _buildGastosCard() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: DecoratedBox(
@@ -431,16 +433,22 @@ class _InsightsScreenState extends State<InsightsScreen>
             children: [
               Row(
                 children: [
-                  const Expanded(child: _SectionLabel('CATEGORÍAS AI')),
+                  const Expanded(child: _SectionLabel('CATEGORÍAS GASTOS')),
                   const SizedBox(width: 8),
                   DecoratedBox(
                     decoration: BoxDecoration(
                       color: AppColors.blueTipBg,
                       borderRadius: BorderRadius.circular(999),
-                      border: Border.all(color: AppColors.blueTipBorder, width: 0.5),
+                      border: Border.all(
+                        color: AppColors.blueTipBorder,
+                        width: 0.5,
+                      ),
                     ),
                     child: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       child: Text(
                         'SMART INSIGHTS',
                         style: TextStyle(
@@ -529,6 +537,121 @@ class _InsightsScreenState extends State<InsightsScreen>
       ),
     );
   }
+
+  Widget _buildIngresosCard() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.white05,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.white07),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Expanded(child: _SectionLabel('CATEGORÍAS INGRESOS')),
+                  const SizedBox(width: 8),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: AppColors.blueTipBg,
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(
+                        color: AppColors.blueTipBorder,
+                        width: 0.5,
+                      ),
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      child: Text(
+                        'SMART INSIGHTS',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                          color: AppColors.systemBlue,
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 120,
+                    height: 120,
+                    child: AnimatedBuilder(
+                      animation: _donutAnim,
+                      builder: (_, __) => CustomPaint(
+                        painter: _DonutPainter(progress: _donutAnim.value),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Total',
+                                style: AppTextStyles.caption1.copyWith(
+                                  fontSize: 10,
+                                ),
+                              ),
+                              const Text(
+                                '100%',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.label,
+                                  height: 1.2,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 24),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _LegendRow(
+                          color: AppColors.systemGreen,
+                          label: 'Salario',
+                          percent: '70%',
+                        ),
+                        SizedBox(height: 12),
+                        _LegendRow(
+                          color: AppColors.systemBlue,
+                          label: 'Inversiones',
+                          percent: '20%',
+                        ),
+                        SizedBox(height: 12),
+                        _LegendRow(
+                          color: AppColors.systemPurple,
+                          label: 'Otros',
+                          percent: '10%',
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 // ─── Reorderable item wrapper ─────────────────────────────────────────────────
@@ -555,15 +678,13 @@ class _ReorderableItem extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          ReorderableDragStartListener(
-            index: index,
-            child: child,
-          ),
+          ReorderableDragStartListener(index: index, child: child),
 
           // ── Delete badge — small, flush to top-right corner of card ─────
           Positioned(
             top: -8,
-            right: 10, // aligns with the card's inner right edge (16px card pad − 6px)
+            right:
+                10, // aligns with the card's inner right edge (16px card pad − 6px)
             child: GestureDetector(
               onTap: onDelete,
               behavior: HitTestBehavior.opaque,
@@ -603,31 +724,35 @@ class _AddWidgetSheet extends StatelessWidget {
   const _AddWidgetSheet();
 
   static String _labelFor(InsightWidgetId id) => switch (id) {
-        InsightWidgetId.stats => 'Resumen del mes',
-        InsightWidgetId.savingsChart => 'Gráfica de ahorro',
-        InsightWidgetId.categories => 'Categorías AI',
-        InsightWidgetId.origin => 'Origen de gastos',
-        InsightWidgetId.bank => 'Promo banco',
-        InsightWidgetId.predictions => 'Predicciones AI',
-      };
+    InsightWidgetId.stats => 'Resumen del mes',
+    InsightWidgetId.savingsChart => 'Gráfica de ahorro',
+    InsightWidgetId.categoriesGastos => 'Categorías Gastos',
+    InsightWidgetId.categoriesIngresos => 'Categorías Ingresos',
+    InsightWidgetId.origin => 'Origen de gastos',
+    InsightWidgetId.bank => 'Promo banco',
+    InsightWidgetId.predictions => 'Predicciones AI',
+  };
 
   static IconData _iconFor(InsightWidgetId id) => switch (id) {
-        InsightWidgetId.stats => CupertinoIcons.chart_bar_square,
-        InsightWidgetId.savingsChart => CupertinoIcons.graph_square,
-        InsightWidgetId.categories => CupertinoIcons.tag_fill,
-        InsightWidgetId.origin => CupertinoIcons.building_2_fill,
-        InsightWidgetId.bank => CupertinoIcons.creditcard_fill,
-        InsightWidgetId.predictions => CupertinoIcons.sparkles,
-      };
+    InsightWidgetId.stats => CupertinoIcons.chart_bar_square,
+    InsightWidgetId.savingsChart => CupertinoIcons.graph_square,
+    InsightWidgetId.categoriesGastos => CupertinoIcons.tag_fill,
+    InsightWidgetId.categoriesIngresos =>
+      CupertinoIcons.money_dollar_circle_fill,
+    InsightWidgetId.origin => CupertinoIcons.building_2_fill,
+    InsightWidgetId.bank => CupertinoIcons.creditcard_fill,
+    InsightWidgetId.predictions => CupertinoIcons.sparkles,
+  };
 
   static Color _colorFor(InsightWidgetId id) => switch (id) {
-        InsightWidgetId.stats => AppColors.systemBlue,
-        InsightWidgetId.savingsChart => AppColors.systemGreen,
-        InsightWidgetId.categories => AppColors.systemOrange,
-        InsightWidgetId.origin => AppColors.systemIndigo,
-        InsightWidgetId.bank => AppColors.systemRed,
-        InsightWidgetId.predictions => AppColors.systemBlue,
-      };
+    InsightWidgetId.stats => AppColors.systemBlue,
+    InsightWidgetId.savingsChart => AppColors.systemGreen,
+    InsightWidgetId.categoriesGastos => AppColors.systemOrange,
+    InsightWidgetId.categoriesIngresos => AppColors.systemGreen,
+    InsightWidgetId.origin => AppColors.systemIndigo,
+    InsightWidgetId.bank => AppColors.systemRed,
+    InsightWidgetId.predictions => AppColors.systemBlue,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -867,9 +992,8 @@ class _WigglingWidgetState extends State<_WigglingWidget>
     return AnimatedBuilder(
       animation: Listenable.merge([_rotateController, _scaleAnim]),
       builder: (_, child) {
-        final angle = math.sin(
-              _rotateController.value * math.pi * 2 + _phaseOffset,
-            ) *
+        final angle =
+            math.sin(_rotateController.value * math.pi * 2 + _phaseOffset) *
             0.026; // ±1.5° — gentle, readable
         return Transform(
           alignment: Alignment.center,
@@ -933,7 +1057,8 @@ class _ScalingButtonState extends State<_ScalingButton>
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _scaleAnim,
-      builder: (_, child) => Transform.scale(scale: _scaleAnim.value, child: child),
+      builder: (_, child) =>
+          Transform.scale(scale: _scaleAnim.value, child: child),
       child: CupertinoButton(
         padding: EdgeInsets.zero,
         onPressed: widget.onPressed,
@@ -948,7 +1073,11 @@ class _ScalingButtonState extends State<_ScalingButton>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(CupertinoIcons.add_circled, size: 16, color: AppColors.systemBlue),
+                Icon(
+                  CupertinoIcons.add_circled,
+                  size: 16,
+                  color: AppColors.systemBlue,
+                ),
                 SizedBox(width: 8),
                 Text(
                   'Agregar widget',
@@ -993,19 +1122,79 @@ class _PredictionsCardState extends State<_PredictionsCard>
   int _currentMonth = 1;
 
   static const _savingsMonths = [
-    _MonthData(label: 'Mar', amount: '\$390', pct: 'Pasado', positive: true, isNeutral: true),
-    _MonthData(label: 'Abr', amount: '\$520', pct: '+15%', positive: true, isNeutral: false),
-    _MonthData(label: 'May', amount: '\$610', pct: '+17%', positive: true, isNeutral: false),
-    _MonthData(label: 'Jun', amount: '\$680', pct: '+11%', positive: true, isNeutral: false),
-    _MonthData(label: 'Jul', amount: '\$720', pct: '+6%', positive: true, isNeutral: false),
+    _MonthData(
+      label: 'Mar',
+      amount: '\$390',
+      pct: 'Pasado',
+      positive: true,
+      isNeutral: true,
+    ),
+    _MonthData(
+      label: 'Abr',
+      amount: '\$520',
+      pct: '+15%',
+      positive: true,
+      isNeutral: false,
+    ),
+    _MonthData(
+      label: 'May',
+      amount: '\$610',
+      pct: '+17%',
+      positive: true,
+      isNeutral: false,
+    ),
+    _MonthData(
+      label: 'Jun',
+      amount: '\$680',
+      pct: '+11%',
+      positive: true,
+      isNeutral: false,
+    ),
+    _MonthData(
+      label: 'Jul',
+      amount: '\$720',
+      pct: '+6%',
+      positive: true,
+      isNeutral: false,
+    ),
   ];
 
   static const _expensesMonths = [
-    _MonthData(label: 'Mar', amount: '\$1,250', pct: 'Pasado', positive: true, isNeutral: true),
-    _MonthData(label: 'Abr', amount: '\$1,305', pct: '+4%', positive: false, isNeutral: false),
-    _MonthData(label: 'May', amount: '\$1,280', pct: '-2%', positive: true, isNeutral: false),
-    _MonthData(label: 'Jun', amount: '\$1,340', pct: '+5%', positive: false, isNeutral: false),
-    _MonthData(label: 'Jul', amount: '\$1,295', pct: '-3%', positive: true, isNeutral: false),
+    _MonthData(
+      label: 'Mar',
+      amount: '\$1,250',
+      pct: 'Pasado',
+      positive: true,
+      isNeutral: true,
+    ),
+    _MonthData(
+      label: 'Abr',
+      amount: '\$1,305',
+      pct: '+4%',
+      positive: false,
+      isNeutral: false,
+    ),
+    _MonthData(
+      label: 'May',
+      amount: '\$1,280',
+      pct: '-2%',
+      positive: true,
+      isNeutral: false,
+    ),
+    _MonthData(
+      label: 'Jun',
+      amount: '\$1,340',
+      pct: '+5%',
+      positive: false,
+      isNeutral: false,
+    ),
+    _MonthData(
+      label: 'Jul',
+      amount: '\$1,295',
+      pct: '-3%',
+      positive: true,
+      isNeutral: false,
+    ),
   ];
 
   @override
@@ -1031,11 +1220,17 @@ class _PredictionsCardState extends State<_PredictionsCard>
 
   Future<void> _switchMode(_PredictionMode mode) async {
     if (mode == _mode) return;
-    await _crossfadeController.animateTo(0,
-        duration: const Duration(milliseconds: 150), curve: Curves.easeIn);
+    await _crossfadeController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeIn,
+    );
     setState(() => _mode = mode);
-    await _crossfadeController.animateTo(1,
-        duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+    await _crossfadeController.animateTo(
+      1,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
+    );
   }
 
   List<_MonthData> get _months =>
@@ -1064,15 +1259,26 @@ class _PredictionsCardState extends State<_PredictionsCard>
                     decoration: BoxDecoration(
                       color: AppColors.blueTipBg,
                       borderRadius: BorderRadius.circular(999),
-                      border: Border.all(color: AppColors.blueTipBorder, width: 0.5),
+                      border: Border.all(
+                        color: AppColors.blueTipBorder,
+                        width: 0.5,
+                      ),
                     ),
                     child: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      child: Text('SMART INSIGHTS',
-                          style: TextStyle(
-                            fontSize: 10, fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5, color: AppColors.systemBlue, height: 1.4,
-                          )),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      child: Text(
+                        'SMART INSIGHTS',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                          color: AppColors.systemBlue,
+                          height: 1.4,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -1101,7 +1307,10 @@ class _PredictionsCardState extends State<_PredictionsCard>
                               opacity: isSelected ? 1.0 : 0.45,
                               duration: const Duration(milliseconds: 250),
                               curve: Curves.easeOut,
-                              child: _MonthChip(data: _months[i], isSelected: isSelected),
+                              child: _MonthChip(
+                                data: _months[i],
+                                isSelected: isSelected,
+                              ),
                             ),
                           );
                         },
@@ -1174,16 +1383,25 @@ class _BlueSegmentedToggle extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.systemBlue.withOpacity(0.10),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: AppColors.systemBlue.withOpacity(0.18), width: 0.5),
+        border: Border.all(
+          color: AppColors.systemBlue.withOpacity(0.18),
+          width: 0.5,
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(3),
         child: Row(
           children: [
-            _BlueChip(label: 'Ahorro', active: selected == _PredictionMode.savings,
-                onTap: () => onChanged(_PredictionMode.savings)),
-            _BlueChip(label: 'Gastos', active: selected == _PredictionMode.expenses,
-                onTap: () => onChanged(_PredictionMode.expenses)),
+            _BlueChip(
+              label: 'Ahorro',
+              active: selected == _PredictionMode.savings,
+              onTap: () => onChanged(_PredictionMode.savings),
+            ),
+            _BlueChip(
+              label: 'Gastos',
+              active: selected == _PredictionMode.expenses,
+              onTap: () => onChanged(_PredictionMode.expenses),
+            ),
           ],
         ),
       ),
@@ -1195,7 +1413,11 @@ class _BlueChip extends StatelessWidget {
   final String label;
   final bool active;
   final VoidCallback onTap;
-  const _BlueChip({required this.label, required this.active, required this.onTap});
+  const _BlueChip({
+    required this.label,
+    required this.active,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1210,14 +1432,16 @@ class _BlueChip extends StatelessWidget {
             color: active ? AppColors.systemBlue : Colors.transparent,
             borderRadius: BorderRadius.circular(999),
           ),
-          child: Text(label,
+          child: Text(
+            label,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,
               fontWeight: active ? FontWeight.w600 : FontWeight.w400,
               color: active ? Colors.white : AppColors.systemBlue,
               height: 1.4,
-            )),
+            ),
+          ),
         ),
       ),
     );
@@ -1231,8 +1455,11 @@ class _MonthData {
   final bool positive;
   final bool isNeutral;
   const _MonthData({
-    required this.label, required this.amount,
-    required this.pct, required this.positive, required this.isNeutral,
+    required this.label,
+    required this.amount,
+    required this.pct,
+    required this.positive,
+    required this.isNeutral,
   });
 }
 
@@ -1266,26 +1493,38 @@ class _MonthChip extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(data.label,
+              Text(
+                data.label,
                 style: TextStyle(
                   fontSize: 11,
-                  color: isSelected ? AppColors.systemBlue : AppColors.secondaryLabel,
+                  color: isSelected
+                      ? AppColors.systemBlue
+                      : AppColors.secondaryLabel,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                   height: 1.3,
-                )),
+                ),
+              ),
               const SizedBox(height: 5),
-              Text(data.amount,
+              Text(
+                data.amount,
                 style: TextStyle(
-                  fontSize: 14, fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
                   color: isSelected ? AppColors.systemBlue : AppColors.label,
-                  height: 1.2, letterSpacing: -0.3,
-                )),
+                  height: 1.2,
+                  letterSpacing: -0.3,
+                ),
+              ),
               const SizedBox(height: 3),
-              Text(data.pct,
+              Text(
+                data.pct,
                 style: TextStyle(
-                  fontSize: 11, fontWeight: FontWeight.w500,
-                  color: pctColor, height: 1.3,
-                )),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: pctColor,
+                  height: 1.3,
+                ),
+              ),
             ],
           ),
         ),
@@ -1315,22 +1554,29 @@ class _SavingsDetails extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('Meta: Viaje 2024', style: AppTextStyles.caption1),
-            Text('\$2,000.00',
+            Text(
+              '\$2,000.00',
               style: AppTextStyles.caption1.copyWith(
-                color: AppColors.secondaryLabel, fontWeight: FontWeight.w600)),
+                color: AppColors.secondaryLabel,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 8),
         ClipRRect(
           borderRadius: BorderRadius.circular(999),
           child: const LinearProgressIndicator(
-            value: 0.225, minHeight: 6,
+            value: 0.225,
+            minHeight: 6,
             backgroundColor: AppColors.tertiaryFill,
             valueColor: AlwaysStoppedAnimation<Color>(AppColors.systemBlue),
           ),
         ),
         const SizedBox(height: 14),
-        _InsightBox(text: _insights[selectedMonth.clamp(0, _insights.length - 1)]),
+        _InsightBox(
+          text: _insights[selectedMonth.clamp(0, _insights.length - 1)],
+        ),
       ],
     );
   }
@@ -1341,14 +1587,38 @@ class _ExpensesDetails extends StatelessWidget {
   const _ExpensesDetails({super.key, required this.selectedMonth});
 
   static const _categories = [
-    _CategoryData(color: AppColors.systemOrange, label: 'Comida',
-        amount: '\$520', progress: 0.70, delta: '+8%', positive: false),
-    _CategoryData(color: AppColors.systemIndigo, label: 'Ocio',
-        amount: '\$390', progress: 0.50, delta: '-5%', positive: true),
-    _CategoryData(color: AppColors.systemRed, label: 'Transporte',
-        amount: '\$240', progress: 0.30, delta: '+3%', positive: false),
-    _CategoryData(color: AppColors.systemGreen, label: 'Otros',
-        amount: '\$155', progress: 0.18, delta: '-2%', positive: true),
+    _CategoryData(
+      color: AppColors.systemOrange,
+      label: 'Comida',
+      amount: '\$520',
+      progress: 0.70,
+      delta: '+8%',
+      positive: false,
+    ),
+    _CategoryData(
+      color: AppColors.systemIndigo,
+      label: 'Ocio',
+      amount: '\$390',
+      progress: 0.50,
+      delta: '-5%',
+      positive: true,
+    ),
+    _CategoryData(
+      color: AppColors.systemRed,
+      label: 'Transporte',
+      amount: '\$240',
+      progress: 0.30,
+      delta: '+3%',
+      positive: false,
+    ),
+    _CategoryData(
+      color: AppColors.systemGreen,
+      label: 'Otros',
+      amount: '\$155',
+      progress: 0.18,
+      delta: '-2%',
+      positive: true,
+    ),
   ];
 
   static const _insights = [
@@ -1364,23 +1634,34 @@ class _ExpensesDetails extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ..._categories.map((c) => Padding(
-          padding: const EdgeInsets.only(bottom: 14),
-          child: _CategoryRow(data: c),
-        )),
+        ..._categories.map(
+          (c) => Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: _CategoryRow(data: c),
+          ),
+        ),
         const Divider(color: AppColors.white07, thickness: 0.5, height: 1),
         const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('Total proyectado', style: AppTextStyles.caption1),
-            const Text('\$1,305',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700,
-                color: AppColors.label, letterSpacing: -0.41, height: 1.29)),
+            const Text(
+              '\$1,305',
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: AppColors.label,
+                letterSpacing: -0.41,
+                height: 1.29,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 14),
-        _InsightBox(text: _insights[selectedMonth.clamp(0, _insights.length - 1)]),
+        _InsightBox(
+          text: _insights[selectedMonth.clamp(0, _insights.length - 1)],
+        ),
       ],
     );
   }
@@ -1394,8 +1675,12 @@ class _CategoryData {
   final String delta;
   final bool positive;
   const _CategoryData({
-    required this.color, required this.label, required this.amount,
-    required this.progress, required this.delta, required this.positive,
+    required this.color,
+    required this.label,
+    required this.amount,
+    required this.progress,
+    required this.delta,
+    required this.positive,
   });
 }
 
@@ -1405,34 +1690,69 @@ class _CategoryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final deltaColor = data.positive ? AppColors.systemGreen : AppColors.systemRed;
+    final deltaColor = data.positive
+        ? AppColors.systemGreen
+        : AppColors.systemRed;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Container(width: 8, height: 8,
-              decoration: BoxDecoration(color: data.color, shape: BoxShape.circle)),
+            Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: data.color,
+                shape: BoxShape.circle,
+              ),
+            ),
             const SizedBox(width: 8),
-            Expanded(child: Text(data.label,
-              style: const TextStyle(fontSize: 13, color: AppColors.label,
-                letterSpacing: -0.08, height: 1.38))),
-            Text(data.amount,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600,
-                color: AppColors.label, letterSpacing: -0.08, height: 1.38)),
+            Expanded(
+              child: Text(
+                data.label,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: AppColors.label,
+                  letterSpacing: -0.08,
+                  height: 1.38,
+                ),
+              ),
+            ),
+            Text(
+              data.amount,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.label,
+                letterSpacing: -0.08,
+                height: 1.38,
+              ),
+            ),
             const SizedBox(width: 8),
-            SizedBox(width: 36,
-              child: Text(data.delta, textAlign: TextAlign.right,
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500,
-                  color: deltaColor, height: 1.38))),
+            SizedBox(
+              width: 36,
+              child: Text(
+                data.delta,
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: deltaColor,
+                  height: 1.38,
+                ),
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 6),
         ClipRRect(
           borderRadius: BorderRadius.circular(999),
-          child: LinearProgressIndicator(value: data.progress, minHeight: 5,
+          child: LinearProgressIndicator(
+            value: data.progress,
+            minHeight: 5,
             backgroundColor: AppColors.tertiaryFill,
-            valueColor: AlwaysStoppedAnimation<Color>(data.color)),
+            valueColor: AlwaysStoppedAnimation<Color>(data.color),
+          ),
         ),
       ],
     );
@@ -1453,8 +1773,14 @@ class _InsightBox extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        child: Text(text,
-          style: const TextStyle(fontSize: 12, color: AppColors.secondaryLabel, height: 1.55)),
+        child: Text(
+          text,
+          style: const TextStyle(
+            fontSize: 12,
+            color: AppColors.secondaryLabel,
+            height: 1.55,
+          ),
+        ),
       ),
     );
   }
@@ -1470,9 +1796,13 @@ class _StatCard extends StatelessWidget {
   final Color glowColor;
 
   const _StatCard({
-    required this.label, required this.amount, required this.decimals,
-    required this.trendIcon, required this.trendColor,
-    required this.trendText, required this.glowColor,
+    required this.label,
+    required this.amount,
+    required this.decimals,
+    required this.trendIcon,
+    required this.trendColor,
+    required this.trendText,
+    required this.glowColor,
   });
 
   @override
@@ -1483,7 +1813,11 @@ class _StatCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.white07),
         boxShadow: [
-          BoxShadow(color: glowColor.withOpacity(0.08), blurRadius: 24, spreadRadius: 2),
+          BoxShadow(
+            color: glowColor.withOpacity(0.08),
+            blurRadius: 24,
+            spreadRadius: 2,
+          ),
         ],
       ),
       child: Padding(
@@ -1491,21 +1825,41 @@ class _StatCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label,
-              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600,
-                letterSpacing: 0.6, color: AppColors.secondaryLabel, height: 1.4)),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.6,
+                color: AppColors.secondaryLabel,
+                height: 1.4,
+              ),
+            ),
             const SizedBox(height: 6),
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(amount,
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700,
-                    letterSpacing: 0.2, color: AppColors.label, height: 1.2)),
+                Text(
+                  amount,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.2,
+                    color: AppColors.label,
+                    height: 1.2,
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 2),
-                  child: Text(decimals,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600,
-                      color: AppColors.secondaryLabel, height: 1.3)),
+                  child: Text(
+                    decimals,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.secondaryLabel,
+                      height: 1.3,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -1515,9 +1869,18 @@ class _StatCard extends StatelessWidget {
                 Icon(trendIcon, size: 12, color: trendColor),
                 const SizedBox(width: 3),
                 Expanded(
-                  child: Text(trendText, maxLines: 1, overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600,
-                      color: trendColor, letterSpacing: -0.1, height: 1.4)),
+                  child: Text(
+                    trendText,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: trendColor,
+                      letterSpacing: -0.1,
+                      height: 1.4,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -1534,9 +1897,16 @@ class _SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(text,
-      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600,
-        letterSpacing: 0.6, color: AppColors.secondaryLabel, height: 1.33));
+    return Text(
+      text,
+      style: const TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0.6,
+        color: AppColors.secondaryLabel,
+        height: 1.33,
+      ),
+    );
   }
 }
 
@@ -1549,8 +1919,12 @@ class _OriginRow extends StatelessWidget {
   final Color progressColor;
 
   const _OriginRow({
-    required this.icon, required this.iconColor, required this.label,
-    required this.amount, required this.progress, required this.progressColor,
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+    required this.amount,
+    required this.progress,
+    required this.progressColor,
   });
 
   @override
@@ -1562,25 +1936,49 @@ class _OriginRow extends StatelessWidget {
           children: [
             DecoratedBox(
               decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
-              child: SizedBox(width: 32, height: 32,
-                child: Icon(icon, color: iconColor, size: 17)),
+                color: iconColor.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: SizedBox(
+                width: 32,
+                height: 32,
+                child: Icon(icon, color: iconColor, size: 17),
+              ),
             ),
             const SizedBox(width: 12),
-            Expanded(child: Text(label,
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500,
-                letterSpacing: -0.24, color: AppColors.label, height: 1.33))),
-            Text(amount,
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700,
-                letterSpacing: -0.24, color: AppColors.label, height: 1.33)),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: -0.24,
+                  color: AppColors.label,
+                  height: 1.33,
+                ),
+              ),
+            ),
+            Text(
+              amount,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.24,
+                color: AppColors.label,
+                height: 1.33,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 8),
         ClipRRect(
           borderRadius: BorderRadius.circular(999),
-          child: LinearProgressIndicator(value: progress, minHeight: 5,
+          child: LinearProgressIndicator(
+            value: progress,
+            minHeight: 5,
             backgroundColor: AppColors.tertiaryFill,
-            valueColor: AlwaysStoppedAnimation<Color>(progressColor)),
+            valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+          ),
         ),
       ],
     );
@@ -1591,21 +1989,44 @@ class _LegendRow extends StatelessWidget {
   final Color color;
   final String label;
   final String percent;
-  const _LegendRow({required this.color, required this.label, required this.percent});
+  const _LegendRow({
+    required this.color,
+    required this.label,
+    required this.percent,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(width: 8, height: 8,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
         const SizedBox(width: 8),
-        Expanded(child: Text(label,
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w400,
-            color: AppColors.secondaryLabel, letterSpacing: -0.08, height: 1.38))),
-        Text(percent,
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700,
-            color: AppColors.label, letterSpacing: -0.08, height: 1.38)),
+        Expanded(
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w400,
+              color: AppColors.secondaryLabel,
+              letterSpacing: -0.08,
+              height: 1.38,
+            ),
+          ),
+        ),
+        Text(
+          percent,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: AppColors.label,
+            letterSpacing: -0.08,
+            height: 1.38,
+          ),
+        ),
       ],
     );
   }
@@ -1632,20 +2053,30 @@ class _DonutPainter extends CustomPainter {
     final radius = (size.shortestSide - _strokeWidth) / 2;
     final rect = Rect.fromCircle(center: center, radius: radius);
 
-    canvas.drawArc(rect, 0, math.pi * 2, false,
+    canvas.drawArc(
+      rect,
+      0,
+      math.pi * 2,
+      false,
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = _strokeWidth
-        ..color = AppColors.tertiaryFill);
+        ..color = AppColors.tertiaryFill,
+    );
 
     double startAngle = -math.pi / 2;
     for (final (fraction, color) in _segments) {
       final sweep = (fraction * math.pi * 2 - _gap).clamp(0.0, math.pi * 2);
-      canvas.drawArc(rect, startAngle, sweep * progress, false,
+      canvas.drawArc(
+        rect,
+        startAngle,
+        sweep * progress,
+        false,
         Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = _strokeWidth
-          ..color = color);
+          ..color = color,
+      );
       startAngle += sweep + _gap;
     }
   }

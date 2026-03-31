@@ -11,6 +11,7 @@ class ExpenseData {
   final String amount;
   final String category;
   final String origin;
+  final String tipo;
 
   const ExpenseData(
     this.icon,
@@ -20,6 +21,7 @@ class ExpenseData {
     this.amount,
     this.category,
     this.origin,
+    this.tipo,
   );
 }
 
@@ -33,6 +35,7 @@ const kAllExpenses = [
     '-\$85.00',
     'Comida',
     'Efectivo',
+    'egreso',
   ),
   ExpenseData(
     CupertinoIcons.bus,
@@ -42,6 +45,7 @@ const kAllExpenses = [
     '-\$100.00',
     'Transporte',
     'Transferencia',
+    'egreso',
   ),
   ExpenseData(
     CupertinoIcons.bag_fill,
@@ -51,6 +55,7 @@ const kAllExpenses = [
     '-\$42.50',
     'Varios',
     'Tarjeta Débito',
+    'egreso',
   ),
   ExpenseData(
     CupertinoIcons.film,
@@ -60,6 +65,7 @@ const kAllExpenses = [
     '-\$159.00',
     'Suscripción',
     'Tarjeta Crédito',
+    'egreso',
   ),
   ExpenseData(
     CupertinoIcons.car_fill,
@@ -69,6 +75,7 @@ const kAllExpenses = [
     '-\$68.00',
     'Transporte',
     'Tarjeta Débito',
+    'egreso',
   ),
   ExpenseData(
     CupertinoIcons.gamecontroller_fill,
@@ -78,6 +85,7 @@ const kAllExpenses = [
     '-\$219.00',
     'Entretenimiento',
     'Tarjeta Crédito',
+    'egreso',
   ),
   ExpenseData(
     CupertinoIcons.heart_fill,
@@ -87,6 +95,7 @@ const kAllExpenses = [
     '-\$320.00',
     'Salud',
     'Efectivo',
+    'egreso',
   ),
   ExpenseData(
     CupertinoIcons.music_note,
@@ -96,6 +105,7 @@ const kAllExpenses = [
     '-\$99.00',
     'Suscripción',
     'Transferencia',
+    'egreso',
   ),
   ExpenseData(
     CupertinoIcons.bolt_fill,
@@ -105,6 +115,7 @@ const kAllExpenses = [
     '-\$200.00',
     'Servicios',
     'Transferencia',
+    'egreso',
   ),
   ExpenseData(
     CupertinoIcons.star_fill,
@@ -114,6 +125,7 @@ const kAllExpenses = [
     '-\$95.00',
     'Comida',
     'Tarjeta Débito',
+    'egreso',
   ),
   ExpenseData(
     CupertinoIcons.airplane,
@@ -123,6 +135,7 @@ const kAllExpenses = [
     '-\$1,850.00',
     'Varios',
     'Tarjeta Crédito',
+    'egreso',
   ),
   ExpenseData(
     CupertinoIcons.flame_fill,
@@ -132,6 +145,7 @@ const kAllExpenses = [
     '-\$650.00',
     'Salud',
     'Transferencia',
+    'egreso',
   ),
   ExpenseData(
     CupertinoIcons.tv_fill,
@@ -141,6 +155,7 @@ const kAllExpenses = [
     '-\$139.00',
     'Suscripción',
     'Tarjeta Crédito',
+    'egreso',
   ),
   ExpenseData(
     CupertinoIcons.cart_fill,
@@ -150,6 +165,7 @@ const kAllExpenses = [
     '-\$734.50',
     'Comida',
     'Tarjeta Débito',
+    'egreso',
   ),
   ExpenseData(
     CupertinoIcons.car_fill,
@@ -159,6 +175,7 @@ const kAllExpenses = [
     '-\$450.00',
     'Transporte',
     'Efectivo',
+    'egreso',
   ),
   ExpenseData(
     CupertinoIcons.book_fill,
@@ -168,6 +185,7 @@ const kAllExpenses = [
     '-\$169.00',
     'Suscripción',
     'Tarjeta Crédito',
+    'egreso',
   ),
   ExpenseData(
     CupertinoIcons.bag_fill,
@@ -177,6 +195,7 @@ const kAllExpenses = [
     '-\$37.00',
     'Varios',
     'Efectivo',
+    'egreso',
   ),
   ExpenseData(
     CupertinoIcons.heart_fill,
@@ -186,6 +205,7 @@ const kAllExpenses = [
     '-\$800.00',
     'Salud',
     'Transferencia',
+    'egreso',
   ),
   ExpenseData(
     CupertinoIcons.bolt_fill,
@@ -195,6 +215,7 @@ const kAllExpenses = [
     '-\$399.00',
     'Servicios',
     'Transferencia',
+    'egreso',
   ),
   ExpenseData(
     CupertinoIcons.building_2_fill,
@@ -204,6 +225,57 @@ const kAllExpenses = [
     '-\$312.00',
     'Comida',
     'Tarjeta Débito',
+    'egreso',
+  ),
+  ExpenseData(
+    CupertinoIcons.money_dollar_circle_fill,
+    AppColors.systemGreen,
+    'Nómina HSBC',
+    'Salario · 15 días',
+    '+\$15,000.00',
+    'Salario',
+    'Depósito',
+    'ingreso',
+  ),
+  ExpenseData(
+    CupertinoIcons.money_dollar_circle_fill,
+    AppColors.systemGreen,
+    'Freelance Diseño',
+    'Trabajo · 12 días',
+    '+\$3,500.00',
+    'Freelance',
+    'Transferencia',
+    'ingreso',
+  ),
+  ExpenseData(
+    CupertinoIcons.money_dollar_circle_fill,
+    AppColors.systemBlue,
+    'Dividendos CFE',
+    'Inversión · 10 días',
+    '+\$850.00',
+    'Inversión',
+    'Depósito',
+    'ingreso',
+  ),
+  ExpenseData(
+    CupertinoIcons.money_dollar_circle_fill,
+    AppColors.systemGreen,
+    'Bono Productividad',
+    'Salario · 5 días',
+    '+\$2,000.00',
+    'Bono',
+    'Depósito',
+    'ingreso',
+  ),
+  ExpenseData(
+    CupertinoIcons.money_dollar_circle_fill,
+    AppColors.systemPurple,
+    'Venta Libro',
+    'Otro · 3 días',
+    '+\$450.00',
+    'Venta',
+    'Transferencia',
+    'ingreso',
   ),
 ];
 
@@ -224,4 +296,7 @@ const kFilterOrigins = [
   'Tarjeta Débito',
   'Tarjeta Crédito',
   'Transferencia',
+  'Depósito',
 ];
+
+const kFilterTipos = ['Todos', 'egreso', 'ingreso'];

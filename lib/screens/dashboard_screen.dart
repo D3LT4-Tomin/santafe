@@ -8,6 +8,7 @@ import '../widgets/animated_blobs.dart';
 import '../widgets/balance_card.dart';
 import '../widgets/cards.dart';
 import '../widgets/expense_widgets.dart';
+import '../widgets/filter_sheet.dart';
 
 class DashboardScreen extends StatefulWidget {
   final ScrollController scrollController;
@@ -20,15 +21,9 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen>
     with TickerProviderStateMixin {
   bool _showMoreExpenses = false;
-  String _selectedFilter = 'Todos';
-  String _selectedOrigin = 'Todos';
+  FilterSelection _filterSelection = const FilterSelection();
 
   final List<String> _filterCategories = List.from(kFilterCategories);
-  late PageController _pillPageController;
-  int _pillPage = 0;
-
-  late PageController _originPageController;
-  int _originPage = 0;
 
   late AnimationController _blob1Controller;
   late AnimationController _blob2Controller;
@@ -68,9 +63,6 @@ class _DashboardScreenState extends State<DashboardScreen>
       curve: const Cubic(0.34, 1.56, 0.64, 1.0),
     );
     _appearController.forward();
-
-    _pillPageController = PageController();
-    _originPageController = PageController();
   }
 
   @override
@@ -78,135 +70,13 @@ class _DashboardScreenState extends State<DashboardScreen>
     _blob1Controller.dispose();
     _blob2Controller.dispose();
     _appearController.dispose();
-    _pillPageController.dispose();
-    _originPageController.dispose();
     super.dispose();
   }
 
   List<ExpenseData> get _filteredExpenses {
-    var expenses = kAllExpenses;
-    if (_selectedFilter != 'Todos') {
-      expenses = expenses.where((e) => e.category == _selectedFilter).toList();
-    }
-    if (_selectedOrigin != 'Todos') {
-      expenses = expenses.where((e) => e.origin == _selectedOrigin).toList();
-    }
-    return expenses;
-  }
-
-  void _showAddCategorySheet() {
-    HapticFeedback.mediumImpact();
-    final controller = TextEditingController();
-    showCupertinoModalPopup(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, _) => Container(
-          decoration: const BoxDecoration(
-            color: AppColors.secondaryBackground,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-          ),
-          padding: EdgeInsets.only(
-            bottom:
-                MediaQuery.of(ctx).viewInsets.bottom +
-                MediaQuery.of(ctx).padding.bottom,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(top: 8, bottom: 4),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Color(0x4D8E8E93),
-                    borderRadius: BorderRadius.all(Radius.circular(999)),
-                  ),
-                  child: SizedBox(width: 36, height: 5),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () => Navigator.pop(ctx),
-                      child: const Text(
-                        'Cancelar',
-                        style: TextStyle(color: AppColors.systemBlue),
-                      ),
-                    ),
-                    const Text(
-                      'Nueva Categoria',
-                      style: AppTextStyles.headline,
-                    ),
-                    CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        final name = controller.text.trim();
-                        if (name.isEmpty) return;
-                        Navigator.pop(ctx);
-                        setState(() {
-                          if (!_filterCategories.contains(name)) {
-                            _filterCategories.add(name);
-                          }
-                          _selectedFilter = name;
-                          _showMoreExpenses = false;
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            _pillPageController.animateToPage(
-                              999,
-                              duration: const Duration(milliseconds: 380),
-                              curve: Curves.easeOutCubic,
-                            );
-                          });
-                        });
-                      },
-                      child: const Text(
-                        'Listo',
-                        style: TextStyle(
-                          color: AppColors.systemBlue,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const ColoredBox(
-                color: AppColors.separator,
-                child: SizedBox(height: 0.5, width: double.infinity),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: CupertinoTextField(
-                  controller: controller,
-                  autofocus: true,
-                  placeholder: 'Nombre de categoria',
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
-                  decoration: const BoxDecoration(
-                    color: AppColors.tertiaryBackground,
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
-                  style: AppTextStyles.body,
-                  placeholderStyle: const TextStyle(
-                    fontSize: 17,
-                    color: AppColors.secondaryLabel,
-                    letterSpacing: -0.41,
-                    height: 1.29,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    return kAllExpenses
+        .where((e) => _filterSelection.matches(e.category, e.origin, e.tipo))
+        .toList();
   }
 
   @override
@@ -234,7 +104,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                   children: [
                     const BalanceCard(),
                     const SizedBox(height: 16),
-                    const SizedBox(height: 28),
                     const TipCard(),
                     const SizedBox(height: 28),
                     _buildRecentExpenses(),
@@ -262,50 +131,38 @@ class _DashboardScreenState extends State<DashboardScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(20, 0, 20, 12),
-          child: Text(
-            'MOVIMIENTOS RECIENTES',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.6,
-              color: AppColors.secondaryLabel,
-              height: 1.33,
-            ),
+        // ── Section header + filter button ─────────────────────────────
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+          child: Row(
+            children: [
+              const Expanded(
+                child: Text(
+                  'MOVIMIENTOS RECIENTES',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.6,
+                    color: AppColors.secondaryLabel,
+                    height: 1.33,
+                  ),
+                ),
+              ),
+              FilterButton(
+                selection: _filterSelection,
+                categories: _filterCategories,
+                origins: kFilterOrigins,
+                tipos: kFilterTipos,
+                onApply: (sel) => setState(() {
+                  _filterSelection = sel;
+                  _showMoreExpenses = false;
+                }),
+              ),
+            ],
           ),
         ),
-        PillPager(
-          categories: _filterCategories,
-          selectedFilter: _selectedFilter,
-          pageController: _pillPageController,
-          currentPage: _pillPage,
-          onPageChanged: (p) => setState(() => _pillPage = p),
-          onFilterSelected: (cat) {
-            HapticFeedback.selectionClick();
-            setState(() {
-              _selectedFilter = cat;
-              _showMoreExpenses = false;
-            });
-          },
-          onAddCategory: _showAddCategorySheet,
-        ),
-        const SizedBox(height: 12),
-        OriginPager(
-          origins: kFilterOrigins,
-          selectedOrigin: _selectedOrigin,
-          pageController: _originPageController,
-          currentPage: _originPage,
-          onPageChanged: (p) => setState(() => _originPage = p),
-          onOriginSelected: (origin) {
-            HapticFeedback.selectionClick();
-            setState(() {
-              _selectedOrigin = origin;
-              _showMoreExpenses = false;
-            });
-          },
-        ),
-        const SizedBox(height: 12),
+
+        // ── Expense list ───────────────────────────────────────────────
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: AnimatedSize(
@@ -344,6 +201,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   Widget _buildEmptyState() {
+    final hasFilters = !_filterSelection.isEmpty;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 36),
       child: Column(
@@ -355,13 +213,10 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
           const SizedBox(height: 10),
           Text(
-            _selectedFilter == 'Todos' && _selectedOrigin == 'Todos'
-                ? 'Sin gastos'
-                : _selectedFilter == 'Todos'
-                ? 'Sin gastos en "$_selectedOrigin"'
-                : _selectedOrigin == 'Todos'
-                ? 'Sin gastos en "$_selectedFilter"'
-                : 'Sin gastos en "$_selectedFilter" con "$_selectedOrigin"',
+            hasFilters
+                ? 'Sin movimientos con los filtros seleccionados'
+                : 'Sin movimientos',
+            textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 14,
               color: AppColors.secondaryLabel,
@@ -369,6 +224,19 @@ class _DashboardScreenState extends State<DashboardScreen>
               height: 1.4,
             ),
           ),
+          if (hasFilters) ...[
+            const SizedBox(height: 12),
+            GestureDetector(
+              onTap: () => setState(() {
+                _filterSelection = const FilterSelection();
+                _showMoreExpenses = false;
+              }),
+              child: const Text(
+                'Limpiar filtros',
+                style: TextStyle(fontSize: 13, color: AppColors.systemBlue),
+              ),
+            ),
+          ],
         ],
       ),
     );
