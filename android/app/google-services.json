@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "956244832711",
+    "project_id": "tomin-1",
+    "storage_bucket": "tomin-1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:956244832711:android:b9458d72947568d83b69e2",
+        "android_client_info": {
+          "package_name": "com.d3tl4.santafe"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDgRJ2VSQRcmrxFJaoaD-8Sm0MTIvM01Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
