@@ -6,14 +6,12 @@ import '../services/account_service.dart';
 import '../services/firebase_service.dart';
 import '../models/transaction_model.dart';
 import '../models/account_model.dart';
-import '../models/expense_data.dart';
 import 'package:flutter/cupertino.dart';
 
 class DataProvider extends ChangeNotifier {
   List<TransactionModel> _transactions = [];
   List<AccountModel> _accounts = [];
   bool _isLoading = true;
-  bool _isSeeded = false;
   String? _error;
   StreamSubscription? _transactionsSub;
   StreamSubscription? _accountsSub;
@@ -43,8 +41,6 @@ class DataProvider extends ChangeNotifier {
     _transactionsLoaded = false;
     _accountsLoaded = false;
     notifyListeners();
-
-    await _checkAndSeedData(userId);
 
     _loadTransactions(userId);
     _loadAccounts(userId);
@@ -110,115 +106,6 @@ class DataProvider extends ChangeNotifier {
     super.dispose();
   }
 
-  Future<void> _checkAndSeedData(String userId) async {
-    try {
-      final snapshot = await FirebaseService.userTransactionsRef(
-        userId,
-      ).limit(1).get();
-      print('Transactions count: ${snapshot.docs.length}');
-
-      if (snapshot.docs.isEmpty && !_isSeeded) {
-        print('No transactions found, running seed...');
-        _isSeeded = true;
-        await _seedData(userId);
-      } else {
-        print('Transactions exist or already seeded, skipping seed');
-        _isSeeded = true;
-      }
-    } catch (e) {
-      print('_checkAndSeedData failed: $e');
-      _error = 'Failed to check seed data: $e';
-      _isSeeded = true;
-    }
-  }
-
-  Future<void> _seedData(String userId) async {
-    print('Starting seed data...');
-
-    try {
-      for (final expense in kAllExpenses) {
-        final amount = expense.tipo == 'egreso'
-            ? -_parseAmount(expense.amount)
-            : _parseAmount(expense.amount);
-
-        await FirebaseService.userTransactionsRef(userId).add({
-          'title': expense.title,
-          'subtitle': expense.subtitle,
-          'amount': amount,
-          'category': expense.category,
-          'origin': expense.origin,
-          'tipo': expense.tipo,
-          'createdAt': Timestamp.fromDate(
-            _getDateFromSubtitle(expense.subtitle),
-          ),
-        });
-      }
-
-      await FirebaseService.userAccountsRef(userId).add({
-        'name': 'Cuenta Corriente',
-        'accountNumber': '****4521',
-        'balance': 1250.00,
-        'type': 'bank',
-        'logoUrl': null,
-        'createdAt': Timestamp.now(),
-      });
-
-      await FirebaseService.userAccountsRef(userId).add({
-        'name': 'Ahorros',
-        'accountNumber': '****8932',
-        'balance': 8500.00,
-        'type': 'cash',
-        'logoUrl': null,
-        'createdAt': Timestamp.now(),
-      });
-
-      print('Seed data completed successfully');
-      _isSeeded = true;
-    } catch (e) {
-      print('Seed data failed: $e');
-      _error = 'Failed to seed data: $e';
-    }
-  }
-
-  double _parseAmount(String amountStr) {
-    final cleaned = amountStr.replaceAll(RegExp(r'[^\d.]'), '');
-    return double.tryParse(cleaned) ?? 0;
-  }
-
-  DateTime _getDateFromSubtitle(String subtitle) {
-    final now = DateTime.now();
-    if (subtitle.contains('14:20') || subtitle.contains('08:45')) {
-      return now;
-    } else if (subtitle.contains('Ayer')) {
-      return now.subtract(const Duration(days: 1));
-    } else if (subtitle.contains('Lun')) {
-      return now.subtract(const Duration(days: 2));
-    } else if (subtitle.contains('Dom')) {
-      return now.subtract(const Duration(days: 3));
-    } else if (subtitle.contains('Sáb')) {
-      return now.subtract(const Duration(days: 4));
-    } else if (subtitle.contains('Vie')) {
-      return now.subtract(const Duration(days: 5));
-    } else if (subtitle.contains('Jue')) {
-      return now.subtract(const Duration(days: 6));
-    } else if (subtitle.contains('Mié')) {
-      return now.subtract(const Duration(days: 7));
-    } else if (subtitle.contains('Mar')) {
-      return now.subtract(const Duration(days: 8));
-    } else if (subtitle.contains('15 días')) {
-      return now.subtract(const Duration(days: 15));
-    } else if (subtitle.contains('12 días')) {
-      return now.subtract(const Duration(days: 12));
-    } else if (subtitle.contains('10 días')) {
-      return now.subtract(const Duration(days: 10));
-    } else if (subtitle.contains('5 días')) {
-      return now.subtract(const Duration(days: 5));
-    } else if (subtitle.contains('3 días')) {
-      return now.subtract(const Duration(days: 3));
-    }
-    return now;
-  }
-
   Future<void> addTransaction(TransactionModel transaction) async {
     final userId = FirebaseService.currentUserId;
     if (userId != null) {
@@ -237,7 +124,6 @@ class DataProvider extends ChangeNotifier {
     _transactions = [];
     _accounts = [];
     _isLoading = true;
-    _isSeeded = false;
     notifyListeners();
   }
 

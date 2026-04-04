@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
@@ -8,6 +10,7 @@ class AuthProvider extends ChangeNotifier {
   User? _firebaseUser;
   bool _isLoading = true;
   String? _error;
+  StreamSubscription<User?>? _authSubscription;
 
   UserModel? get user => _user;
   User? get firebaseUser => _firebaseUser;
@@ -20,16 +23,41 @@ class AuthProvider extends ChangeNotifier {
   }
 
   void _initAuthState() {
-    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
-      _firebaseUser = user;
-      if (user != null) {
-        _user = await AuthService.getUserData(user.uid);
-      } else {
+    _authSubscription = FirebaseAuth.instance.authStateChanges().listen(
+      (User? user) async {
+        _firebaseUser = user;
+        if (user != null) {
+          try {
+            _user = await AuthService.getUserData(user.uid);
+            _error = null;
+          } catch (_) {
+            _user = null;
+            _error = 'No se pudo cargar tu perfil de Firebase';
+          }
+        } else {
+          _user = null;
+          _error = null;
+        }
+        _isLoading = false;
+        notifyListeners();
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        _firebaseUser = null;
         _user = null;
-      }
-      _isLoading = false;
-      notifyListeners();
-    });
+        _error = _getAuthStreamErrorMessage(error);
+        _isLoading = false;
+        notifyListeners();
+      },
+    );
+  }
+
+  String _getAuthStreamErrorMessage(Object error) {
+    final errorText = error.toString();
+    if (errorText.contains('admin-restricted-operation') ||
+        errorText.contains('operation-not-allowed')) {
+      return 'Firebase Auth rechazó una operación deshabilitada en el proyecto. Revisa el método de inicio de sesión en Firebase Console.';
+    }
+    return 'Error al leer el estado de autenticación de Firebase';
   }
 
   Future<bool> signIn(String email, String password) async {
@@ -100,7 +128,14 @@ class AuthProvider extends ChangeNotifier {
     await AuthService.signOut();
     _user = null;
     _firebaseUser = null;
+    _error = null;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _authSubscription?.cancel();
+    super.dispose();
   }
 
   String _getErrorMessage(String code) {
@@ -115,6 +150,9 @@ class AuthProvider extends ChangeNotifier {
         return 'Correo electrónico inválido';
       case 'weak-password':
         return 'La contraseña debe tener al menos 6 caracteres';
+      case 'admin-restricted-operation':
+      case 'operation-not-allowed':
+        return 'Firebase Auth tiene deshabilitada esta operación en el proyecto';
       default:
         return 'Error de autenticación';
     }
