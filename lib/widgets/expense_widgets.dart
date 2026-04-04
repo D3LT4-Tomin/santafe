@@ -1,14 +1,73 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../models/expense_data.dart';
+import '../models/transaction_model.dart';
 import '../theme/app_theme.dart';
 import '../screens/expense_detail_screen.dart';
 
-// ─── Expense Row ──────────────────────────────────────────────────────────────
 class ExpenseRow extends StatelessWidget {
-  final ExpenseData data;
+  final ExpenseData? data;
+  final TransactionModel? transaction;
 
-  const ExpenseRow({super.key, required this.data});
+  const ExpenseRow({super.key, this.data, this.transaction});
+
+  IconData get _icon {
+    if (data != null) return data!.icon;
+    final category = transaction?.category ?? '';
+    if (category.contains('Comida')) return CupertinoIcons.cart_fill;
+    if (category.contains('Transporte')) return CupertinoIcons.car_fill;
+    if (category.contains('Suscripción')) return CupertinoIcons.film;
+    if (category.contains('Salud')) return CupertinoIcons.heart_fill;
+    if (category.contains('Entretenimiento'))
+      return CupertinoIcons.gamecontroller_fill;
+    if (category.contains('Servicios')) return CupertinoIcons.bolt_fill;
+    if (category.contains('Salario') ||
+        category.contains('Freelance') ||
+        category.contains('Inversión') ||
+        category.contains('Bono') ||
+        category.contains('Venta'))
+      return CupertinoIcons.money_dollar_circle_fill;
+    return CupertinoIcons.bag_fill;
+  }
+
+  Color get _iconColor {
+    if (data != null) return data!.iconColor;
+    final tipo = transaction?.tipo ?? 'egreso';
+    if (tipo == 'ingreso') return AppColors.systemGreen;
+    final category = transaction?.category ?? '';
+    if (category.contains('Comida')) return AppColors.systemOrange;
+    if (category.contains('Transporte')) return AppColors.systemRed;
+    if (category.contains('Suscripción') ||
+        category.contains('Entretenimiento')) {
+      return AppColors.systemPurple;
+    }
+    if (category.contains('Salud')) return AppColors.systemRed;
+    if (category.contains('Servicios')) return AppColors.systemOrange;
+    return AppColors.systemGreen;
+  }
+
+  String get _title {
+    if (data != null) return data!.title;
+    return transaction?.title ?? '';
+  }
+
+  String get _subtitle {
+    if (data != null) return data!.subtitle;
+    final t = transaction;
+    if (t == null) return '';
+    final category = t.category;
+    final hour = t.createdAt.hour.toString().padLeft(2, '0');
+    final minute = t.createdAt.minute.toString().padLeft(2, '0');
+    return '$category · $hour:$minute';
+  }
+
+  String get _amount {
+    if (data != null) return data!.amount;
+    final amount = transaction?.amount ?? 0;
+    final isIncome = amount > 0;
+    final prefix = isIncome ? '+\$' : '-\$';
+    return '$prefix${amount.abs().toStringAsFixed(2)}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,18 +88,13 @@ class ExpenseRow extends StatelessWidget {
                 children: [
                   DecoratedBox(
                     decoration: BoxDecoration(
-                      color: Color.fromRGBO(
-                        (data.iconColor.r * 255.0).round().clamp(0, 255),
-                        (data.iconColor.g * 255.0).round().clamp(0, 255),
-                        (data.iconColor.b * 255.0).round().clamp(0, 255),
-                        0.15,
-                      ),
+                      color: _iconColor.withOpacity(0.15),
                       borderRadius: const BorderRadius.all(Radius.circular(9)),
                     ),
                     child: SizedBox(
                       width: 36,
                       height: 36,
-                      child: Icon(data.icon, color: data.iconColor, size: 18),
+                      child: Icon(_icon, color: _iconColor, size: 18),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -50,7 +104,7 @@ class ExpenseRow extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          data.title,
+                          _title,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -60,12 +114,12 @@ class ExpenseRow extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 1),
-                        Text(data.subtitle, style: AppTextStyles.caption1),
+                        Text(_subtitle, style: AppTextStyles.caption1),
                       ],
                     ),
                   ),
                   Text(
-                    data.amount,
+                    _amount,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -97,7 +151,6 @@ class ExpenseRow extends StatelessWidget {
   }
 }
 
-// ─── Show More Button ─────────────────────────────────────────────────────────
 class ShowMoreButton extends StatelessWidget {
   final bool expanded;
   final VoidCallback onTap;
@@ -167,7 +220,6 @@ class ShowMoreButton extends StatelessWidget {
   }
 }
 
-// ─── Filter Pill ──────────────────────────────────────────────────────────────
 class FilterPill extends StatelessWidget {
   final String label;
   final bool selected;
@@ -228,7 +280,6 @@ class FilterPill extends StatelessWidget {
   }
 }
 
-// ─── Filter Pill Pager ────────────────────────────────────────────────────────
 class PillPager extends StatelessWidget {
   final List<String> categories;
   final String selectedFilter;
@@ -368,7 +419,6 @@ class PillPager extends StatelessWidget {
   }
 }
 
-// ─── Origin Filter Pill Pager ───────────────────────────────────────────────
 class OriginPager extends StatelessWidget {
   final List<String> origins;
   final String selectedOrigin;
@@ -476,7 +526,6 @@ class OriginPager extends StatelessWidget {
   }
 }
 
-// ─── Origin Pill ─────────────────────────────────────────────────────────────
 class OriginPill extends StatelessWidget {
   final String label;
   final bool selected;

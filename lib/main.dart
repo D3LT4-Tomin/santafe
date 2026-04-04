@@ -1,14 +1,24 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 
-import 'shell/app_shell.dart';
+import 'firebase_options.dart';
+import 'providers/auth_provider.dart';
+import 'providers/data_provider.dart';
+import 'screens/auth_wrapper.dart';
 import 'theme/app_theme.dart';
 
-void main() {
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarBrightness: Brightness.dark,
-    statusBarIconBrightness: Brightness.light,
-  ));
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.light,
+    ),
+  );
   runApp(const FinanzasApp());
 }
 
@@ -17,16 +27,22 @@ class FinanzasApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const CupertinoApp(
-      title: 'Finanzas',
-      debugShowCheckedModeBanner: false,
-      theme: CupertinoThemeData(
-        brightness: Brightness.dark,
-        primaryColor: AppColors.systemBlue,
-        scaffoldBackgroundColor: AppColors.systemBackground,
-        textTheme: CupertinoTextThemeData(primaryColor: AppColors.systemBlue),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => DataProvider()),
+      ],
+      child: const CupertinoApp(
+        title: 'SantaFe',
+        debugShowCheckedModeBanner: false,
+        theme: CupertinoThemeData(
+          brightness: Brightness.dark,
+          primaryColor: AppColors.systemBlue,
+          scaffoldBackgroundColor: AppColors.systemBackground,
+          textTheme: CupertinoTextThemeData(primaryColor: AppColors.systemBlue),
+        ),
+        home: AuthWrapper(),
       ),
-      home: AppShell(),
     );
   }
 }

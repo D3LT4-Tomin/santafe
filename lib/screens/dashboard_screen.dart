@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
+import '../providers/data_provider.dart';
 import '../models/expense_data.dart';
+import '../models/transaction_model.dart';
 import '../theme/app_theme.dart';
 import '../widgets/animated_blobs.dart';
 import '../widgets/balance_card.dart';
@@ -73,54 +76,61 @@ class _DashboardScreenState extends State<DashboardScreen>
     super.dispose();
   }
 
-  List<ExpenseData> get _filteredExpenses {
-    return kAllExpenses
-        .where((e) => _filterSelection.matches(e.category, e.origin, e.tipo))
-        .toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
 
-    return Stack(
-      children: [
-        RepaintBoundary(
-          child: AnimatedBlobs(blob1Anim: _blob1Anim, blob2Anim: _blob2Anim),
-        ),
-        Positioned.fill(
-          child: SingleChildScrollView(
-            controller: widget.scrollController,
-            physics: const BouncingScrollPhysics(),
-            padding: EdgeInsets.only(top: topPadding + 76, bottom: 80),
-            child: FadeTransition(
-              opacity: _appearAnim,
-              child: SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(0, 0.04),
-                  end: Offset.zero,
-                ).animate(_appearAnim),
-                child: Column(
-                  children: [
-                    const BalanceCard(),
-                    const SizedBox(height: 16),
-                    const TipCard(),
-                    const SizedBox(height: 28),
-                    _buildRecentExpenses(),
-                    const SizedBox(height: 28),
-                    const WeeklySummaryCard(),
-                  ],
+    return Consumer<DataProvider>(
+      builder: (context, dataProvider, _) {
+        if (dataProvider.isLoading) {
+          return const Center(child: CupertinoActivityIndicator());
+        }
+
+        return Stack(
+          children: [
+            RepaintBoundary(
+              child: AnimatedBlobs(
+                blob1Anim: _blob1Anim,
+                blob2Anim: _blob2Anim,
+              ),
+            ),
+            Positioned.fill(
+              child: SingleChildScrollView(
+                controller: widget.scrollController,
+                physics: const BouncingScrollPhysics(),
+                padding: EdgeInsets.only(top: topPadding + 76, bottom: 80),
+                child: FadeTransition(
+                  opacity: _appearAnim,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0, 0.04),
+                      end: Offset.zero,
+                    ).animate(_appearAnim),
+                    child: Column(
+                      children: [
+                        const BalanceCard(),
+                        const SizedBox(height: 16),
+                        const TipCard(),
+                        const SizedBox(height: 28),
+                        _buildRecentExpenses(dataProvider.transactions),
+                        const SizedBox(height: 28),
+                        const WeeklySummaryCard(),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 
-  Widget _buildRecentExpenses() {
-    final filtered = _filteredExpenses;
+  Widget _buildRecentExpenses(List<TransactionModel> transactions) {
+    final filtered = transactions
+        .where((t) => _filterSelection.matches(t.category, t.origin, t.tipo))
+        .toList();
     const initialCount = 5;
     final showingAll = _showMoreExpenses || filtered.length <= initialCount;
     final visibleExpenses = showingAll
@@ -131,7 +141,6 @@ class _DashboardScreenState extends State<DashboardScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ── Section header + filter button ─────────────────────────────
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
           child: Row(
@@ -161,8 +170,6 @@ class _DashboardScreenState extends State<DashboardScreen>
             ],
           ),
         ),
-
-        // ── Expense list ───────────────────────────────────────────────
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: AnimatedSize(
@@ -179,8 +186,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                   ? _buildEmptyState()
                   : Column(
                       children: [
-                        for (final data in visibleExpenses)
-                          ExpenseRow(data: data),
+                        for (final transaction in visibleExpenses)
+                          ExpenseRow(transaction: transaction),
                         if (hasMore)
                           ShowMoreButton(
                             expanded: _showMoreExpenses,

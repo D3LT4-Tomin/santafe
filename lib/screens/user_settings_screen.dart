@@ -2,9 +2,12 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 import '../theme/app_theme.dart';
 import '../widgets/animated_blobs.dart';
+import '../providers/auth_provider.dart';
+import '../providers/data_provider.dart';
 
 class UserSettingsScreen extends StatefulWidget {
   final ScrollController? scrollController;
@@ -479,7 +482,13 @@ class _SignOutButton extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: CupertinoButton(
         padding: EdgeInsets.zero,
-        onPressed: () => HapticFeedback.mediumImpact(),
+        onPressed: () async {
+          HapticFeedback.mediumImpact();
+          final authProvider = context.read<AuthProvider>();
+          final dataProvider = context.read<DataProvider>();
+          dataProvider.clearData();
+          await authProvider.signOut();
+        },
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: AppColors.systemRed.withOpacity(0.08),
