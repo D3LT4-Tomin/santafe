@@ -216,7 +216,7 @@ class _WidgetListItem extends StatelessWidget {
                 // Toggle
                 CupertinoSwitch(
                   value: config.visible,
-                  activeColor: const Color(0xFF34C759),
+                  activeTrackColor: const Color(0xFF34C759),
                   onChanged: onToggle,
                 ),
               ],

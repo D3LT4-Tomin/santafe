@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../theme/app_theme.dart';
@@ -226,9 +225,9 @@ class _NetWorthPill extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.15)),
+          border: Border.all(color: color.withValues(alpha: 0.15)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -301,8 +300,7 @@ class _SectionCard extends StatelessWidget {
                   ),
                   CupertinoButton(
                     padding: EdgeInsets.zero,
-                    minSize: 36,
-                    onPressed: onAdd,
+                    onPressed: onAdd, minimumSize: Size(36, 36),
                     child: const Icon(
                       CupertinoIcons.add,
                       color: AppColors.systemBlue,
@@ -422,7 +420,7 @@ class _BankAccountsSection extends StatelessWidget {
                         vertical: 3,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.systemBlue.withOpacity(0.12),
+                        color: AppColors.systemBlue.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Text(
@@ -498,7 +496,7 @@ class _BankAccountRow extends StatelessWidget {
                   width: 28,
                   height: 28,
                   fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => const Icon(
+                  errorBuilder: (_, _, _) => const Icon(
                     CupertinoIcons.building_2_fill,
                     color: AppColors.systemBlue,
                     size: 20,
@@ -621,7 +619,7 @@ class _CashSection extends StatelessWidget {
                         vertical: 3,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.systemGreen.withOpacity(0.12),
+                        color: AppColors.systemGreen.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Text(
@@ -687,7 +685,7 @@ class _CashRow extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.12),
+                color: color.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, color: color, size: 20),
@@ -778,7 +776,7 @@ class _InvestmentsSection extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: AppColors.systemGreen.withOpacity(0.12),
+                  color: AppColors.systemGreen.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -864,7 +862,7 @@ class _InvestmentRow extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.12),
+                color: color.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, color: color, size: 20),

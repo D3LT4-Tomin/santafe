@@ -1,6 +1,4 @@
-import 'dart:ui' show ImageFilter;
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
@@ -321,8 +319,8 @@ class _SettingsRow extends StatelessWidget {
                   height: 30,
                   decoration: BoxDecoration(
                     color: isDestructive
-                        ? AppColors.systemRed.withOpacity(0.12)
-                        : color.withOpacity(0.14),
+                        ? AppColors.systemRed.withValues(alpha: 0.12)
+                        : color.withValues(alpha: 0.14),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -388,7 +386,7 @@ class _ToggleRow extends StatelessWidget {
                 width: 30,
                 height: 30,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.14),
+                  color: color.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(icon, size: 16, color: color),
@@ -421,7 +419,7 @@ class _ToggleRow extends StatelessWidget {
               const SizedBox(width: 8),
               CupertinoSwitch(
                 value: value,
-                activeColor: AppColors.systemBlue,
+                activeTrackColor: AppColors.systemBlue,
                 onChanged: (v) {
                   HapticFeedback.selectionClick();
                   onChanged(v);
@@ -491,9 +489,9 @@ class _SignOutButton extends StatelessWidget {
         },
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: AppColors.systemRed.withOpacity(0.08),
+            color: AppColors.systemRed.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.systemRed.withOpacity(0.18)),
+            border: Border.all(color: AppColors.systemRed.withValues(alpha: 0.18)),
           ),
           child: const SizedBox(
             width: double.infinity,

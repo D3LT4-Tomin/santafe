@@ -176,7 +176,7 @@ class _ActivityCardState extends State<_ActivityCard>
               ),
               AnimatedBuilder(
                 animation: _anim,
-                builder: (_, __) => SizedBox(
+                builder: (_, _) => SizedBox(
                   width: 90,
                   height: 90,
                   child: CustomPaint(
@@ -389,7 +389,7 @@ class _ModulesSectionState extends State<_ModulesSection> {
           icon: CupertinoIcons.money_dollar_circle_fill,
           color: AppColors.systemBlue,
           recommended: true,
-          lessonScreen: const DondeSeVanLesson(),
+          lessonScreen: DondeSeVanLesson(),
         ),
         // ── Locked ───────────────────────────────────────────────────────────
         _ModuleData(
@@ -440,7 +440,7 @@ class _ModulesSectionState extends State<_ModulesSection> {
           icon: CupertinoIcons.ant_fill,
           color: AppColors.systemOrange,
           recommended: true,
-          lessonScreen: const GastosHormigaLesson(),
+          lessonScreen: GastosHormigaLesson(),
         ),
         // ── Locked ───────────────────────────────────────────────────────────
         _ModuleData(
@@ -491,7 +491,7 @@ class _ModulesSectionState extends State<_ModulesSection> {
           icon: CupertinoIcons.star_circle_fill,
           color: AppColors.systemGreen,
           recommended: true,
-          lessonScreen: const AhorroBasicoLesson(),
+          lessonScreen: AhorroBasicoLesson(),
         ),
         // ── Locked ───────────────────────────────────────────────────────────
         _ModuleData(
@@ -661,21 +661,21 @@ class _ModuleCard extends StatelessWidget {
     } else if (isCurrent) {
       iconColor = AppColors.systemBlue;
       textColor = AppColors.label;
-      borderColor = AppColors.systemBlue.withOpacity(0.55);
-      bgColor = AppColors.systemBlue.withOpacity(0.08);
-      iconBgColor = AppColors.systemBlue.withOpacity(0.15);
+      borderColor = AppColors.systemBlue.withValues(alpha: 0.55);
+      bgColor = AppColors.systemBlue.withValues(alpha: 0.08);
+      iconBgColor = AppColors.systemBlue.withValues(alpha: 0.15);
     } else if (completed) {
-      iconColor = data.color.withOpacity(0.5);
+      iconColor = data.color.withValues(alpha: 0.5);
       textColor = AppColors.secondaryLabel;
       borderColor = AppColors.white07;
       bgColor = AppColors.white05;
-      iconBgColor = data.color.withOpacity(0.08);
+      iconBgColor = data.color.withValues(alpha: 0.08);
     } else {
       iconColor = data.color;
       textColor = AppColors.label;
-      borderColor = data.color.withOpacity(0.22);
-      bgColor = data.color.withOpacity(0.08);
-      iconBgColor = data.color.withOpacity(0.15);
+      borderColor = data.color.withValues(alpha: 0.22);
+      bgColor = data.color.withValues(alpha: 0.08);
+      iconBgColor = data.color.withValues(alpha: 0.15);
     }
 
     return Builder(
@@ -766,13 +766,13 @@ class _ModuleCard extends StatelessWidget {
                 right: 0,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: AppColors.systemPurple.withOpacity(0.18),
+                    color: AppColors.systemPurple.withValues(alpha: 0.18),
                     borderRadius: const BorderRadius.only(
                       topRight: Radius.circular(18),
                       bottomLeft: Radius.circular(10),
                     ),
                     border: Border.all(
-                      color: AppColors.systemPurple.withOpacity(0.35),
+                      color: AppColors.systemPurple.withValues(alpha: 0.35),
                       width: 0.5,
                     ),
                   ),
@@ -827,10 +827,10 @@ class _ModuleCard extends StatelessWidget {
                   width: 18,
                   height: 18,
                   decoration: BoxDecoration(
-                    color: AppColors.systemGreen.withOpacity(0.18),
+                    color: AppColors.systemGreen.withValues(alpha: 0.18),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: AppColors.systemGreen.withOpacity(0.40),
+                      color: AppColors.systemGreen.withValues(alpha: 0.40),
                       width: 0.5,
                     ),
                   ),
@@ -949,10 +949,10 @@ class _HexBadge extends StatelessWidget {
     final earned = achievement.earned;
     final iconColor = earned ? AppColors.systemBlue : AppColors.tertiaryLabel;
     final bgColor = earned
-        ? AppColors.systemBlue.withOpacity(0.12)
+        ? AppColors.systemBlue.withValues(alpha: 0.12)
         : AppColors.white05;
     final borderColor = earned
-        ? AppColors.systemBlue.withOpacity(0.28)
+        ? AppColors.systemBlue.withValues(alpha: 0.28)
         : AppColors.white07;
     final labelColor = earned ? AppColors.label : AppColors.tertiaryLabel;
 
@@ -1001,10 +1001,11 @@ class _HexPainter extends CustomPainter {
       final angle = math.pi / 180 * (60 * i - 30);
       final x = cx + r * math.cos(angle);
       final y = cy + r * math.sin(angle);
-      if (i == 0)
+      if (i == 0) {
         path.moveTo(x, y);
-      else
+      } else {
         path.lineTo(x, y);
+      }
     }
     path.close();
     canvas.drawPath(

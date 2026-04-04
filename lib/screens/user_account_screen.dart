@@ -1,7 +1,5 @@
 import 'dart:math' as math;
-import 'dart:ui' show ImageFilter;
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../theme/app_theme.dart';
@@ -26,10 +24,10 @@ class _UserAccountScreenState extends State<UserAccountScreen>
   late Animation<double> _appearAnim;
 
   // Notification toggles
-  bool _notifGastos = true;
-  bool _notifMetas = true;
-  bool _notifResumen = false;
-  bool _notifPromociones = false;
+  final bool _notifGastos = true;
+  final bool _notifMetas = true;
+  final bool _notifResumen = false;
+  final bool _notifPromociones = false;
 
   @override
   void initState() {
@@ -175,7 +173,7 @@ class _AvatarHeader extends StatelessWidget {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.systemBlue.withOpacity(0.3),
+                          color: AppColors.systemBlue.withValues(alpha: 0.3),
                           blurRadius: 14,
                           offset: const Offset(0, 4),
                         ),
@@ -245,18 +243,17 @@ class _AvatarHeader extends StatelessWidget {
                     const SizedBox(height: 10),
                     CupertinoButton(
                       padding: EdgeInsets.zero,
-                      minSize: 0,
-                      onPressed: () => HapticFeedback.selectionClick(),
+                      onPressed: () => HapticFeedback.selectionClick(), minimumSize: Size(0, 0),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
                           vertical: 5,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.systemBlue.withOpacity(0.12),
+                          color: AppColors.systemBlue.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: AppColors.systemBlue.withOpacity(0.2),
+                            color: AppColors.systemBlue.withValues(alpha: 0.2),
                           ),
                         ),
                         child: const Text(
@@ -296,10 +293,10 @@ class _SubscriptionCard extends StatelessWidget {
             colors: [Color(0xFF1A1040), Color(0xFF0D1F40)],
           ),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.systemPurple.withOpacity(0.3)),
+          border: Border.all(color: AppColors.systemPurple.withValues(alpha: 0.3)),
           boxShadow: [
             BoxShadow(
-              color: AppColors.systemPurple.withOpacity(0.15),
+              color: AppColors.systemPurple.withValues(alpha: 0.15),
               blurRadius: 20,
               offset: const Offset(0, 6),
             ),
@@ -319,7 +316,7 @@ class _SubscriptionCard extends StatelessWidget {
                         width: 32,
                         height: 32,
                         decoration: BoxDecoration(
-                          color: AppColors.systemPurple.withOpacity(0.2),
+                          color: AppColors.systemPurple.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Icon(
@@ -346,10 +343,10 @@ class _SubscriptionCard extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.systemPurple.withOpacity(0.25),
+                      color: AppColors.systemPurple.withValues(alpha: 0.25),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: AppColors.systemPurple.withOpacity(0.4),
+                        color: AppColors.systemPurple.withValues(alpha: 0.4),
                       ),
                     ),
                     child: const Text(
@@ -407,8 +404,7 @@ class _SubscriptionCard extends StatelessWidget {
                   ),
                   CupertinoButton(
                     padding: EdgeInsets.zero,
-                    minSize: 0,
-                    onPressed: () => HapticFeedback.selectionClick(),
+                    onPressed: () => HapticFeedback.selectionClick(), minimumSize: Size(0, 0),
                     child: const Text(
                       'Gestionar',
                       style: TextStyle(
@@ -550,8 +546,8 @@ class _SettingsRow extends StatelessWidget {
                   height: 30,
                   decoration: BoxDecoration(
                     color: isDestructive
-                        ? AppColors.systemRed.withOpacity(0.12)
-                        : color.withOpacity(0.14),
+                        ? AppColors.systemRed.withValues(alpha: 0.12)
+                        : color.withValues(alpha: 0.14),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -617,7 +613,7 @@ class _ToggleRow extends StatelessWidget {
                 width: 30,
                 height: 30,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.14),
+                  color: color.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(icon, size: 16, color: color),
@@ -650,7 +646,7 @@ class _ToggleRow extends StatelessWidget {
               const SizedBox(width: 8),
               CupertinoSwitch(
                 value: value,
-                activeColor: AppColors.systemBlue,
+                activeTrackColor: AppColors.systemBlue,
                 onChanged: (v) {
                   HapticFeedback.selectionClick();
                   onChanged(v);
@@ -714,9 +710,9 @@ class _SignOutButton extends StatelessWidget {
         onPressed: () => HapticFeedback.mediumImpact(),
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: AppColors.systemRed.withOpacity(0.08),
+            color: AppColors.systemRed.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.systemRed.withOpacity(0.18)),
+            border: Border.all(color: AppColors.systemRed.withValues(alpha: 0.18)),
           ),
           child: const SizedBox(
             width: double.infinity,
@@ -823,10 +819,10 @@ class _HexBadge extends StatelessWidget {
     final earned = achievement.earned;
     final iconColor = earned ? AppColors.systemBlue : AppColors.tertiaryLabel;
     final bgColor = earned
-        ? AppColors.systemBlue.withOpacity(0.12)
+        ? AppColors.systemBlue.withValues(alpha: 0.12)
         : AppColors.white05;
     final borderColor = earned
-        ? AppColors.systemBlue.withOpacity(0.28)
+        ? AppColors.systemBlue.withValues(alpha: 0.28)
         : AppColors.white07;
     final labelColor = earned ? AppColors.label : AppColors.tertiaryLabel;
 

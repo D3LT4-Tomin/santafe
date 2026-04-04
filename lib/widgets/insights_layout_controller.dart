@@ -29,7 +29,7 @@ class InsightWidgetConfig {
 class InsightsLayoutController extends ChangeNotifier {
   static const _defaultOrder = InsightWidgetId.values;
 
-  List<InsightWidgetConfig> _configs = _defaultOrder
+  final List<InsightWidgetConfig> _configs = _defaultOrder
       .map((id) => InsightWidgetConfig(id: id, visible: true))
       .toList();
 
@@ -105,8 +105,4 @@ class InsightsLayoutController extends ChangeNotifier {
     notifyListeners();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
 }

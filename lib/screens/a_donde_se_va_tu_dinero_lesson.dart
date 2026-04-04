@@ -146,9 +146,9 @@ class _LessonShellState extends State<_LessonShell>
                           height: 6,
                           child: AnimatedBuilder(
                             animation: _progressAnim,
-                            builder: (_, __) => LinearProgressIndicator(
+                            builder: (_, _) => LinearProgressIndicator(
                               value: _progressAnim.value,
-                              backgroundColor: Colors.white.withOpacity(0.10),
+                              backgroundColor: Colors.white.withValues(alpha: 0.10),
                               valueColor: const AlwaysStoppedAnimation(
                                 AppColors.systemBlue,
                               ),
@@ -237,10 +237,10 @@ class _LessonHeader extends StatelessWidget {
           width: 56,
           height: 56,
           decoration: BoxDecoration(
-            color: AppColors.systemBlue.withOpacity(0.15),
+            color: AppColors.systemBlue.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: AppColors.systemBlue.withOpacity(0.35),
+              color: AppColors.systemBlue.withValues(alpha: 0.35),
               width: 1,
             ),
           ),
@@ -268,7 +268,7 @@ class _LessonHeader extends StatelessWidget {
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 13,
-            color: Colors.white.withOpacity(0.45),
+            color: Colors.white.withValues(alpha: 0.45),
             height: 1.4,
           ),
         ),
@@ -312,7 +312,7 @@ class _Step0MultiChoiceState extends State<_Step0MultiChoice> {
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
-                color: Colors.white.withOpacity(0.85),
+                color: Colors.white.withValues(alpha: 0.85),
               ),
             ),
           ),
@@ -337,13 +337,13 @@ class _Step0MultiChoiceState extends State<_Step0MultiChoice> {
                   curve: Curves.easeOutCubic,
                   decoration: BoxDecoration(
                     color: selected
-                        ? c.color.withOpacity(0.20)
-                        : Colors.white.withOpacity(0.06),
+                        ? c.color.withValues(alpha: 0.20)
+                        : Colors.white.withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: selected
-                          ? c.color.withOpacity(0.60)
-                          : Colors.white.withOpacity(0.10),
+                          ? c.color.withValues(alpha: 0.60)
+                          : Colors.white.withValues(alpha: 0.10),
                       width: selected ? 1.5 : 1,
                     ),
                   ),
@@ -455,7 +455,7 @@ class _Step1RevealState extends State<_Step1Reveal>
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white.withOpacity(0.85),
+                      color: Colors.white.withValues(alpha: 0.85),
                     ),
                   ),
                 ),
@@ -472,7 +472,7 @@ class _Step1RevealState extends State<_Step1Reveal>
                     final delay = i * 0.12;
                     return AnimatedBuilder(
                       animation: _ctrl,
-                      builder: (_, __) {
+                      builder: (_, _) {
                         final t = (((_ctrl.value - delay) / (1 - delay)).clamp(
                           0.0,
                           1.0,
@@ -518,9 +518,9 @@ class _RevealCard extends StatelessWidget {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: item.color.withOpacity(0.12),
+            color: item.color.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: item.color.withOpacity(0.30)),
+            border: Border.all(color: item.color.withValues(alpha: 0.30)),
           ),
           padding: const EdgeInsets.all(14),
           child: Column(
@@ -535,7 +535,7 @@ class _RevealCard extends StatelessWidget {
                     item.label,
                     style: TextStyle(
                       fontSize: 11,
-                      color: Colors.white.withOpacity(0.60),
+                      color: Colors.white.withValues(alpha: 0.60),
                       height: 1.3,
                     ),
                   ),
@@ -560,10 +560,10 @@ class _RevealCard extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
             decoration: BoxDecoration(
-              color: AppColors.systemGreen.withOpacity(0.20),
+              color: AppColors.systemGreen.withValues(alpha: 0.20),
               borderRadius: BorderRadius.circular(999),
               border: Border.all(
-                color: AppColors.systemGreen.withOpacity(0.40),
+                color: AppColors.systemGreen.withValues(alpha: 0.40),
               ),
             ),
             child: const Text(
@@ -682,7 +682,7 @@ class _Step2RankState extends State<_Step2Rank> {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white.withOpacity(0.85),
+                      color: Colors.white.withValues(alpha: 0.85),
                     ),
                   ),
                 ),
@@ -704,13 +704,13 @@ class _Step2RankState extends State<_Step2Rank> {
                         curve: Curves.easeOutCubic,
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? color.withOpacity(0.18)
-                              : Colors.white.withOpacity(0.06),
+                              ? color.withValues(alpha: 0.18)
+                              : Colors.white.withValues(alpha: 0.06),
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
                             color: isSelected
-                                ? color.withOpacity(0.50)
-                                : Colors.white.withOpacity(0.10),
+                                ? color.withValues(alpha: 0.50)
+                                : Colors.white.withValues(alpha: 0.10),
                             width: isSelected ? 1.5 : 1,
                           ),
                         ),
@@ -728,8 +728,8 @@ class _Step2RankState extends State<_Step2Rank> {
                                 height: 32,
                                 decoration: BoxDecoration(
                                   color: isSelected
-                                      ? color.withOpacity(0.25)
-                                      : Colors.white.withOpacity(0.08),
+                                      ? color.withValues(alpha: 0.25)
+                                      : Colors.white.withValues(alpha: 0.08),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Center(
@@ -770,12 +770,12 @@ class _Step2RankState extends State<_Step2Rank> {
                                     vertical: 3,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: AppColors.systemGreen.withOpacity(
+                                    color: AppColors.systemGreen.withValues(alpha: 
                                       0.18,
                                     ),
                                     borderRadius: BorderRadius.circular(999),
                                     border: Border.all(
-                                      color: AppColors.systemGreen.withOpacity(
+                                      color: AppColors.systemGreen.withValues(alpha: 
                                         0.40,
                                       ),
                                     ),
@@ -861,7 +861,7 @@ class _Step4CompletionState extends State<_Step4Completion>
                 // Lesson icon — animate to "done" state
                 AnimatedBuilder(
                   animation: _fade,
-                  builder: (_, __) => Opacity(
+                  builder: (_, _) => Opacity(
                     opacity: _fade.value,
                     child: ScaleTransition(
                       scale: _scale,
@@ -869,10 +869,10 @@ class _Step4CompletionState extends State<_Step4Completion>
                         width: 56,
                         height: 56,
                         decoration: BoxDecoration(
-                          color: AppColors.systemBlue.withOpacity(0.15),
+                          color: AppColors.systemBlue.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: AppColors.systemBlue.withOpacity(0.35),
+                            color: AppColors.systemBlue.withValues(alpha: 0.35),
                           ),
                         ),
                         child: const Icon(
@@ -902,14 +902,14 @@ class _Step4CompletionState extends State<_Step4Completion>
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 13,
-                    color: Colors.white.withOpacity(0.45),
+                    color: Colors.white.withValues(alpha: 0.45),
                     height: 1.4,
                   ),
                 ),
                 const SizedBox(height: 36),
 
                 // Divider
-                Container(height: 1, color: Colors.white.withOpacity(0.08)),
+                Container(height: 1, color: Colors.white.withValues(alpha: 0.08)),
                 const SizedBox(height: 28),
 
                 // Recuerda card
@@ -919,9 +919,9 @@ class _Step4CompletionState extends State<_Step4Completion>
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
+                      color: Colors.white.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white.withOpacity(0.10)),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -931,7 +931,7 @@ class _Step4CompletionState extends State<_Step4Completion>
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
-                            color: Colors.white.withOpacity(0.50),
+                            color: Colors.white.withValues(alpha: 0.50),
                             letterSpacing: 0.3,
                           ),
                         ),
@@ -999,9 +999,9 @@ class _CompletionBadge extends StatelessWidget {
       width: 120,
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.30)),
+        border: Border.all(color: color.withValues(alpha: 0.30)),
       ),
       child: Column(
         children: [
@@ -1045,7 +1045,7 @@ class _BottomButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: enabled
                 ? AppColors.systemBlue
-                : Colors.white.withOpacity(0.08),
+                : Colors.white.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(14),
           ),
           child: Center(

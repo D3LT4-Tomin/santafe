@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../theme/app_theme.dart';
@@ -188,7 +187,7 @@ class _FilterRow extends StatelessWidget {
                       onTap: () => onSelected(item),
                     ),
                   )),
-              if (trailingWidget != null) trailingWidget!,
+              ?trailingWidget,
             ],
           ),
         ),
@@ -222,12 +221,12 @@ class _Pill extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
           color: isActive
-              ? activeColor.withOpacity(0.15)
+              ? activeColor.withValues(alpha: 0.15)
               : AppColors.white05,
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
             color: isActive
-                ? activeColor.withOpacity(0.45)
+                ? activeColor.withValues(alpha: 0.45)
                 : AppColors.white07,
             width: isActive ? 1.0 : 0.5,
           ),

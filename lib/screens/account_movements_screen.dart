@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 import '../models/expense_data.dart';
+import '../models/transaction_model.dart';
+import '../providers/data_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/animated_blobs.dart';
 import '../widgets/expense_widgets.dart';
@@ -74,22 +76,24 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
     super.dispose();
   }
 
-  List<ExpenseData> get _filteredExpenses {
-    return kAllExpenses.where((e) {
+  List<TransactionModel> _filteredTransactions(
+    List<TransactionModel> transactions,
+  ) {
+    return transactions.where((t) {
       bool originMatch = false;
       if (widget.originName.contains('BBVA') ||
           widget.originName.contains('Scotiabank')) {
         originMatch =
-            e.origin.contains('Tarjeta') || e.origin.contains('Transferencia');
+            t.origin.contains('Tarjeta') || t.origin.contains('Transferencia');
       } else if (widget.originName.contains('Cartera') ||
           widget.originName.contains('colchón')) {
-        originMatch = e.origin == 'Efectivo';
+        originMatch = t.origin == 'Efectivo';
       } else {
         originMatch = true; // For others
       }
 
       if (_selectedCategory == 'Todos') return originMatch;
-      return originMatch && e.category == _selectedCategory;
+      return originMatch && t.category == _selectedCategory;
     }).toList();
   }
 
@@ -106,7 +110,7 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
           widget.originName,
           style: const TextStyle(color: AppColors.label),
         ),
-        backgroundColor: AppColors.frostedBlue.withOpacity(0.5),
+        backgroundColor: AppColors.frostedBlue.withValues(alpha: 0.5),
         border: null,
       ),
       child: Stack(
@@ -138,7 +142,8 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
   }
 
   Widget _buildMovementsPanel() {
-    final filtered = _filteredExpenses;
+    final transactions = context.watch<DataProvider>().transactions;
+    final filtered = _filteredTransactions(transactions);
     const initialCount = 10;
     final showingAll = _showMoreExpenses || filtered.length <= initialCount;
     final visibleExpenses = showingAll
@@ -194,8 +199,8 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
                   ? _buildEmptyState()
                   : Column(
                       children: [
-                        for (final data in visibleExpenses)
-                          ExpenseRow(data: data),
+                        for (final transaction in visibleExpenses)
+                          ExpenseRow(transaction: transaction),
                         if (hasMore)
                           ShowMoreButton(
                             expanded: _showMoreExpenses,

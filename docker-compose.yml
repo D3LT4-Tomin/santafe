@@ -1,8 +1,21 @@
 services:
-  app:
+  web:
     build:
       context: .
       dockerfile: Dockerfile
+      target: runtime
     ports:
       - "8080:80"
     restart: unless-stopped
+
+  linux-build: # Error in desktop because there is no firebase plugin for linux or windows desktop
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build-linux
+    user: "0:0"
+    command: sh -c "mkdir -p /out && cp -a /app/build/linux/x64/release/bundle/. /out"
+    volumes:
+      - ./dist/linux:/out:Z
+    profiles:
+      - build

@@ -181,7 +181,7 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
               width: double.infinity,
               child: AnimatedBuilder(
                 animation: _chartAnim,
-                builder: (_, __) => CustomPaint(
+                builder: (_, _) => CustomPaint(
                   painter: _SavingsChartPainter(
                     progress: _chartAnim.value,
                     currentAge: d.currentAge,
@@ -325,7 +325,7 @@ class _SavingsChartPainter extends CustomPainter {
     canvas.drawPath(
       bandPath,
       Paint()
-        ..color = const Color(0xFF0A84FF).withOpacity(0.15)
+        ..color = const Color(0xFF0A84FF).withValues(alpha: 0.15)
         ..style = PaintingStyle.fill,
     );
 
