@@ -1,7 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../widgets/header_row.dart';
 
 class ComerFueraVsCocinarLesson extends StatelessWidget {
   const ComerFueraVsCocinarLesson({super.key});

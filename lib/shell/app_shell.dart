@@ -165,21 +165,27 @@ class _AppShellState extends State<AppShell> {
     debugPrint('Opening chat with financial assistant');
   }
 
-  Future<bool> _onWillPop() async {
+  bool _canPopShell() {
+    final nav = _navigatorKeys[_selectedIndex].currentState;
+    return nav == null || !nav.canPop();
+  }
+
+  void _onPopInvokedWithResult(bool didPop, Object? result) {
+    if (didPop) return;
+
     final nav = _navigatorKeys[_selectedIndex].currentState;
     if (nav != null && nav.canPop()) {
       nav.pop();
-      return false;
     }
-    return true;
   }
 
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: _canPopShell(),
+      onPopInvokedWithResult: _onPopInvokedWithResult,
       child: CupertinoPageScaffold(
         backgroundColor: AppColors.systemBackground,
         child: Stack(

@@ -1,7 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import '../theme/app_theme.dart';
-import '../widgets/header_row.dart';
 
 class ConceptosBaseLesson extends StatelessWidget {
   const ConceptosBaseLesson({super.key});

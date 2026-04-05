@@ -1,6 +1,4 @@
-import 'dart:ui' show ImageFilter;
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../theme/app_theme.dart';
 import '../screens/user_account_screen.dart';

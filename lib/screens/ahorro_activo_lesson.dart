@@ -284,7 +284,7 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: AppColors.systemBackground.withOpacity(0.8),
+                  color: AppColors.systemBackground.withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
@@ -365,7 +365,7 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
               ),
               // Progress counter – same style as dashboard section labels
               Text(
-                '${_totalAnswered} / ${_shuffledExpenses.length}',
+                '$_totalAnswered / ${_shuffledExpenses.length}',
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -481,9 +481,9 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: color.withOpacity(0.25)),
+              border: Border.all(color: color.withValues(alpha: 0.25)),
             ),
             child: Icon(icon, color: color, size: 20),
           ),
@@ -531,7 +531,7 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
         // Softer shadow – consistent with other elevated surfaces in the app
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.25),
+            color: Colors.black.withValues(alpha: 0.25),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -688,7 +688,7 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
                         (passed
                                 ? AppColors.systemGreen
                                 : AppColors.systemOrange)
-                            .withOpacity(0.35),
+                            .withValues(alpha: 0.35),
                     blurRadius: 32,
                     offset: const Offset(0, 12),
                   ),

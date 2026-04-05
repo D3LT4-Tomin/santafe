@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import '../models/expense_data.dart';
 import '../models/transaction_model.dart';
 import '../theme/app_theme.dart';
@@ -18,15 +17,17 @@ class ExpenseRow extends StatelessWidget {
     if (category.contains('Transporte')) return CupertinoIcons.car_fill;
     if (category.contains('Suscripción')) return CupertinoIcons.film;
     if (category.contains('Salud')) return CupertinoIcons.heart_fill;
-    if (category.contains('Entretenimiento'))
+    if (category.contains('Entretenimiento')) {
       return CupertinoIcons.gamecontroller_fill;
+    }
     if (category.contains('Servicios')) return CupertinoIcons.bolt_fill;
     if (category.contains('Salario') ||
         category.contains('Freelance') ||
         category.contains('Inversión') ||
         category.contains('Bono') ||
-        category.contains('Venta'))
+        category.contains('Venta')) {
       return CupertinoIcons.money_dollar_circle_fill;
+    }
     return CupertinoIcons.bag_fill;
   }
 
@@ -93,7 +94,7 @@ class ExpenseRow extends StatelessWidget {
                 children: [
                   DecoratedBox(
                     decoration: BoxDecoration(
-                      color: _iconColor.withOpacity(0.15),
+                      color: _iconColor.withValues(alpha: 0.15),
                       borderRadius: const BorderRadius.all(Radius.circular(9)),
                     ),
                     child: SizedBox(
@@ -557,12 +558,12 @@ class OriginPill extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
           color: selected
-              ? AppColors.systemGreen.withOpacity(0.2)
+              ? AppColors.systemGreen.withValues(alpha: 0.2)
               : const Color(0x1AFFFFFF),
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
             color: selected
-                ? AppColors.systemGreen.withOpacity(0.5)
+                ? AppColors.systemGreen.withValues(alpha: 0.5)
                 : const Color(0x1FFFFFFF),
             width: 0.5,
           ),

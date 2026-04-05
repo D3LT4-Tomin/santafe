@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2c9d161fa6ebfe046fd1379c78d20f58785ce422
 import '../models/expense_data.dart';
 import '../models/transaction_model.dart';
 import '../providers/data_provider.dart';
@@ -83,6 +86,7 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
     super.dispose();
   }
 
+<<<<<<< HEAD
   List<TransactionModel> _getFilteredTransactions(
     List<TransactionModel> allTransactions,
   ) {
@@ -91,6 +95,26 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
 
       if (_selectedCategory == 'Todos') return true;
       return t.category == _selectedCategory;
+=======
+  List<TransactionModel> _filteredTransactions(
+    List<TransactionModel> transactions,
+  ) {
+    return transactions.where((t) {
+      bool originMatch = false;
+      if (widget.originName.contains('BBVA') ||
+          widget.originName.contains('Scotiabank')) {
+        originMatch =
+            t.origin.contains('Tarjeta') || t.origin.contains('Transferencia');
+      } else if (widget.originName.contains('Cartera') ||
+          widget.originName.contains('colchón')) {
+        originMatch = t.origin == 'Efectivo';
+      } else {
+        originMatch = true; // For others
+      }
+
+      if (_selectedCategory == 'Todos') return originMatch;
+      return originMatch && t.category == _selectedCategory;
+>>>>>>> 2c9d161fa6ebfe046fd1379c78d20f58785ce422
     }).toList();
   }
 
@@ -107,7 +131,7 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
           widget.accountName,
           style: const TextStyle(color: AppColors.label),
         ),
-        backgroundColor: AppColors.frostedBlue.withOpacity(0.5),
+        backgroundColor: AppColors.frostedBlue.withValues(alpha: 0.5),
         border: null,
       ),
       child: Consumer<DataProvider>(
@@ -147,7 +171,13 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
     );
   }
 
+<<<<<<< HEAD
   Widget _buildMovementsPanel(List<TransactionModel> filtered) {
+=======
+  Widget _buildMovementsPanel() {
+    final transactions = context.watch<DataProvider>().transactions;
+    final filtered = _filteredTransactions(transactions);
+>>>>>>> 2c9d161fa6ebfe046fd1379c78d20f58785ce422
     const initialCount = 10;
     final showingAll = _showMoreExpenses || filtered.length <= initialCount;
     final visibleExpenses = showingAll
@@ -204,6 +234,7 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
                   : Column(
                       children: [
                         for (final transaction in visibleExpenses)
+<<<<<<< HEAD
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).push(
@@ -216,6 +247,9 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
                             },
                             child: ExpenseRow(transaction: transaction),
                           ),
+=======
+                          ExpenseRow(transaction: transaction),
+>>>>>>> 2c9d161fa6ebfe046fd1379c78d20f58785ce422
                         if (hasMore)
                           ShowMoreButton(
                             expanded: _showMoreExpenses,

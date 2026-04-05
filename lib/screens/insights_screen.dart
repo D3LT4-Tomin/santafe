@@ -133,7 +133,7 @@ class _InsightsScreenState extends State<InsightsScreen>
           // GestureDetectors first and never reach this handler.
           Positioned.fill(
             child: Consumer<InsightsLayoutController>(
-              builder: (_, controller, __) {
+              builder: (_, controller, _) {
                 return GestureDetector(
                   behavior: HitTestBehavior.translucent,
                   onTap: controller.isReorderMode
@@ -210,7 +210,7 @@ class _InsightsScreenState extends State<InsightsScreen>
 
           // ── "Done" pill (floats above content in reorder mode) ────────────
           Consumer<InsightsLayoutController>(
-            builder: (_, controller, __) {
+            builder: (_, controller, _) {
               return AnimatedPositioned(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeOutCubic,
@@ -227,7 +227,7 @@ class _InsightsScreenState extends State<InsightsScreen>
                         borderRadius: BorderRadius.circular(999),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.systemBlue.withOpacity(0.35),
+                            color: AppColors.systemBlue.withValues(alpha: 0.35),
                             blurRadius: 16,
                             spreadRadius: 1,
                           ),
@@ -320,7 +320,7 @@ class _InsightsScreenState extends State<InsightsScreen>
             return Material(
               elevation: elevation,
               color: Colors.transparent,
-              shadowColor: AppColors.systemBlue.withOpacity(0.3),
+              shadowColor: AppColors.systemBlue.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(16),
               child: child,
             );
@@ -471,7 +471,7 @@ class _InsightsScreenState extends State<InsightsScreen>
                     height: 120,
                     child: AnimatedBuilder(
                       animation: _donutAnim,
-                      builder: (_, __) => CustomPaint(
+                      builder: (_, _) => CustomPaint(
                         painter: _DonutPainter(progress: _donutAnim.value),
                         child: Center(
                           child: Column(
@@ -592,7 +592,7 @@ class _InsightsScreenState extends State<InsightsScreen>
                     height: 120,
                     child: AnimatedBuilder(
                       animation: _donutAnim,
-                      builder: (_, __) => CustomPaint(
+                      builder: (_, _) => CustomPaint(
                         painter: _DonutPainter(progress: _donutAnim.value),
                         child: Center(
                           child: Column(
@@ -694,7 +694,7 @@ class _ReorderableItem extends StatelessWidget {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.28),
+                      color: Colors.black.withValues(alpha: 0.28),
                       blurRadius: 5,
                       offset: const Offset(0, 1),
                     ),
@@ -757,7 +757,7 @@ class _AddWidgetSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<InsightsLayoutController>(
-      builder: (_, controller, __) {
+      builder: (_, controller, _) {
         final hidden = controller.hiddenConfigs;
 
         return Container(
@@ -801,8 +801,8 @@ class _AddWidgetSheet extends StatelessWidget {
                     const Spacer(),
                     CupertinoButton(
                       padding: EdgeInsets.zero,
-                      minSize: 0,
                       onPressed: () => Navigator.of(context).pop(),
+                      minimumSize: Size(0, 0),
                       child: const Text(
                         'Cerrar',
                         style: TextStyle(
@@ -881,7 +881,7 @@ class _AddWidgetRow extends StatelessWidget {
             children: [
               DecoratedBox(
                 decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.14),
+                  color: iconColor.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(9),
                 ),
                 child: SizedBox(
@@ -905,8 +905,8 @@ class _AddWidgetRow extends StatelessWidget {
               ),
               CupertinoButton(
                 padding: EdgeInsets.zero,
-                minSize: 0,
                 onPressed: onAdd,
+                minimumSize: Size(0, 0),
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: AppColors.systemBlue,
@@ -998,7 +998,7 @@ class _WigglingWidgetState extends State<_WigglingWidget>
         return Transform(
           alignment: Alignment.center,
           transform: Matrix4.identity()
-            ..scale(_scaleAnim.value)
+            ..scaleByDouble(_scaleAnim.value)
             ..rotateZ(angle),
           child: child,
         );
@@ -1066,7 +1066,7 @@ class _ScalingButtonState extends State<_ScalingButton>
           decoration: BoxDecoration(
             color: AppColors.white05,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.systemBlue.withOpacity(0.25)),
+            border: Border.all(color: AppColors.systemBlue.withValues(alpha: 0.25)),
           ),
           child: const Padding(
             padding: EdgeInsets.symmetric(vertical: 14),
@@ -1330,7 +1330,7 @@ class _PredictionsCardState extends State<_PredictionsCard>
                           decoration: BoxDecoration(
                             color: active
                                 ? AppColors.systemBlue
-                                : AppColors.secondaryLabel.withOpacity(0.3),
+                                : AppColors.secondaryLabel.withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(999),
                           ),
                         );
@@ -1381,10 +1381,10 @@ class _BlueSegmentedToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.systemBlue.withOpacity(0.10),
+        color: AppColors.systemBlue.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(999),
         border: Border.all(
-          color: AppColors.systemBlue.withOpacity(0.18),
+          color: AppColors.systemBlue.withValues(alpha: 0.18),
           width: 0.5,
         ),
       ),
@@ -1478,12 +1478,12 @@ class _MonthChip extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.systemBlue.withOpacity(0.12)
+              ? AppColors.systemBlue.withValues(alpha: 0.12)
               : AppColors.tertiaryFill,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: isSelected
-                ? AppColors.systemBlue.withOpacity(0.35)
+                ? AppColors.systemBlue.withValues(alpha: 0.35)
                 : AppColors.white07,
             width: isSelected ? 1 : 0.5,
           ),
@@ -1814,7 +1814,7 @@ class _StatCard extends StatelessWidget {
         border: Border.all(color: AppColors.white07),
         boxShadow: [
           BoxShadow(
-            color: glowColor.withOpacity(0.08),
+            color: glowColor.withValues(alpha: 0.08),
             blurRadius: 24,
             spreadRadius: 2,
           ),
@@ -1936,7 +1936,7 @@ class _OriginRow extends StatelessWidget {
           children: [
             DecoratedBox(
               decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.12),
+                color: iconColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: SizedBox(

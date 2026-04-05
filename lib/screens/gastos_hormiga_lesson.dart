@@ -20,7 +20,7 @@ class GastosHormigaLesson extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: AppColors.systemBackground.withOpacity(0.8),
+                  color: AppColors.systemBackground.withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
