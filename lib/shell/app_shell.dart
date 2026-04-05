@@ -8,13 +8,12 @@ import '../screens/cuenta_screen.dart';
 import '../screens/dashboard_screen.dart';
 import '../screens/insights_screen.dart';
 import '../screens/aprender_screen.dart';
+import '../screens/tomy_chat_screen.dart';
 import '../theme/app_theme.dart';
 import '../widgets/add_expense_sheet.dart';
 import '../widgets/buttons.dart';
 import '../widgets/header_row.dart';
 import '../widgets/tab_bar.dart';
-
-import '../widgets/chat_overlay.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
@@ -27,10 +26,9 @@ class _AppShellState extends State<AppShell> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
   bool _isInLesson = false;
-  bool _isChatMode = false;
 
   final List<ScrollController> _scrollControllers = List.generate(
-    4,
+    5,
     (_) => ScrollController(),
   );
 
@@ -38,7 +36,7 @@ class _AppShellState extends State<AppShell> {
   double _lastScrollOffset = 0;
 
   final List<GlobalKey<NavigatorState>> _navigatorKeys = List.generate(
-    4,
+    5,
     (_) => GlobalKey<NavigatorState>(),
   );
 
@@ -50,7 +48,7 @@ class _AppShellState extends State<AppShell> {
     super.initState();
 
     _navigatorObservers = List.generate(
-      4,
+      5,
       (index) => _ShellNavigatorObserver(() {
         if (index == _selectedIndex) {
           _updateLessonState();
@@ -63,6 +61,7 @@ class _AppShellState extends State<AppShell> {
       InsightsScreen(scrollController: _scrollControllers[1]),
       CuentaScreen(scrollController: _scrollControllers[2]),
       AprenderScreen(scrollController: _scrollControllers[3]),
+      TomyChatScreen(scrollController: _scrollControllers[4]),
     ];
 
     _pageController.addListener(() {
@@ -143,11 +142,13 @@ class _AppShellState extends State<AppShell> {
     if (index == _selectedIndex) {
       _navigatorKeys[index].currentState?.popUntil((route) => route.isFirst);
 
-      _scrollControllers[index].animateTo(
-        0,
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.easeOutCubic,
-      );
+      if (_scrollControllers[index].hasClients) {
+        _scrollControllers[index].animateTo(
+          0,
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeOutCubic,
+        );
+      }
       return;
     }
 
@@ -165,24 +166,16 @@ class _AppShellState extends State<AppShell> {
 
   void _showSearchChat() {
     HapticFeedback.mediumImpact();
-    setState(() {
-      _isChatMode = true;
-    });
+    _onTabSelected(4);
   }
 
   bool _canPopShell() {
-    if (_isChatMode) return false;
     final nav = _navigatorKeys[_selectedIndex].currentState;
     return nav == null || !nav.canPop();
   }
 
   void _onPopInvokedWithResult(bool didPop, Object? result) {
     if (didPop) return;
-
-    if (_isChatMode) {
-      setState(() => _isChatMode = false);
-      return;
-    }
 
     final nav = _navigatorKeys[_selectedIndex].currentState;
     if (nav != null && nav.canPop()) {
@@ -201,96 +194,50 @@ class _AppShellState extends State<AppShell> {
         backgroundColor: AppColors.systemBackground,
         child: Stack(
           children: [
-            AnimatedScale(
-              scale: _isChatMode ? 0.93 : 1.0,
-              duration: const Duration(milliseconds: 350),
-              curve: Curves.easeOutCubic,
-              alignment: Alignment.center,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 350),
-                curve: Curves.easeOutCubic,
-                decoration: BoxDecoration(
-                  color: AppColors.systemBackground,
-                  borderRadius: BorderRadius.circular(_isChatMode ? 32 : 0),
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: Stack(
-                  children: [
-                    PageView(
-                      controller: _pageController,
-                      physics: _isChatMode
-                          ? const NeverScrollableScrollPhysics()
-                          : null,
-                      children: List.generate(_screens.length, (index) {
-                        return _TabNavigator(
-                          navigatorKey: _navigatorKeys[index],
-                          screen: _screens[index],
-                          observers: [_navigatorObservers[index]],
-                        );
-                      }),
-                    ),
-                    if (_selectedIndex == 0 && !_isInLesson)
-                      Positioned(
-                        right: 20,
-                        bottom: MediaQuery.of(context).padding.bottom + 70,
-                        child: FabButton(onTap: _showAddExpenseSheet),
-                      ),
-                    if (!_isInLesson)
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        child: RepaintBoundary(
-                          child: AppTabBar(
-                            selectedIndex: _selectedIndex,
-                            onTabSelected: _onTabSelected,
-                          ),
-                        ),
-                      ),
-                    if (!_isInLesson) ...[
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        child: IgnorePointer(
-                          child: _buildHeaderChrome(topPadding),
-                        ),
-                      ),
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        child: _buildFixedHeader(topPadding),
-                      ),
-                    ],
-                    Positioned.fill(
-                      child: IgnorePointer(
-                        ignoring: !_isChatMode,
-                        child: AnimatedOpacity(
-                          opacity: _isChatMode ? 1.0 : 0.0,
-                          duration: const Duration(milliseconds: 350),
-                          curve: Curves.easeOutCubic,
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                            child: ColoredBox(
-                              color: Colors.black.withValues(alpha: 0.65),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            PageView(
+              controller: _pageController,
+              children: List.generate(_screens.length, (index) {
+                return _TabNavigator(
+                  navigatorKey: _navigatorKeys[index],
+                  screen: _screens[index],
+                  observers: [_navigatorObservers[index]],
+                );
+              }),
             ),
-            if (_isChatMode)
+
+            if (!_isInLesson) ...[
               Positioned(
-                top: topPadding,
+                top: 0,
+                left: 0,
+                right: 0,
+                child: IgnorePointer(child: _buildHeaderChrome(topPadding)),
+              ),
+
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: _buildFixedHeader(topPadding),
+              ),
+            ],
+
+            if (_selectedIndex == 0 && !_isInLesson)
+              Positioned(
+                right: 20,
+                bottom: MediaQuery.of(context).padding.bottom + 70,
+                child: FabButton(onTap: _showAddExpenseSheet),
+              ),
+
+            if (!_isInLesson)
+              Positioned(
                 left: 0,
                 right: 0,
                 bottom: 0,
-                child: ChatOverlay(
-                  onClose: () => setState(() => _isChatMode = false),
+                child: RepaintBoundary(
+                  child: AppTabBar(
+                    selectedIndex: _selectedIndex,
+                    onTabSelected: _onTabSelected,
+                  ),
                 ),
               ),
           ],
@@ -366,7 +313,16 @@ class _TabNavigator extends StatelessWidget {
     return Navigator(
       key: navigatorKey,
       observers: observers,
-      onGenerateRoute: (_) => CupertinoPageRoute(builder: (_) => screen),
+      onGenerateRoute: (settings) {
+        if (screen is TomyChatScreen) {
+          return PageRouteBuilder(
+            settings: settings,
+            pageBuilder: (_, __, ___) => screen,
+            transitionsBuilder: (_, animation, __, child) => child,
+          );
+        }
+        return CupertinoPageRoute(builder: (_) => screen, settings: settings);
+      },
     );
   }
 }

@@ -42,6 +42,7 @@ class HeaderRow extends StatelessWidget {
 
             return Row(
               crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 GestureDetector(
                   onTap: () {
@@ -76,7 +77,6 @@ class HeaderRow extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: avatarGap),
-                const Expanded(child: SizedBox.shrink()),
                 GestureDetector(
                   onTap: () => HapticFeedback.lightImpact(),
                   child: AnimatedContainer(
