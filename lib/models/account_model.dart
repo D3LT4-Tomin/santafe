@@ -10,6 +10,7 @@ class AccountModel {
   final AccountType type;
   final String? logoUrl;
   final DateTime createdAt;
+  final double? returnRate;
 
   AccountModel({
     this.id,
@@ -19,6 +20,7 @@ class AccountModel {
     required this.type,
     this.logoUrl,
     required this.createdAt,
+    this.returnRate,
   });
 
   factory AccountModel.fromFirestore(DocumentSnapshot doc) {
@@ -34,6 +36,7 @@ class AccountModel {
       ),
       logoUrl: data['logoUrl'],
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      returnRate: data['returnRate']?.toDouble(),
     );
   }
 
@@ -45,6 +48,7 @@ class AccountModel {
       'type': type.name,
       'logoUrl': logoUrl,
       'createdAt': Timestamp.fromDate(createdAt),
+      'returnRate': returnRate,
     };
   }
 
@@ -56,6 +60,7 @@ class AccountModel {
     AccountType? type,
     String? logoUrl,
     DateTime? createdAt,
+    double? returnRate,
   }) {
     return AccountModel(
       id: id ?? this.id,
@@ -65,6 +70,15 @@ class AccountModel {
       type: type ?? this.type,
       logoUrl: logoUrl ?? this.logoUrl,
       createdAt: createdAt ?? this.createdAt,
+      returnRate: returnRate ?? this.returnRate,
     );
+  }
+
+  double calculateNewBalance(double transactionAmount, String tipo) {
+    if (tipo == 'egreso') {
+      return balance - transactionAmount.abs();
+    } else {
+      return balance + transactionAmount.abs();
+    }
   }
 }

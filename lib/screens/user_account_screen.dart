@@ -3,8 +3,10 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 import '../theme/app_theme.dart';
+import '../providers/auth_provider.dart';
 import '../widgets/animated_blobs.dart';
 import 'user_settings_screen.dart';
 
@@ -146,136 +148,153 @@ class _UserAccountScreenState extends State<UserAccountScreen>
 class _AvatarHeader extends StatelessWidget {
   const _AvatarHeader();
 
+  String _getInitials(String name) {
+    if (name.isEmpty) return 'U';
+    final parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    }
+    return name[0].toUpperCase();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.white05,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.white07),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Row(
-            children: [
-              // Avatar
-              Stack(
+    return Consumer<AuthProvider>(
+      builder: (context, authProvider, _) {
+        final user = authProvider.user;
+        final displayName = user?.displayName ?? 'Usuario';
+        final initials = _getInitials(displayName);
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.white05,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppColors.white07),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
                 children: [
-                  Container(
-                    width: 72,
-                    height: 72,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Color(0xFF0A84FF), Color(0xFF409CFF)],
+                  // Avatar
+                  Stack(
+                    children: [
+                      Container(
+                        width: 72,
+                        height: 72,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [Color(0xFF0A84FF), Color(0xFF409CFF)],
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.systemBlue.withOpacity(0.3),
+                              blurRadius: 14,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Text(
+                            initials,
+                            style: const TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w700,
+                              color: CupertinoColors.white,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                        ),
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.systemBlue.withOpacity(0.3),
-                          blurRadius: 14,
-                          offset: const Offset(0, 4),
+                      // Edit badge
+                      Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: AppColors.secondaryBackground,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppColors.white07,
+                              width: 1.5,
+                            ),
+                          ),
+                          child: const Icon(
+                            CupertinoIcons.pencil,
+                            size: 12,
+                            color: AppColors.secondaryLabel,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 16),
+                  // Name + email
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          displayName,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.label,
+                            height: 1.2,
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          user?.email ?? '',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.secondaryLabel,
+                            height: 1.33,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          minSize: 0,
+                          onPressed: () => HapticFeedback.selectionClick(),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.systemBlue.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: AppColors.systemBlue.withOpacity(0.2),
+                              ),
+                            ),
+                            child: const Text(
+                              'Editar perfil',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.systemBlue,
+                              ),
+                            ),
+                          ),
                         ),
                       ],
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'JF',
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w700,
-                          color: CupertinoColors.white,
-                          letterSpacing: -0.5,
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Edit badge
-                  Positioned(
-                    right: 0,
-                    bottom: 0,
-                    child: Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: AppColors.secondaryBackground,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppColors.white07,
-                          width: 1.5,
-                        ),
-                      ),
-                      child: const Icon(
-                        CupertinoIcons.pencil,
-                        size: 12,
-                        color: AppColors.secondaryLabel,
-                      ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(width: 16),
-              // Name + email
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Jovany Flores',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.label,
-                        height: 1.2,
-                        letterSpacing: -0.3,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    const Text(
-                      'jovany@ejemplo.com',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: AppColors.secondaryLabel,
-                        height: 1.33,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      minSize: 0,
-                      onPressed: () => HapticFeedback.selectionClick(),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.systemBlue.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: AppColors.systemBlue.withOpacity(0.2),
-                          ),
-                        ),
-                        child: const Text(
-                          'Editar perfil',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.systemBlue,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

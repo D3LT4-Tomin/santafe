@@ -9,6 +9,8 @@ class TransactionModel {
   final String origin;
   final String tipo;
   final DateTime createdAt;
+  final String? accountId;
+  final String? accountName;
 
   TransactionModel({
     this.id,
@@ -19,6 +21,8 @@ class TransactionModel {
     required this.origin,
     required this.tipo,
     required this.createdAt,
+    this.accountId,
+    this.accountName,
   });
 
   factory TransactionModel.fromFirestore(DocumentSnapshot doc) {
@@ -32,6 +36,8 @@ class TransactionModel {
       origin: data['origin'] ?? '',
       tipo: data['tipo'] ?? 'egreso',
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      accountId: data['accountId'],
+      accountName: data['accountName'],
     );
   }
 
@@ -44,6 +50,8 @@ class TransactionModel {
       'origin': origin,
       'tipo': tipo,
       'createdAt': Timestamp.fromDate(createdAt),
+      'accountId': accountId,
+      'accountName': accountName,
     };
   }
 
@@ -56,6 +64,8 @@ class TransactionModel {
     String? origin,
     String? tipo,
     DateTime? createdAt,
+    String? accountId,
+    String? accountName,
   }) {
     return TransactionModel(
       id: id ?? this.id,
@@ -66,6 +76,8 @@ class TransactionModel {
       origin: origin ?? this.origin,
       tipo: tipo ?? this.tipo,
       createdAt: createdAt ?? this.createdAt,
+      accountId: accountId ?? this.accountId,
+      accountName: accountName ?? this.accountName,
     );
   }
 }

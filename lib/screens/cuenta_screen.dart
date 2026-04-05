@@ -1,11 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../theme/app_theme.dart';
 import '../widgets/animated_blobs.dart';
-import '../widgets/header_row.dart';
-import '../widgets/buttons.dart';
 import '../screens/add_bank_account_screen.dart';
 import '../screens/add_cash_account_screen.dart';
 import '../screens/add_investment_screen.dart';
@@ -476,7 +473,10 @@ class _BankAccountRow extends StatelessWidget {
         HapticFeedback.selectionClick();
         Navigator.of(context).push(
           CupertinoPageRoute(
-            builder: (context) => AccountMovementsScreen(originName: bankName),
+            builder: (context) => AccountMovementsScreen(
+              accountId: bankName,
+              accountName: bankName,
+            ),
           ),
         );
       },
@@ -675,7 +675,8 @@ class _CashRow extends StatelessWidget {
         HapticFeedback.selectionClick();
         Navigator.of(context).push(
           CupertinoPageRoute(
-            builder: (context) => AccountMovementsScreen(originName: name),
+            builder: (context) =>
+                AccountMovementsScreen(accountId: name, accountName: name),
           ),
         );
       },
@@ -852,7 +853,8 @@ class _InvestmentRow extends StatelessWidget {
         HapticFeedback.selectionClick();
         Navigator.of(context).push(
           CupertinoPageRoute(
-            builder: (context) => AccountMovementsScreen(originName: name),
+            builder: (context) =>
+                AccountMovementsScreen(accountId: name, accountName: name),
           ),
         );
       },

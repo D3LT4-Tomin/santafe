@@ -112,17 +112,17 @@ class DataProvider extends ChangeNotifier {
 
   Future<void> _checkAndSeedData(String userId) async {
     try {
-      final snapshot = await FirebaseService.userTransactionsRef(
+      final snapshot = await FirebaseService.userAccountsRef(
         userId,
       ).limit(1).get();
-      print('Transactions count: ${snapshot.docs.length}');
+      print('Accounts count: ${snapshot.docs.length}');
 
       if (snapshot.docs.isEmpty && !_isSeeded) {
-        print('No transactions found, running seed...');
+        print('No accounts found, running seed...');
         _isSeeded = true;
         await _seedData(userId);
       } else {
-        print('Transactions exist or already seeded, skipping seed');
+        print('Accounts exist or already seeded, skipping seed');
         _isSeeded = true;
       }
     } catch (e) {
@@ -136,24 +136,6 @@ class DataProvider extends ChangeNotifier {
     print('Starting seed data...');
 
     try {
-      for (final expense in kAllExpenses) {
-        final amount = expense.tipo == 'egreso'
-            ? -_parseAmount(expense.amount)
-            : _parseAmount(expense.amount);
-
-        await FirebaseService.userTransactionsRef(userId).add({
-          'title': expense.title,
-          'subtitle': expense.subtitle,
-          'amount': amount,
-          'category': expense.category,
-          'origin': expense.origin,
-          'tipo': expense.tipo,
-          'createdAt': Timestamp.fromDate(
-            _getDateFromSubtitle(expense.subtitle),
-          ),
-        });
-      }
-
       await FirebaseService.userAccountsRef(userId).add({
         'name': 'Cuenta Corriente',
         'accountNumber': '****4521',
@@ -171,6 +153,49 @@ class DataProvider extends ChangeNotifier {
         'logoUrl': null,
         'createdAt': Timestamp.now(),
       });
+
+      final accountsSnapshot = await FirebaseService.userAccountsRef(
+        userId,
+      ).get();
+      final accounts = accountsSnapshot.docs;
+
+      if (accounts.isEmpty) {
+        print('No accounts created, skipping transaction seed');
+        _isSeeded = true;
+        return;
+      }
+
+      final accountId1 = accounts[0].id;
+      final accountName1 = accounts[0].data()['name'] as String;
+      final accountId2 = accounts.length > 1 ? accounts[1].id : accountId1;
+      final accountName2 = accounts.length > 1
+          ? accounts[1].data()['name'] as String
+          : accountName1;
+
+      final allExpenses = [...kAllExpenses, ...kAdditionalExpenses];
+      for (int i = 0; i < allExpenses.length; i++) {
+        final expense = allExpenses[i];
+        final amount = expense.tipo == 'egreso'
+            ? -_parseAmount(expense.amount)
+            : _parseAmount(expense.amount);
+
+        final accountId = i % 2 == 0 ? accountId1 : accountId2;
+        final accountName = i % 2 == 0 ? accountName1 : accountName2;
+
+        await FirebaseService.userTransactionsRef(userId).add({
+          'title': expense.title,
+          'subtitle': expense.subtitle,
+          'amount': amount,
+          'category': expense.category,
+          'origin': expense.origin,
+          'tipo': expense.tipo,
+          'createdAt': Timestamp.fromDate(
+            _getDateFromSubtitle(expense.subtitle),
+          ),
+          'accountId': accountId,
+          'accountName': accountName,
+        });
+      }
 
       print('Seed data completed successfully');
       _isSeeded = true;
@@ -221,8 +246,41 @@ class DataProvider extends ChangeNotifier {
 
   Future<void> addTransaction(TransactionModel transaction) async {
     final userId = FirebaseService.currentUserId;
-    if (userId != null) {
-      await TransactionService.addTransaction(userId, transaction);
+    if (userId == null) return;
+
+    final transactionRef = await TransactionService.addTransaction(
+      userId,
+      transaction,
+    );
+
+    if (transaction.accountId != null) {
+      await _updateAccountBalance(userId, transaction.accountId!, transaction);
+    }
+  }
+
+  Future<void> _updateAccountBalance(
+    String userId,
+    String accountId,
+    TransactionModel transaction,
+  ) async {
+    final accountRef = FirebaseService.userAccountsRef(userId).doc(accountId);
+
+    try {
+      final accountDoc = await accountRef.get();
+      if (!accountDoc.exists) return;
+
+      final currentBalance = (accountDoc.data()!['balance'] as num).toDouble();
+
+      double newBalance;
+      if (transaction.tipo == 'egreso') {
+        newBalance = currentBalance - transaction.amount.abs();
+      } else {
+        newBalance = currentBalance + transaction.amount.abs();
+      }
+
+      await accountRef.update({'balance': newBalance});
+    } catch (e) {
+      print('Error actualizando saldo: $e');
     }
   }
 
@@ -258,5 +316,12 @@ class DataProvider extends ChangeNotifier {
       }
       return true;
     }).toList();
+  }
+
+  Future<void> deleteTransaction(String transactionId) async {
+    final userId = FirebaseService.currentUserId;
+    if (userId == null) return;
+
+    await TransactionService.deleteTransaction(userId, transactionId);
   }
 }

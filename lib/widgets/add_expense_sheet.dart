@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/data_provider.dart';
 import '../models/transaction_model.dart';
+import '../models/account_model.dart';
 import '../theme/app_theme.dart';
 
 class AddExpenseSheet extends StatefulWidget {
@@ -21,7 +22,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
   String? _selectedAccountName;
   bool _isLoading = false;
 
-  final List<String> _categories = [
+  final List<String> _expenseCategories = [
     'Comida',
     'Transporte',
     'Suscripción',
@@ -29,12 +30,19 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
     'Entretenimiento',
     'Servicios',
     'Varios',
+  ];
+
+  final List<String> _incomeCategories = [
     'Salario',
     'Freelance',
     'Inversión',
     'Bono',
     'Venta',
+    'Otro',
   ];
+
+  List<String> get _currentCategories =>
+      _isExpense ? _expenseCategories : _incomeCategories;
 
   @override
   void initState() {
@@ -98,6 +106,8 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
         origin: _selectedAccountName ?? 'Cuenta',
         tipo: _isExpense ? 'egreso' : 'ingreso',
         createdAt: DateTime.now(),
+        accountId: _selectedAccountId,
+        accountName: _selectedAccountName,
       );
 
       final dataProvider = context.read<DataProvider>();
@@ -443,10 +453,10 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
           itemExtent: 40,
           onSelectedItemChanged: (index) {
             setState(() {
-              _selectedCategory = _categories[index];
+              _selectedCategory = _currentCategories[index];
             });
           },
-          children: _categories
+          children: _currentCategories
               .map(
                 (cat) => Center(
                   child: Text(

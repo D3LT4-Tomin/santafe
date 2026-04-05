@@ -1,15 +1,24 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:provider/provider.dart';
 import '../models/expense_data.dart';
+import '../models/transaction_model.dart';
+import '../providers/data_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/animated_blobs.dart';
 import '../widgets/expense_widgets.dart';
+import 'expense_detail_screen.dart';
 
 class AccountMovementsScreen extends StatefulWidget {
-  final String originName;
-  const AccountMovementsScreen({super.key, required this.originName});
+  final String accountId;
+  final String accountName;
+
+  const AccountMovementsScreen({
+    super.key,
+    required this.accountId,
+    required this.accountName,
+  });
 
   @override
   State<AccountMovementsScreen> createState() => _AccountMovementsScreenState();
@@ -74,22 +83,14 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
     super.dispose();
   }
 
-  List<ExpenseData> get _filteredExpenses {
-    return kAllExpenses.where((e) {
-      bool originMatch = false;
-      if (widget.originName.contains('BBVA') ||
-          widget.originName.contains('Scotiabank')) {
-        originMatch =
-            e.origin.contains('Tarjeta') || e.origin.contains('Transferencia');
-      } else if (widget.originName.contains('Cartera') ||
-          widget.originName.contains('colchón')) {
-        originMatch = e.origin == 'Efectivo';
-      } else {
-        originMatch = true; // For others
-      }
+  List<TransactionModel> _getFilteredTransactions(
+    List<TransactionModel> allTransactions,
+  ) {
+    return allTransactions.where((t) {
+      if (t.accountId != widget.accountId) return false;
 
-      if (_selectedCategory == 'Todos') return originMatch;
-      return originMatch && e.category == _selectedCategory;
+      if (_selectedCategory == 'Todos') return true;
+      return t.category == _selectedCategory;
     }).toList();
   }
 
@@ -103,42 +104,50 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
       backgroundColor: AppColors.systemBackground,
       navigationBar: CupertinoNavigationBar(
         middle: Text(
-          widget.originName,
+          widget.accountName,
           style: const TextStyle(color: AppColors.label),
         ),
         backgroundColor: AppColors.frostedBlue.withOpacity(0.5),
         border: null,
       ),
-      child: Stack(
-        children: [
-          RepaintBoundary(
-            child: AnimatedBlobs(blob1Anim: _blob1Anim, blob2Anim: _blob2Anim),
-          ),
-          Positioned.fill(
-            child: SafeArea(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.only(top: 20, bottom: 40),
-                child: FadeTransition(
-                  opacity: _appearAnim,
-                  child: SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(0, 0.04),
-                      end: Offset.zero,
-                    ).animate(_appearAnim),
-                    child: _buildMovementsPanel(),
+      child: Consumer<DataProvider>(
+        builder: (context, dataProvider, _) {
+          final filtered = _getFilteredTransactions(dataProvider.transactions);
+
+          return Stack(
+            children: [
+              RepaintBoundary(
+                child: AnimatedBlobs(
+                  blob1Anim: _blob1Anim,
+                  blob2Anim: _blob2Anim,
+                ),
+              ),
+              Positioned.fill(
+                child: SafeArea(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.only(top: 20, bottom: 40),
+                    child: FadeTransition(
+                      opacity: _appearAnim,
+                      child: SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(0, 0.04),
+                          end: Offset.zero,
+                        ).animate(_appearAnim),
+                        child: _buildMovementsPanel(filtered),
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
-        ],
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildMovementsPanel() {
-    final filtered = _filteredExpenses;
+  Widget _buildMovementsPanel(List<TransactionModel> filtered) {
     const initialCount = 10;
     final showingAll = _showMoreExpenses || filtered.length <= initialCount;
     final visibleExpenses = showingAll
@@ -194,8 +203,19 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
                   ? _buildEmptyState()
                   : Column(
                       children: [
-                        for (final data in visibleExpenses)
-                          ExpenseRow(data: data),
+                        for (final transaction in visibleExpenses)
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                CupertinoPageRoute(
+                                  builder: (context) => ExpenseDetailScreen(
+                                    transaction: transaction,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: ExpenseRow(transaction: transaction),
+                          ),
                         if (hasMore)
                           ShowMoreButton(
                             expanded: _showMoreExpenses,

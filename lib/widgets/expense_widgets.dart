@@ -73,9 +73,14 @@ class ExpenseRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(
-          CupertinoPageRoute(builder: (context) => const ExpenseDetailScreen()),
-        );
+        if (transaction != null) {
+          Navigator.of(context).push(
+            CupertinoPageRoute(
+              builder: (context) =>
+                  ExpenseDetailScreen(transaction: transaction!),
+            ),
+          );
+        }
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
