@@ -4,8 +4,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 
 import 'firebase_options.dart';
-import 'providers/auth_provider.dart';
+import 'providers/auth_provider.dart' as app;
 import 'providers/data_provider.dart';
+import 'widgets/insights_layout_controller.dart';
 import 'screens/auth_wrapper.dart';
 import 'theme/app_theme.dart';
 
@@ -29,8 +30,9 @@ class FinanzasApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => app.AuthProvider()),
         ChangeNotifierProvider(create: (_) => DataProvider()),
+        ChangeNotifierProvider(create: (_) => InsightsLayoutController()),
       ],
       child: const CupertinoApp(
         title: 'SantaFe',

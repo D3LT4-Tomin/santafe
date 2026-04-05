@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -87,6 +88,8 @@ class _UserAccountScreenState extends State<UserAccountScreen>
                 child: Column(
                   children: [
                     const _ProfileHeader(),
+                    const SizedBox(height: 28),
+                    const _AchievementsSection(),
                     const SizedBox(height: 28),
                     const _PlanCard(),
                     const SizedBox(height: 28),
@@ -215,6 +218,230 @@ class _ProfileHeader extends StatelessWidget {
       },
     );
   }
+}
+
+// ─── Achievements Section ─────────────────────────────────────────────────────
+class _AchievementsSection extends StatelessWidget {
+  const _AchievementsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.white05,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.white07),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: AppColors.systemBlue.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      CupertinoIcons.star_fill,
+                      color: AppColors.systemBlue,
+                      size: 16,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  const Text(
+                    'Logros',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.label,
+                      letterSpacing: -0.41,
+                      height: 1.29,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    '${_achievements.where((a) => a.earned).length}/${_achievements.length}',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: AppColors.secondaryLabel,
+                      height: 1.33,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              const ColoredBox(
+                color: AppColors.separator,
+                child: SizedBox(height: 0.5, width: double.infinity),
+              ),
+              const SizedBox(height: 16),
+              GridView.count(
+                crossAxisCount: 3,
+                crossAxisSpacing: 14,
+                mainAxisSpacing: 14,
+                childAspectRatio: 0.85,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                children: _achievements
+                    .map((a) => _HexBadge(achievement: a))
+                    .toList(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Achievement {
+  final String label;
+  final IconData icon;
+  final bool earned;
+  const _Achievement({
+    required this.label,
+    required this.icon,
+    required this.earned,
+  });
+}
+
+const _achievements = [
+  _Achievement(
+    label: 'Primer\nlección',
+    icon: CupertinoIcons.pencil,
+    earned: true,
+  ),
+  _Achievement(
+    label: 'Primer\nahorro',
+    icon: CupertinoIcons.money_dollar,
+    earned: true,
+  ),
+  _Achievement(
+    label: 'Una semana\nde racha',
+    icon: CupertinoIcons.rocket_fill,
+    earned: true,
+  ),
+  _Achievement(
+    label: '5 lecciones\nseguidas',
+    icon: CupertinoIcons.pencil_slash,
+    earned: true,
+  ),
+  _Achievement(
+    label: 'Un mes\nde racha',
+    icon: CupertinoIcons.calendar,
+    earned: false,
+  ),
+  _Achievement(
+    label: '365 días\nde racha',
+    icon: CupertinoIcons.gift_fill,
+    earned: false,
+  ),
+  _Achievement(
+    label: 'Noche\nestudiosa',
+    icon: CupertinoIcons.moon_fill,
+    earned: false,
+  ),
+  _Achievement(
+    label: 'Explorador',
+    icon: CupertinoIcons.cube_box_fill,
+    earned: false,
+  ),
+  _Achievement(label: 'Constante', icon: CupertinoIcons.link, earned: false),
+];
+
+class _HexBadge extends StatelessWidget {
+  final _Achievement achievement;
+  const _HexBadge({required this.achievement});
+
+  @override
+  Widget build(BuildContext context) {
+    final earned = achievement.earned;
+    final iconColor = earned ? AppColors.systemBlue : AppColors.tertiaryLabel;
+    final bgColor = earned
+        ? AppColors.systemBlue.withValues(alpha: 0.12)
+        : AppColors.white05;
+    final borderColor = earned
+        ? AppColors.systemBlue.withValues(alpha: 0.28)
+        : AppColors.white07;
+    final labelColor = earned ? AppColors.label : AppColors.tertiaryLabel;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: 76,
+          height: 76,
+          child: CustomPaint(
+            painter: _HexPainter(fillColor: bgColor, borderColor: borderColor),
+            child: Center(
+              child: Icon(achievement.icon, color: iconColor, size: 26),
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          achievement.label,
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+            color: labelColor,
+            height: 1.3,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _HexPainter extends CustomPainter {
+  final Color fillColor;
+  final Color borderColor;
+  const _HexPainter({required this.fillColor, required this.borderColor});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final r = math.min(cx, cy) - 1.5;
+    final path = Path();
+    for (var i = 0; i < 6; i++) {
+      final angle = (i * 60 - 30) * math.pi / 180;
+      final x = cx + r * math.cos(angle);
+      final y = cy + r * math.sin(angle);
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+    path.close();
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = fillColor
+        ..style = PaintingStyle.fill,
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = borderColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_HexPainter old) =>
+      old.fillColor != fillColor || old.borderColor != borderColor;
 }
 
 // ─── Plan Card ────────────────────────────────────────────────────────────────

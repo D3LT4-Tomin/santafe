@@ -14,6 +14,8 @@ import '../widgets/buttons.dart';
 import '../widgets/header_row.dart';
 import '../widgets/tab_bar.dart';
 
+import '../widgets/chat_overlay.dart';
+
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
 
@@ -25,6 +27,7 @@ class _AppShellState extends State<AppShell> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
   bool _isInLesson = false;
+  bool _isChatMode = false;
 
   final List<ScrollController> _scrollControllers = List.generate(
     4,
@@ -162,16 +165,24 @@ class _AppShellState extends State<AppShell> {
 
   void _showSearchChat() {
     HapticFeedback.mediumImpact();
-    debugPrint('Opening chat with financial assistant');
+    setState(() {
+      _isChatMode = true;
+    });
   }
 
   bool _canPopShell() {
+    if (_isChatMode) return false;
     final nav = _navigatorKeys[_selectedIndex].currentState;
     return nav == null || !nav.canPop();
   }
 
   void _onPopInvokedWithResult(bool didPop, Object? result) {
     if (didPop) return;
+
+    if (_isChatMode) {
+      setState(() => _isChatMode = false);
+      return;
+    }
 
     final nav = _navigatorKeys[_selectedIndex].currentState;
     if (nav != null && nav.canPop()) {
@@ -190,50 +201,96 @@ class _AppShellState extends State<AppShell> {
         backgroundColor: AppColors.systemBackground,
         child: Stack(
           children: [
-            PageView(
-              controller: _pageController,
-              children: List.generate(_screens.length, (index) {
-                return _TabNavigator(
-                  navigatorKey: _navigatorKeys[index],
-                  screen: _screens[index],
-                  observers: [_navigatorObservers[index]],
-                );
-              }),
+            AnimatedScale(
+              scale: _isChatMode ? 0.93 : 1.0,
+              duration: const Duration(milliseconds: 350),
+              curve: Curves.easeOutCubic,
+              alignment: Alignment.center,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 350),
+                curve: Curves.easeOutCubic,
+                decoration: BoxDecoration(
+                  color: AppColors.systemBackground,
+                  borderRadius: BorderRadius.circular(_isChatMode ? 32 : 0),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Stack(
+                  children: [
+                    PageView(
+                      controller: _pageController,
+                      physics: _isChatMode
+                          ? const NeverScrollableScrollPhysics()
+                          : null,
+                      children: List.generate(_screens.length, (index) {
+                        return _TabNavigator(
+                          navigatorKey: _navigatorKeys[index],
+                          screen: _screens[index],
+                          observers: [_navigatorObservers[index]],
+                        );
+                      }),
+                    ),
+                    if (_selectedIndex == 0 && !_isInLesson)
+                      Positioned(
+                        right: 20,
+                        bottom: MediaQuery.of(context).padding.bottom + 70,
+                        child: FabButton(onTap: _showAddExpenseSheet),
+                      ),
+                    if (!_isInLesson)
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: RepaintBoundary(
+                          child: AppTabBar(
+                            selectedIndex: _selectedIndex,
+                            onTabSelected: _onTabSelected,
+                          ),
+                        ),
+                      ),
+                    if (!_isInLesson) ...[
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        child: IgnorePointer(
+                          child: _buildHeaderChrome(topPadding),
+                        ),
+                      ),
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        child: _buildFixedHeader(topPadding),
+                      ),
+                    ],
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        ignoring: !_isChatMode,
+                        child: AnimatedOpacity(
+                          opacity: _isChatMode ? 1.0 : 0.0,
+                          duration: const Duration(milliseconds: 350),
+                          curve: Curves.easeOutCubic,
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                            child: ColoredBox(
+                              color: Colors.black.withValues(alpha: 0.65),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-
-            if (!_isInLesson) ...[
+            if (_isChatMode)
               Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: IgnorePointer(child: _buildHeaderChrome(topPadding)),
-              ),
-
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: _buildFixedHeader(topPadding),
-              ),
-            ],
-
-            if (_selectedIndex == 0 && !_isInLesson)
-              Positioned(
-                right: 20,
-                bottom: MediaQuery.of(context).padding.bottom + 70,
-                child: FabButton(onTap: _showAddExpenseSheet),
-              ),
-
-            if (!_isInLesson)
-              Positioned(
+                top: topPadding,
                 left: 0,
                 right: 0,
                 bottom: 0,
-                child: RepaintBoundary(
-                  child: AppTabBar(
-                    selectedIndex: _selectedIndex,
-                    onTabSelected: _onTabSelected,
-                  ),
+                child: ChatOverlay(
+                  onClose: () => setState(() => _isChatMode = false),
                 ),
               ),
           ],

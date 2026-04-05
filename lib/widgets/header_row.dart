@@ -138,6 +138,7 @@ class HeaderRow extends StatelessWidget {
                                     const SizedBox(width: 6),
                                     Expanded(
                                       child: CupertinoTextField(
+                                        readOnly: true,
                                         placeholder: 'Chatear con tu asistente',
                                         placeholderStyle:
                                             AppTextStyles.subheadline,
@@ -149,8 +150,10 @@ class HeaderRow extends StatelessWidget {
                                         ),
                                         decoration: BoxDecoration(),
                                         padding: EdgeInsets.zero,
-                                        onTap:
-                                            onSearchPressed, // Use the callback passed from parent
+                                        onTap: () {
+                                          FocusScope.of(context).unfocus();
+                                          onSearchPressed?.call();
+                                        },
                                       ),
                                     ),
                                     const SizedBox(width: 12),

@@ -50,12 +50,16 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     } on FirebaseAuthException catch (e) {
-      _error = _getErrorMessage(e.code);
+      debugPrint(
+        '[AUTH] signIn FirebaseAuthException: code=${e.code}, message=${e.message}',
+      );
+      _error = _getErrorMessage(e.code, e.message);
       _isLoading = false;
       notifyListeners();
       return false;
-    } catch (e) {
-      _error = 'Error al iniciar sesión';
+    } catch (e, st) {
+      debugPrint('[AUTH] signIn unexpected error: $e\n$st');
+      _error = 'Error al iniciar sesión: $e';
       _isLoading = false;
       notifyListeners();
       return false;
@@ -84,12 +88,16 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     } on FirebaseAuthException catch (e) {
-      _error = _getErrorMessage(e.code);
+      debugPrint(
+        '[AUTH] signUp FirebaseAuthException: code=${e.code}, message=${e.message}',
+      );
+      _error = _getErrorMessage(e.code, e.message);
       _isLoading = false;
       notifyListeners();
       return false;
-    } catch (e) {
-      _error = 'Error al crear cuenta';
+    } catch (e, st) {
+      debugPrint('[AUTH] signUp unexpected error: $e\n$st');
+      _error = 'Error al crear cuenta: $e';
       _isLoading = false;
       notifyListeners();
       return false;
@@ -103,7 +111,29 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  String _getErrorMessage(String code) {
+  Future<void> skipLogin() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    // Bypass Firebase entirely to avoid macOS Keychain errors during dev
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    _firebaseUser = null; // We don't need a real Firebase User object
+    _user = UserModel(
+      id: 'dev-user-123',
+      email: 'dev@santafe.app',
+      displayName: 'UX Designer',
+      createdAt: DateTime.now(),
+      totalBalance: 25400.50,
+    );
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  String _getErrorMessage(String code, [String? message]) {
+    debugPrint('[AUTH] Error code: $code, message: $message');
     switch (code) {
       case 'user-not-found':
         return 'No existe una cuenta con este correo';

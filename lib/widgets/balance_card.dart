@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../providers/data_provider.dart';
-import '../models/account_model.dart';
 import '../theme/app_theme.dart';
 
 class BalanceCard extends StatefulWidget {

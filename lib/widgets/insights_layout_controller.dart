@@ -12,6 +12,27 @@ enum InsightWidgetId {
   predictions,
 }
 
+extension InsightWidgetIdExtension on InsightWidgetId {
+  String get displayName {
+    switch (this) {
+      case InsightWidgetId.stats:
+        return 'Resumen general';
+      case InsightWidgetId.savingsChart:
+        return 'Gráfico de ahorros';
+      case InsightWidgetId.categoriesGastos:
+        return 'Categorías de gastos';
+      case InsightWidgetId.categoriesIngresos:
+        return 'Categorías de ingresos';
+      case InsightWidgetId.origin:
+        return 'Origen de fondos';
+      case InsightWidgetId.bank:
+        return 'Bancos';
+      case InsightWidgetId.predictions:
+        return 'Predicciones IA';
+    }
+  }
+}
+
 // ─── Config ──────────────────────────────────────────────────────────────────
 
 class InsightWidgetConfig {
@@ -38,6 +59,8 @@ class InsightsLayoutController extends ChangeNotifier {
   // ── Public getters ──────────────────────────────────────────────────────────
 
   bool get isReorderMode => _isReorderMode;
+
+  List<InsightWidgetConfig> get configs => List.unmodifiable(_configs);
 
   List<InsightWidgetConfig> get visibleConfigs =>
       _configs.where((c) => c.visible).toList();
@@ -105,4 +128,18 @@ class InsightsLayoutController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setVisible(InsightWidgetId id, bool visible) {
+    final i = _configs.indexWhere((c) => c.id == id);
+    if (i == -1) return;
+    _configs[i] = _configs[i].copyWith(visible: visible);
+    notifyListeners();
+  }
+
+  void reset() {
+    _configs.clear();
+    _configs.addAll(
+      _defaultOrder.map((id) => InsightWidgetConfig(id: id, visible: true)),
+    );
+    notifyListeners();
+  }
 }

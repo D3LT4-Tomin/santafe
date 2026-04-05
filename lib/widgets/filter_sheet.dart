@@ -103,12 +103,12 @@ class FilterButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         decoration: BoxDecoration(
           color: hasFilters
-              ? AppColors.systemBlue.withOpacity(0.14)
+              ? AppColors.systemBlue.withValues(alpha: 0.14)
               : AppColors.white05,
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
             color: hasFilters
-                ? AppColors.systemBlue.withOpacity(0.40)
+                ? AppColors.systemBlue.withValues(alpha: 0.40)
                 : AppColors.white07,
             width: hasFilters ? 1.0 : 0.5,
           ),
@@ -251,7 +251,7 @@ class _FilterSheetState extends State<_FilterSheet> {
               width: 36,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.tertiaryLabel.withOpacity(0.4),
+                color: AppColors.tertiaryLabel.withValues(alpha: 0.4),
                 borderRadius: BorderRadius.circular(999),
               ),
             ),
@@ -471,10 +471,10 @@ class _SectionLabel extends StatelessWidget {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
             decoration: BoxDecoration(
-              color: AppColors.systemBlue.withOpacity(0.15),
+              color: AppColors.systemBlue.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(999),
               border: Border.all(
-                color: AppColors.systemBlue.withOpacity(0.35),
+                color: AppColors.systemBlue.withValues(alpha: 0.35),
                 width: 0.5,
               ),
             ),
@@ -517,11 +517,13 @@ class _SelectChip extends StatelessWidget {
         curve: Curves.easeOutCubic,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
         decoration: BoxDecoration(
-          color: isSelected ? activeColor.withOpacity(0.14) : AppColors.white05,
+          color: isSelected
+              ? activeColor.withValues(alpha: 0.14)
+              : AppColors.white05,
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
             color: isSelected
-                ? activeColor.withOpacity(0.45)
+                ? activeColor.withValues(alpha: 0.45)
                 : AppColors.white07,
             width: isSelected ? 1.0 : 0.5,
           ),
