@@ -166,6 +166,25 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 12),
+                  Center(
+                    child: CupertinoButton(
+                      onPressed: authProvider.isLoading
+                          ? null
+                          : () => authProvider.skipLogin(),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 8,
+                      ),
+                      child: const Text(
+                        'Continuar como invitado',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: AppColors.secondaryLabel,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             );

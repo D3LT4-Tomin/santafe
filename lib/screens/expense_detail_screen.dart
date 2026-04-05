@@ -24,7 +24,7 @@ class ExpenseDetailScreen extends StatelessWidget {
           isExpense ? 'Detalle del Gasto' : 'Detalle del Ingreso',
           style: const TextStyle(color: AppColors.label),
         ),
-        backgroundColor: AppColors.frostedBlue.withOpacity(0.5),
+        backgroundColor: AppColors.frostedBlue.withValues(alpha: 0.5),
         border: null,
       ),
       child: SafeArea(
@@ -102,10 +102,10 @@ class ExpenseDetailScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 decoration: BoxDecoration(
-                  color: AppColors.systemRed.withOpacity(0.12),
+                  color: AppColors.systemRed.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: AppColors.systemRed.withOpacity(0.25),
+                    color: AppColors.systemRed.withValues(alpha: 0.25),
                   ),
                 ),
                 child: const Row(

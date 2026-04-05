@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -24,12 +23,6 @@ class _UserAccountScreenState extends State<UserAccountScreen>
   late Animation<double> _blob2Anim;
   late AnimationController _appearController;
   late Animation<double> _appearAnim;
-
-  // Notification toggles
-  final bool _notifGastos = true;
-  final bool _notifMetas = true;
-  final bool _notifResumen = false;
-  final bool _notifPromociones = false;
 
   @override
   void initState() {
@@ -83,7 +76,7 @@ class _UserAccountScreenState extends State<UserAccountScreen>
           child: SingleChildScrollView(
             controller: widget.scrollController ?? ScrollController(),
             physics: const BouncingScrollPhysics(),
-            padding: EdgeInsets.only(top: topPadding + 76, bottom: 80),
+            padding: EdgeInsets.only(top: topPadding + 76, bottom: 120),
             child: FadeTransition(
               opacity: _appearAnim,
               child: SlideTransition(
@@ -93,19 +86,10 @@ class _UserAccountScreenState extends State<UserAccountScreen>
                 ).animate(_appearAnim),
                 child: Column(
                   children: [
-                    // ── Avatar header ─────────────────────────────────
-                    const _AvatarHeader(),
+                    const _ProfileHeader(),
                     const SizedBox(height: 28),
-
-                    // ── Suscripción ───────────────────────────────────
-                    const _SubscriptionCard(),
+                    const _PlanCard(),
                     const SizedBox(height: 28),
-
-                    // ── Logros ────────────────────────────────────────
-                    const _AchievementsGrid(),
-                    const SizedBox(height: 28),
-
-                    // ── Configuración ─────────────────────────────────
                     _SettingsRow(
                       icon: CupertinoIcons.gear_alt_fill,
                       color: AppColors.systemBlue,
@@ -121,8 +105,6 @@ class _UserAccountScreenState extends State<UserAccountScreen>
                       isLast: true,
                     ),
                     const SizedBox(height: 28),
-
-                    // ── Version ───────────────────────────────────────
                     const Text(
                       'Finanzas v1.0.0',
                       style: TextStyle(
@@ -142,9 +124,9 @@ class _UserAccountScreenState extends State<UserAccountScreen>
   }
 }
 
-// ─── Avatar Header ────────────────────────────────────────────────────────────
-class _AvatarHeader extends StatelessWidget {
-  const _AvatarHeader();
+// ─── Profile Header ───────────────────────────────────────────────────────────
+class _ProfileHeader extends StatelessWidget {
+  const _ProfileHeader();
 
   String _getInitials(String name) {
     if (name.isEmpty) return 'U';
@@ -168,73 +150,37 @@ class _AvatarHeader extends StatelessWidget {
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: AppColors.white05,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(16),
               border: Border.all(color: AppColors.white07),
             ),
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
                 children: [
-                  // Avatar
-                  Stack(
-                    children: [
-                      Container(
-                        width: 72,
-                        height: 72,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Color(0xFF0A84FF), Color(0xFF409CFF)],
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.systemBlue.withOpacity(0.3),
-                              blurRadius: 14,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Text(
-                            initials,
-                            style: const TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w700,
-                              color: CupertinoColors.white,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Color(0xFF0A84FF), Color(0xFF409CFF)],
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        initials,
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: CupertinoColors.white,
+                          letterSpacing: -0.5,
                         ),
                       ),
-<<<<<<< HEAD
-                      // Edit badge
-                      Positioned(
-                        right: 0,
-                        bottom: 0,
-                        child: Container(
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            color: AppColors.secondaryBackground,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: AppColors.white07,
-                              width: 1.5,
-                            ),
-                          ),
-                          child: const Icon(
-                            CupertinoIcons.pencil,
-                            size: 12,
-                            color: AppColors.secondaryLabel,
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                  const SizedBox(width: 16),
-                  // Name + email
+                  const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -258,104 +204,12 @@ class _AvatarHeader extends StatelessWidget {
                             height: 1.33,
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        CupertinoButton(
-                          padding: EdgeInsets.zero,
-                          minSize: 0,
-                          onPressed: () => HapticFeedback.selectionClick(),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 5,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.systemBlue.withOpacity(0.12),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: AppColors.systemBlue.withOpacity(0.2),
-                              ),
-                            ),
-                            child: const Text(
-                              'Editar perfil',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.systemBlue,
-                              ),
-                            ),
-                          ),
-=======
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.systemBlue.withValues(alpha: 0.3),
-                          blurRadius: 14,
-                          offset: const Offset(0, 4),
->>>>>>> 2c9d161fa6ebfe046fd1379c78d20f58785ce422
-                        ),
                       ],
                     ),
                   ),
                 ],
               ),
-<<<<<<< HEAD
             ),
-=======
-              const SizedBox(width: 16),
-              // Name + email
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Jovany Flores',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.label,
-                        height: 1.2,
-                        letterSpacing: -0.3,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    const Text(
-                      'jovany@ejemplo.com',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: AppColors.secondaryLabel,
-                        height: 1.33,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () => HapticFeedback.selectionClick(), minimumSize: Size(0, 0),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.systemBlue.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: AppColors.systemBlue.withValues(alpha: 0.2),
-                          ),
-                        ),
-                        child: const Text(
-                          'Editar perfil',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.systemBlue,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
->>>>>>> 2c9d161fa6ebfe046fd1379c78d20f58785ce422
           ),
         );
       },
@@ -363,9 +217,9 @@ class _AvatarHeader extends StatelessWidget {
   }
 }
 
-// ─── Subscription Card ────────────────────────────────────────────────────────
-class _SubscriptionCard extends StatelessWidget {
-  const _SubscriptionCard();
+// ─── Plan Card ────────────────────────────────────────────────────────────────
+class _PlanCard extends StatelessWidget {
+  const _PlanCard();
 
   @override
   Widget build(BuildContext context) {
@@ -373,20 +227,9 @@ class _SubscriptionCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF1A1040), Color(0xFF0D1F40)],
-          ),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.systemPurple.withValues(alpha: 0.3)),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.systemPurple.withValues(alpha: 0.15),
-              blurRadius: 20,
-              offset: const Offset(0, 6),
-            ),
-          ],
+          color: AppColors.white05,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.white07),
         ),
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -394,111 +237,73 @@ class _SubscriptionCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: AppColors.systemPurple.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          CupertinoIcons.sparkles,
-                          color: AppColors.systemPurple,
-                          size: 16,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      const Text(
-                        'Finanzas Pro',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: CupertinoColors.white,
-                          letterSpacing: -0.2,
-                        ),
-                      ),
-                    ],
-                  ),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
+                    width: 32,
+                    height: 32,
                     decoration: BoxDecoration(
-                      color: AppColors.systemPurple.withValues(alpha: 0.25),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: AppColors.systemPurple.withValues(alpha: 0.4),
-                      ),
+                      color: AppColors.systemPurple.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Text(
-                      'ACTIVO',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.8,
-                        color: AppColors.systemPurple,
-                      ),
+                    child: const Icon(
+                      CupertinoIcons.sparkles,
+                      color: AppColors.systemPurple,
+                      size: 16,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  const Text(
+                    'Plan gratuito',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.label,
+                      letterSpacing: -0.41,
+                      height: 1.29,
                     ),
                   ),
                 ],
               ),
+              const SizedBox(height: 12),
+              const Text(
+                'Cuentas básicas y seguimiento de gastos',
+                style: TextStyle(
+                  fontSize: 15,
+                  color: AppColors.secondaryLabel,
+                  height: 1.33,
+                  letterSpacing: -0.24,
+                ),
+              ),
               const SizedBox(height: 16),
               const ColoredBox(
-                color: Color(0x1AFFFFFF),
+                color: AppColors.separator,
                 child: SizedBox(height: 0.5, width: double.infinity),
               ),
               const SizedBox(height: 16),
               Row(
                 children: [
-                  _PlanFeature(
+                  _Feature(
                     icon: CupertinoIcons.checkmark_circle_fill,
-                    label: 'Cuentas ilimitadas',
+                    label: 'Hasta 3 cuentas',
                   ),
                   const SizedBox(width: 16),
-                  _PlanFeature(
+                  _Feature(
                     icon: CupertinoIcons.checkmark_circle_fill,
-                    label: 'IA personalizada',
+                    label: 'Resumen semanal',
                   ),
                 ],
               ),
               const SizedBox(height: 8),
               Row(
                 children: [
-                  _PlanFeature(
+                  _Feature(
                     icon: CupertinoIcons.checkmark_circle_fill,
-                    label: 'Exportar datos',
+                    label: 'Categorías básicas',
                   ),
                   const SizedBox(width: 16),
-                  _PlanFeature(
+                  _Feature(
                     icon: CupertinoIcons.checkmark_circle_fill,
-                    label: 'Sin anuncios',
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Se renueva el 15 de abril',
-                    style: TextStyle(fontSize: 12, color: Color(0x99FFFFFF)),
-                  ),
-                  CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () => HapticFeedback.selectionClick(), minimumSize: Size(0, 0),
-                    child: const Text(
-                      'Gestionar',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.systemPurple,
-                      ),
-                    ),
+                    label: 'Metas de ahorro',
                   ),
                 ],
               ),
@@ -510,67 +315,27 @@ class _SubscriptionCard extends StatelessWidget {
   }
 }
 
-class _PlanFeature extends StatelessWidget {
+class _Feature extends StatelessWidget {
   final IconData icon;
   final String label;
-  const _PlanFeature({required this.icon, required this.label});
+  const _Feature({required this.icon, required this.label});
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Row(
         children: [
-          Icon(icon, color: AppColors.systemPurple, size: 13),
+          Icon(icon, color: AppColors.systemPurple, size: 14),
           const SizedBox(width: 6),
           Flexible(
             child: Text(
               label,
               style: const TextStyle(
-                fontSize: 12,
-                color: Color(0xCCFFFFFF),
+                fontSize: 13,
+                color: AppColors.secondaryLabel,
                 height: 1.3,
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Settings Section ─────────────────────────────────────────────────────────
-class _SettingsSection extends StatelessWidget {
-  final String title;
-  final List<Widget> rows;
-  const _SettingsSection({required this.title, required this.rows});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 4, bottom: 10),
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.6,
-                color: AppColors.secondaryLabel,
-                height: 1.33,
-              ),
-            ),
-          ),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: AppColors.white05,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.white07),
-            ),
-            child: Column(children: rows),
           ),
         ],
       ),
@@ -600,7 +365,6 @@ class _SettingsRow extends StatelessWidget {
   final String label;
   final Widget trailing;
   final VoidCallback onTap;
-  final bool isDestructive;
   final bool isLast;
 
   const _SettingsRow({
@@ -609,7 +373,6 @@ class _SettingsRow extends StatelessWidget {
     required this.label,
     required this.trailing,
     required this.onTap,
-    this.isDestructive = false,
     this.isLast = false,
   });
 
@@ -631,27 +394,19 @@ class _SettingsRow extends StatelessWidget {
                   width: 30,
                   height: 30,
                   decoration: BoxDecoration(
-                    color: isDestructive
-                        ? AppColors.systemRed.withValues(alpha: 0.12)
-                        : color.withValues(alpha: 0.14),
+                    color: color.withValues(alpha: 0.14),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
-                    icon,
-                    size: 16,
-                    color: isDestructive ? AppColors.systemRed : color,
-                  ),
+                  child: Icon(icon, size: 16, color: color),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     label,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
-                      color: isDestructive
-                          ? AppColors.systemRed
-                          : AppColors.label,
+                      color: AppColors.label,
                       height: 1.33,
                     ),
                   ),
@@ -667,87 +422,7 @@ class _SettingsRow extends StatelessWidget {
   }
 }
 
-// ─── Toggle Row ───────────────────────────────────────────────────────────────
-class _ToggleRow extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  final String label;
-  final String subtitle;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-  final bool isLast;
-
-  const _ToggleRow({
-    required this.icon,
-    required this.color,
-    required this.label,
-    required this.subtitle,
-    required this.value,
-    required this.onChanged,
-    this.isLast = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              Container(
-                width: 30,
-                height: 30,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(icon, size: 16, color: color),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      label,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.label,
-                        height: 1.33,
-                      ),
-                    ),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.secondaryLabel,
-                        height: 1.3,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              CupertinoSwitch(
-                value: value,
-                activeTrackColor: AppColors.systemBlue,
-                onChanged: (v) {
-                  HapticFeedback.selectionClick();
-                  onChanged(v);
-                },
-              ),
-            ],
-          ),
-        ),
-        if (!isLast) const _RowSeparator(),
-      ],
-    );
-  }
-}
-
-// ─── Trailing helpers ─────────────────────────────────────────────────────────
+// ─── Trailing Chevron ─────────────────────────────────────────────────────────
 class _TrailingChevron extends StatelessWidget {
   const _TrailingChevron();
   @override
@@ -758,228 +433,4 @@ class _TrailingChevron extends StatelessWidget {
       color: AppColors.tertiaryLabel,
     );
   }
-}
-
-class _TrailingValue extends StatelessWidget {
-  final String value;
-  const _TrailingValue(this.value);
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          value,
-          style: const TextStyle(fontSize: 14, color: AppColors.secondaryLabel),
-        ),
-        const SizedBox(width: 4),
-        const Icon(
-          CupertinoIcons.chevron_right,
-          size: 14,
-          color: AppColors.tertiaryLabel,
-        ),
-      ],
-    );
-  }
-}
-
-// ─── Sign Out Button ──────────────────────────────────────────────────────────
-class _SignOutButton extends StatelessWidget {
-  const _SignOutButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: CupertinoButton(
-        padding: EdgeInsets.zero,
-        onPressed: () => HapticFeedback.mediumImpact(),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: AppColors.systemRed.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.systemRed.withValues(alpha: 0.18)),
-          ),
-          child: const SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: Center(
-              child: Text(
-                'Cerrar sesión',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.systemRed,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ─── Achievements grid ────────────────────────────────────────────────────────
-class _Achievement {
-  final String label;
-  final IconData icon;
-  final bool earned;
-  const _Achievement({
-    required this.label,
-    required this.icon,
-    required this.earned,
-  });
-}
-
-class _AchievementsGrid extends StatelessWidget {
-  const _AchievementsGrid();
-
-  static const _achievements = [
-    _Achievement(
-      label: 'Primer\nlección',
-      icon: CupertinoIcons.pencil,
-      earned: true,
-    ),
-    _Achievement(
-      label: 'Primer\nahorro',
-      icon: CupertinoIcons.money_dollar,
-      earned: true,
-    ),
-    _Achievement(
-      label: 'Una semana\nde racha',
-      icon: CupertinoIcons.rocket_fill,
-      earned: true,
-    ),
-    _Achievement(
-      label: '5 lecciones\nseguidas',
-      icon: CupertinoIcons.pencil_slash,
-      earned: true,
-    ),
-    _Achievement(
-      label: 'Un mes\nde racha',
-      icon: CupertinoIcons.calendar,
-      earned: false,
-    ),
-    _Achievement(
-      label: '365 días\nde racha',
-      icon: CupertinoIcons.gift_fill,
-      earned: false,
-    ),
-    _Achievement(
-      label: 'Noche\nestudiosa',
-      icon: CupertinoIcons.moon_fill,
-      earned: false,
-    ),
-    _Achievement(
-      label: 'Explorador',
-      icon: CupertinoIcons.cube_box_fill,
-      earned: false,
-    ),
-    _Achievement(label: 'Constante', icon: CupertinoIcons.link, earned: false),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: GridView.count(
-        crossAxisCount: 3,
-        crossAxisSpacing: 14,
-        mainAxisSpacing: 14,
-        childAspectRatio: 0.85,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        children: _achievements.map((a) => _HexBadge(achievement: a)).toList(),
-      ),
-    );
-  }
-}
-
-class _HexBadge extends StatelessWidget {
-  final _Achievement achievement;
-  const _HexBadge({required this.achievement});
-
-  @override
-  Widget build(BuildContext context) {
-    final earned = achievement.earned;
-    final iconColor = earned ? AppColors.systemBlue : AppColors.tertiaryLabel;
-    final bgColor = earned
-        ? AppColors.systemBlue.withValues(alpha: 0.12)
-        : AppColors.white05;
-    final borderColor = earned
-        ? AppColors.systemBlue.withValues(alpha: 0.28)
-        : AppColors.white07;
-    final labelColor = earned ? AppColors.label : AppColors.tertiaryLabel;
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(
-          width: 76,
-          height: 76,
-          child: CustomPaint(
-            painter: _HexPainter(fillColor: bgColor, borderColor: borderColor),
-            child: Center(
-              child: Icon(achievement.icon, color: iconColor, size: 26),
-            ),
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          achievement.label,
-          textAlign: TextAlign.center,
-          maxLines: 2,
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w500,
-            color: labelColor,
-            height: 1.3,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _HexPainter extends CustomPainter {
-  final Color fillColor;
-  final Color borderColor;
-  const _HexPainter({required this.fillColor, required this.borderColor});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final cx = size.width / 2;
-    final cy = size.height / 2;
-    final r = math.min(cx, cy) - 1.5;
-    final path = Path();
-    for (var i = 0; i < 6; i++) {
-      final angle = (i * 60 - 30) * math.pi / 180;
-      final x = cx + r * math.cos(angle);
-      final y = cy + r * math.sin(angle);
-      if (i == 0) {
-        path.moveTo(x, y);
-      } else {
-        path.lineTo(x, y);
-      }
-    }
-    path.close();
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = fillColor
-        ..style = PaintingStyle.fill,
-    );
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = borderColor
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.5,
-    );
-  }
-
-  @override
-  bool shouldRepaint(_HexPainter old) =>
-      old.fillColor != fillColor || old.borderColor != borderColor;
 }

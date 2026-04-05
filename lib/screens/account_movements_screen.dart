@@ -1,10 +1,7 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-<<<<<<< HEAD
-=======
-
->>>>>>> 2c9d161fa6ebfe046fd1379c78d20f58785ce422
 import '../models/expense_data.dart';
 import '../models/transaction_model.dart';
 import '../providers/data_provider.dart';
@@ -86,7 +83,6 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
     super.dispose();
   }
 
-<<<<<<< HEAD
   List<TransactionModel> _getFilteredTransactions(
     List<TransactionModel> allTransactions,
   ) {
@@ -95,26 +91,6 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
 
       if (_selectedCategory == 'Todos') return true;
       return t.category == _selectedCategory;
-=======
-  List<TransactionModel> _filteredTransactions(
-    List<TransactionModel> transactions,
-  ) {
-    return transactions.where((t) {
-      bool originMatch = false;
-      if (widget.originName.contains('BBVA') ||
-          widget.originName.contains('Scotiabank')) {
-        originMatch =
-            t.origin.contains('Tarjeta') || t.origin.contains('Transferencia');
-      } else if (widget.originName.contains('Cartera') ||
-          widget.originName.contains('colchón')) {
-        originMatch = t.origin == 'Efectivo';
-      } else {
-        originMatch = true; // For others
-      }
-
-      if (_selectedCategory == 'Todos') return originMatch;
-      return originMatch && t.category == _selectedCategory;
->>>>>>> 2c9d161fa6ebfe046fd1379c78d20f58785ce422
     }).toList();
   }
 
@@ -131,7 +107,7 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
           widget.accountName,
           style: const TextStyle(color: AppColors.label),
         ),
-        backgroundColor: AppColors.frostedBlue.withValues(alpha: 0.5),
+        backgroundColor: AppColors.frostedBlue.withOpacity(0.5),
         border: null,
       ),
       child: Consumer<DataProvider>(
@@ -150,7 +126,7 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
                 child: SafeArea(
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.only(top: 20, bottom: 40),
+                    padding: const EdgeInsets.only(top: 20, bottom: 120),
                     child: FadeTransition(
                       opacity: _appearAnim,
                       child: SlideTransition(
@@ -171,13 +147,7 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
     );
   }
 
-<<<<<<< HEAD
   Widget _buildMovementsPanel(List<TransactionModel> filtered) {
-=======
-  Widget _buildMovementsPanel() {
-    final transactions = context.watch<DataProvider>().transactions;
-    final filtered = _filteredTransactions(transactions);
->>>>>>> 2c9d161fa6ebfe046fd1379c78d20f58785ce422
     const initialCount = 10;
     final showingAll = _showMoreExpenses || filtered.length <= initialCount;
     final visibleExpenses = showingAll
@@ -229,12 +199,12 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.white07),
               ),
-              child: visibleExpenses.isEmpty
-                  ? _buildEmptyState()
-                  : Column(
-                      children: [
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: visibleExpenses.isEmpty
+                    ? [_buildEmptyState()]
+                    : [
                         for (final transaction in visibleExpenses)
-<<<<<<< HEAD
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).push(
@@ -247,9 +217,6 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
                             },
                             child: ExpenseRow(transaction: transaction),
                           ),
-=======
-                          ExpenseRow(transaction: transaction),
->>>>>>> 2c9d161fa6ebfe046fd1379c78d20f58785ce422
                         if (hasMore)
                           ShowMoreButton(
                             expanded: _showMoreExpenses,
@@ -261,7 +228,7 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
                             },
                           ),
                       ],
-                    ),
+              ),
             ),
           ),
         ),
@@ -270,31 +237,35 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
   }
 
   Widget _buildEmptyState() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 36),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(
-            CupertinoIcons.tray,
-            color: AppColors.tertiaryLabel,
-            size: 32,
-          ),
-          const SizedBox(height: 10),
-          Center(
-            child: Text(
-              _selectedCategory == 'Todos'
-                  ? 'Sin movimientos'
-                  : 'Sin movimientos en "$_selectedCategory"',
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppColors.secondaryLabel,
-                letterSpacing: -0.1,
-                height: 1.4,
+    return SizedBox(
+      width: double.infinity,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 36),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              CupertinoIcons.tray,
+              color: AppColors.tertiaryLabel,
+              size: 32,
+            ),
+            const SizedBox(height: 10),
+            Center(
+              child: Text(
+                _selectedCategory == 'Todos'
+                    ? 'Sin movimientos'
+                    : 'Sin movimientos en "$_selectedCategory"',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: AppColors.secondaryLabel,
+                  letterSpacing: -0.1,
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

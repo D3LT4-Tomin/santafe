@@ -97,7 +97,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               child: SingleChildScrollView(
                 controller: widget.scrollController,
                 physics: const BouncingScrollPhysics(),
-                padding: EdgeInsets.only(top: topPadding + 76, bottom: 80),
+                padding: EdgeInsets.only(top: topPadding + 76, bottom: 120),
                 child: FadeTransition(
                   opacity: _appearAnim,
                   child: SlideTransition(
@@ -181,10 +181,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.white07),
               ),
-              child: visibleExpenses.isEmpty
-                  ? _buildEmptyState()
-                  : Column(
-                      children: [
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: visibleExpenses.isEmpty
+                    ? [_buildEmptyState()]
+                    : [
                         for (final transaction in visibleExpenses)
                           ExpenseRow(transaction: transaction),
                         if (hasMore)
@@ -198,7 +199,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                             },
                           ),
                       ],
-                    ),
+              ),
             ),
           ),
         ),

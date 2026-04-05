@@ -41,14 +41,9 @@ class _InsightsScreenState extends State<InsightsScreen>
   late AnimationController _donutController;
   late Animation<double> _donutAnim;
 
-  late final InsightsLayoutController _layoutController;
-
   @override
   void initState() {
     super.initState();
-
-    _layoutController = InsightsLayoutController();
-    _layoutController.load();
 
     _blob1Controller = AnimationController(
       vsync: this,
@@ -96,7 +91,6 @@ class _InsightsScreenState extends State<InsightsScreen>
     _blob2Controller.dispose();
     _appearController.dispose();
     _donutController.dispose();
-    _layoutController.dispose();
     super.dispose();
   }
 
@@ -105,10 +99,7 @@ class _InsightsScreenState extends State<InsightsScreen>
   void _showAddWidgetSheet() {
     showCupertinoModalPopup<void>(
       context: context,
-      builder: (_) => ChangeNotifierProvider.value(
-        value: _layoutController,
-        child: const _AddWidgetSheet(),
-      ),
+      builder: (_) => const _AddWidgetSheet(),
     );
   }
 
@@ -118,135 +109,84 @@ class _InsightsScreenState extends State<InsightsScreen>
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
 
-    return ChangeNotifierProvider.value(
-      value: _layoutController,
-      child: Stack(
-        children: [
-          // ── Background blobs ──────────────────────────────────────────────
-          RepaintBoundary(
-            child: AnimatedBlobs(blob1Anim: _blob1Anim, blob2Anim: _blob2Anim),
-          ),
+    return Stack(
+      children: [
+        // ── Background blobs ──────────────────────────────────────────────
+        RepaintBoundary(
+          child: AnimatedBlobs(blob1Anim: _blob1Anim, blob2Anim: _blob2Anim),
+        ),
 
-          // ── Scrollable content ────────────────────────────────────────────
-          // GestureDetector wraps the scroll view: taps on empty background
-          // exit reorder mode; card/badge taps are absorbed by their own
-          // GestureDetectors first and never reach this handler.
-          Positioned.fill(
-            child: Consumer<InsightsLayoutController>(
-              builder: (_, controller, _) {
-                return GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onTap: controller.isReorderMode
-                      ? controller.exitReorderMode
-                      : null,
-                  child: SingleChildScrollView(
-                    controller: widget.scrollController,
-                    physics: const BouncingScrollPhysics(),
-                    padding: EdgeInsets.only(top: topPadding + 76, bottom: 120),
-                    child: FadeTransition(
-                      opacity: _appearAnim,
-                      child: SlideTransition(
-                        position: Tween<Offset>(
-                          begin: const Offset(0, 0.04),
-                          end: Offset.zero,
-                        ).animate(_appearAnim),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            // ── Dynamic widget list ─────────────────────────────
-                            Consumer<InsightsLayoutController>(
-                              builder: (context, controller, _) {
-                                final configs = controller.visibleConfigs;
-
-                                if (controller.isReorderMode) {
-                                  return Localizations(
-                                    locale: const Locale('en'),
-                                    delegates: const [
-                                      DefaultWidgetsLocalizations.delegate,
-                                      DefaultMaterialLocalizations.delegate,
-                                    ],
-                                    child: Material(
-                                      color: Colors.transparent,
-                                      child: _buildReorderableList(
-                                        controller,
-                                        configs,
-                                      ),
-                                    ),
-                                  );
-                                }
-
-                                return Column(
-                                  children: [
-                                    for (final config in configs) ...[
-                                      _buildWidgetById(
-                                        config.id,
-                                        isReorderMode: false,
-                                        controller: controller,
-                                      ),
-                                      const SizedBox(height: 16),
-                                    ],
-                                  ],
-                                );
-                              },
-                            ),
-
-                            // ── Add widgets button — same horizontal margins as cards ─
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                              child: _ScalingButton(
-                                listenTo: _layoutController,
-                                onPressed: _showAddWidgetSheet,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-
-          // ── "Done" pill (floats above content in reorder mode) ────────────
-          Consumer<InsightsLayoutController>(
+        // ── Scrollable content ────────────────────────────────────────────
+        // GestureDetector wraps the scroll view: taps on empty background
+        // exit reorder mode; card/badge taps are absorbed by their own
+        // GestureDetectors first and never reach this handler.
+        Positioned.fill(
+          child: Consumer<InsightsLayoutController>(
             builder: (_, controller, _) {
-              return AnimatedPositioned(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeOutCubic,
-                bottom: controller.isReorderMode ? 100 : -60,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: controller.exitReorderMode,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: AppColors.systemBlue,
-                        borderRadius: BorderRadius.circular(999),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.systemBlue.withValues(alpha: 0.35),
-                            blurRadius: 16,
-                            spreadRadius: 1,
+              return GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: controller.isReorderMode
+                    ? controller.exitReorderMode
+                    : null,
+                child: SingleChildScrollView(
+                  controller: widget.scrollController,
+                  physics: const BouncingScrollPhysics(),
+                  padding: EdgeInsets.only(top: topPadding + 76, bottom: 120),
+                  child: FadeTransition(
+                    opacity: _appearAnim,
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0, 0.04),
+                        end: Offset.zero,
+                      ).animate(_appearAnim),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // ── Dynamic widget list ─────────────────────────────
+                          Consumer<InsightsLayoutController>(
+                            builder: (context, controller, _) {
+                              final configs = controller.visibleConfigs;
+
+                              if (controller.isReorderMode) {
+                                return Localizations(
+                                  locale: const Locale('en'),
+                                  delegates: const [
+                                    DefaultWidgetsLocalizations.delegate,
+                                    DefaultMaterialLocalizations.delegate,
+                                  ],
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: _buildReorderableList(
+                                      controller,
+                                      configs,
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              return Column(
+                                children: [
+                                  for (final config in configs) ...[
+                                    _buildWidgetById(
+                                      config.id,
+                                      isReorderMode: false,
+                                      controller: controller,
+                                    ),
+                                    const SizedBox(height: 16),
+                                  ],
+                                ],
+                              );
+                            },
+                          ),
+
+                          // ── Add widgets button — same horizontal margins as cards ─
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                            child: _ScalingButton(
+                              onPressed: _showAddWidgetSheet,
+                            ),
                           ),
                         ],
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 28,
-                          vertical: 12,
-                        ),
-                        child: Text(
-                          'Listo',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                            height: 1.33,
-                          ),
-                        ),
                       ),
                     ),
                   ),
@@ -254,8 +194,55 @@ class _InsightsScreenState extends State<InsightsScreen>
               );
             },
           ),
-        ],
-      ),
+        ),
+
+        // ── "Done" pill (floats above content in reorder mode) ────────────
+        Consumer<InsightsLayoutController>(
+          builder: (_, controller, _) {
+            return AnimatedPositioned(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutCubic,
+              bottom: controller.isReorderMode ? 100 : -60,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: controller.exitReorderMode,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: AppColors.systemBlue,
+                      borderRadius: BorderRadius.circular(999),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.systemBlue.withValues(alpha: 0.35),
+                          blurRadius: 16,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 28,
+                        vertical: 12,
+                      ),
+                      child: Text(
+                        'Listo',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          height: 1.33,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 
@@ -998,7 +985,7 @@ class _WigglingWidgetState extends State<_WigglingWidget>
         return Transform(
           alignment: Alignment.center,
           transform: Matrix4.identity()
-            ..scaleByDouble(_scaleAnim.value)
+            ..scale(_scaleAnim.value)
             ..rotateZ(angle),
           child: child,
         );
@@ -1013,9 +1000,8 @@ class _WigglingWidgetState extends State<_WigglingWidget>
 // from scratch, meaning didUpdateWidget fires reliably.
 
 class _ScalingButton extends StatefulWidget {
-  final InsightsLayoutController listenTo;
   final VoidCallback onPressed;
-  const _ScalingButton({required this.listenTo, required this.onPressed});
+  const _ScalingButton({required this.onPressed});
 
   @override
   State<_ScalingButton> createState() => _ScalingButtonState();
@@ -1036,25 +1022,24 @@ class _ScalingButtonState extends State<_ScalingButton>
     _scaleAnim = Tween<double>(begin: 1.0, end: 0.96).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
     );
-    widget.listenTo.addListener(_onControllerChanged);
   }
 
-  void _onControllerChanged() {
+  void _onControllerChanged(InsightsLayoutController layout) {
     if (!mounted) return;
-    widget.listenTo.isReorderMode
-        ? _controller.forward()
-        : _controller.reverse();
+    layout.isReorderMode ? _controller.forward() : _controller.reverse();
   }
 
   @override
   void dispose() {
-    widget.listenTo.removeListener(_onControllerChanged);
     _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final layout = context.watch<InsightsLayoutController>();
+    _onControllerChanged(layout);
+
     return AnimatedBuilder(
       animation: _scaleAnim,
       builder: (_, child) =>
@@ -1066,7 +1051,9 @@ class _ScalingButtonState extends State<_ScalingButton>
           decoration: BoxDecoration(
             color: AppColors.white05,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.systemBlue.withValues(alpha: 0.25)),
+            border: Border.all(
+              color: AppColors.systemBlue.withValues(alpha: 0.25),
+            ),
           ),
           child: const Padding(
             padding: EdgeInsets.symmetric(vertical: 14),
@@ -1330,7 +1317,9 @@ class _PredictionsCardState extends State<_PredictionsCard>
                           decoration: BoxDecoration(
                             color: active
                                 ? AppColors.systemBlue
-                                : AppColors.secondaryLabel.withValues(alpha: 0.3),
+                                : AppColors.secondaryLabel.withValues(
+                                    alpha: 0.3,
+                                  ),
                             borderRadius: BorderRadius.circular(999),
                           ),
                         );
