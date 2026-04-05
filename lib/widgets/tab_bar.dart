@@ -60,6 +60,13 @@ class AppTabBar extends StatelessWidget {
                   selectedIndex: selectedIndex,
                   onTap: onTabSelected,
                 ),
+                TabItem(
+                  icon: CupertinoIcons.chat_bubble_fill,
+                  label: 'Asistente',
+                  index: 4,
+                  selectedIndex: selectedIndex,
+                  onTap: onTabSelected,
+                ),
               ],
             ),
           ),
