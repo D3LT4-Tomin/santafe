@@ -17,6 +17,7 @@ import 'package:flutter/material.dart'
 import 'package:provider/provider.dart';
 
 import '../theme/app_theme.dart';
+import '../providers/data_provider.dart';
 import '../widgets/animated_blobs.dart';
 import '../widgets/cards.dart';
 import '../widgets/savings_projection_card.dart';
@@ -44,6 +45,7 @@ class _InsightsScreenState extends State<InsightsScreen>
   @override
   void initState() {
     super.initState();
+    context.read<InsightsLayoutController>().init();
 
     _blob1Controller = AnimationController(
       vsync: this,
@@ -329,78 +331,169 @@ class _InsightsScreenState extends State<InsightsScreen>
     );
   }
 
-  // ─── Stat grid & cards (unchanged logic) ────────────────────────────────────
+  // ─── Origin data helper ─────────────────────────────────────────────────────
+
+  static final Map<String, _OriginData> _originMapping = {
+    'Efectivo': _OriginData(
+      CupertinoIcons.money_dollar_circle_fill,
+      AppColors.systemGreen,
+    ),
+    'Tarjeta Débito': _OriginData(
+      CupertinoIcons.creditcard_fill,
+      AppColors.systemBlue,
+    ),
+    'Tarjeta Crédito': _OriginData(
+      CupertinoIcons.creditcard,
+      AppColors.systemPurple,
+    ),
+    'Transferencia': _OriginData(
+      CupertinoIcons.arrow_right_arrow_left_circle_fill,
+      AppColors.systemIndigo,
+    ),
+    'Depósito': _OriginData(
+      CupertinoIcons.building_2_fill,
+      AppColors.systemOrange,
+    ),
+  };
+
+  _OriginData _getOriginData(String origin) {
+    return _originMapping[origin] ??
+        _OriginData(CupertinoIcons.circle_fill, AppColors.secondaryLabel);
+  }
+
+  // ─── Stat grid & cards (with real data) ────────────────────────────────────
 
   Widget _buildStatsGrid() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          Expanded(
-            child: _StatCard(
-              label: 'TOTAL GASTADO',
-              amount: '\$1,250',
-              decimals: '.00',
-              trendIcon: CupertinoIcons.arrow_up_right,
-              trendColor: AppColors.systemRed,
-              trendText: '-5% vs mes ant.',
-              glowColor: AppColors.systemBlue,
-            ),
+    return Consumer<DataProvider>(
+      builder: (context, data, _) {
+        final expenses = data.currentMonthExpenses;
+        final savings = data.currentMonthSavings;
+        final expenseTrend = data.expenseTrendPercent;
+        final savingsTrend = data.savingsTrendPercent;
+
+        final expenseTrendPositive = expenseTrend <= 0;
+        final savingsTrendPositive = savingsTrend >= 0;
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              Expanded(
+                child: _StatCard(
+                  label: 'TOTAL GASTADO',
+                  amount: '\$${expenses.toStringAsFixed(0)}',
+                  decimals: '.00',
+                  trendIcon: expenseTrendPositive
+                      ? CupertinoIcons.arrow_down_left
+                      : CupertinoIcons.arrow_up_right,
+                  trendColor: expenseTrendPositive
+                      ? AppColors.systemGreen
+                      : AppColors.systemRed,
+                  trendText: '${expenseTrend.abs()}% vs mes ant.',
+                  glowColor: AppColors.systemBlue,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _StatCard(
+                  label: 'TOTAL AHORRADO',
+                  amount: '\$${savings.toStringAsFixed(0)}',
+                  decimals: '.00',
+                  trendIcon: savingsTrendPositive
+                      ? CupertinoIcons.arrow_up_right
+                      : CupertinoIcons.arrow_down_left,
+                  trendColor: savingsTrendPositive
+                      ? AppColors.systemGreen
+                      : AppColors.systemRed,
+                  trendText: '${savingsTrend.abs()}% vs mes ant.',
+                  glowColor: AppColors.systemGreen,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _StatCard(
-              label: 'TOTAL AHORRADO',
-              amount: '\$450',
-              decimals: '.00',
-              trendIcon: CupertinoIcons.arrow_up_right,
-              trendColor: AppColors.systemGreen,
-              trendText: '+12% meta',
-              glowColor: AppColors.systemGreen,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   Widget _buildOriginCard() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.white05,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.white07),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const _SectionLabel('ORIGEN DE GASTOS'),
-              const SizedBox(height: 16),
-              _OriginRow(
-                icon: CupertinoIcons.money_dollar_circle_fill,
-                iconColor: AppColors.systemBlue,
-                label: 'Efectivo',
-                amount: '\$320.00',
-                progress: 0.35,
-                progressColor: AppColors.systemBlue,
+    return Consumer<DataProvider>(
+      builder: (context, data, _) {
+        final expensesByOrigin = data.expensesByOrigin;
+
+        if (expensesByOrigin.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: AppColors.white05,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.white07),
               ),
-              const SizedBox(height: 16),
-              _OriginRow(
-                icon: CupertinoIcons.building_2_fill,
-                iconColor: AppColors.systemIndigo,
-                label: 'Banco',
-                amount: '\$930.00',
-                progress: 0.65,
-                progressColor: AppColors.systemIndigo,
+              child: const Padding(
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _SectionLabel('ORIGEN DE GASTOS'),
+                    SizedBox(height: 16),
+                    Text(
+                      'Sin gastos este mes',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.secondaryLabel,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ],
+            ),
+          );
+        }
+
+        final totalExpenses = expensesByOrigin.values.fold(
+          0.0,
+          (a, b) => a + b,
+        );
+        final sortedOrigins = expensesByOrigin.entries.toList()
+          ..sort((a, b) => b.value.compareTo(a.value));
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.white05,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.white07),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const _SectionLabel('ORIGEN DE GASTOS'),
+                  const SizedBox(height: 16),
+                  ...sortedOrigins.map((entry) {
+                    final originData = _getOriginData(entry.key);
+                    final progress = entry.value / totalExpenses;
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: _OriginRow(
+                        icon: originData.icon,
+                        iconColor: originData.color,
+                        label: entry.key,
+                        amount: '\$${entry.value.toStringAsFixed(2)}',
+                        progress: progress.clamp(0.0, 1.0),
+                        progressColor: originData.color,
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -717,7 +810,7 @@ class _AddWidgetSheet extends StatelessWidget {
     InsightWidgetId.categoriesIngresos => 'Categorías Ingresos',
     InsightWidgetId.origin => 'Origen de gastos',
     InsightWidgetId.bank => 'Promo banco',
-    InsightWidgetId.predictions => 'Predicciones AI',
+    InsightWidgetId.predictions => 'Pronostico AI',
   };
 
   static IconData _iconFor(InsightWidgetId id) => switch (id) {
@@ -1240,7 +1333,7 @@ class _PredictionsCardState extends State<_PredictionsCard>
             children: [
               Row(
                 children: [
-                  const Expanded(child: _SectionLabel('PREDICCIONES AI')),
+                  const Expanded(child: _SectionLabel('PRONOSTICO AI')),
                   const SizedBox(width: 8),
                   DecoratedBox(
                     decoration: BoxDecoration(
@@ -1972,6 +2065,12 @@ class _OriginRow extends StatelessWidget {
       ],
     );
   }
+}
+
+class _OriginData {
+  final IconData icon;
+  final Color color;
+  const _OriginData(this.icon, this.color);
 }
 
 class _LegendRow extends StatelessWidget {
