@@ -38,6 +38,117 @@ class DataProvider extends ChangeNotifier {
         .fold(0.0, (total, t) => total + t.amount);
   }
 
+  // ── Month Stats ──────────────────────────────────────────────────────────────
+
+  DateTime get _currentMonthStart {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, 1);
+  }
+
+  DateTime get _previousMonthStart {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month - 1, 1);
+  }
+
+  DateTime get _previousMonthEnd {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, 0);
+  }
+
+  List<TransactionModel> get _currentMonthTransactions {
+    return _transactions.where((t) {
+      return t.createdAt.isAfter(_currentMonthStart) ||
+          (t.createdAt.year == _currentMonthStart.year &&
+              t.createdAt.month == _currentMonthStart.month);
+    }).toList();
+  }
+
+  List<TransactionModel> get _previousMonthTransactions {
+    return _transactions.where((t) {
+      return t.createdAt.isAfter(_previousMonthStart) &&
+          t.createdAt.isBefore(_previousMonthEnd.add(const Duration(days: 1)));
+    }).toList();
+  }
+
+  double get currentMonthExpenses {
+    return _currentMonthTransactions
+        .where((t) => t.tipo == 'egreso')
+        .fold(0.0, (total, t) => total + t.amount.abs());
+  }
+
+  double get currentMonthIncome {
+    return _currentMonthTransactions
+        .where((t) => t.tipo == 'ingreso')
+        .fold(0.0, (total, t) => total + t.amount.abs());
+  }
+
+  double get currentMonthSavings {
+    return currentMonthIncome - currentMonthExpenses;
+  }
+
+  double get previousMonthExpenses {
+    return _previousMonthTransactions
+        .where((t) => t.tipo == 'egreso')
+        .fold(0.0, (total, t) => total + t.amount.abs());
+  }
+
+  double get previousMonthIncome {
+    return _previousMonthTransactions
+        .where((t) => t.tipo == 'ingreso')
+        .fold(0.0, (total, t) => total + t.amount.abs());
+  }
+
+  double get previousMonthSavings {
+    return previousMonthIncome - previousMonthExpenses;
+  }
+
+  int get expenseTrendPercent {
+    if (previousMonthExpenses == 0) return 0;
+    final diff = currentMonthExpenses - previousMonthExpenses;
+    return ((diff / previousMonthExpenses) * 100).round();
+  }
+
+  int get savingsTrendPercent {
+    if (previousMonthSavings == 0) return 0;
+    final diff = currentMonthSavings - previousMonthSavings;
+    return ((diff / previousMonthSavings.abs()) * 100).round();
+  }
+
+  // ── Origin breakdown ─────────────────────────────────────────────────────────
+
+  Map<String, double> get expensesByOrigin {
+    final Map<String, double> result = {};
+    for (final t in _currentMonthTransactions.where(
+      (t) => t.tipo == 'egreso',
+    )) {
+      final origin = t.origin.isNotEmpty ? t.origin : 'Otro';
+      result[origin] = (result[origin] ?? 0) + t.amount.abs();
+    }
+    return result;
+  }
+
+  Map<String, double> get expensesByCategory {
+    final Map<String, double> result = {};
+    for (final t in _currentMonthTransactions.where(
+      (t) => t.tipo == 'egreso',
+    )) {
+      final category = t.category.isNotEmpty ? t.category : 'Otro';
+      result[category] = (result[category] ?? 0) + t.amount.abs();
+    }
+    return result;
+  }
+
+  Map<String, double> get incomeByCategory {
+    final Map<String, double> result = {};
+    for (final t in _currentMonthTransactions.where(
+      (t) => t.tipo == 'ingreso',
+    )) {
+      final category = t.category.isNotEmpty ? t.category : 'Otro';
+      result[category] = (result[category] ?? 0) + t.amount.abs();
+    }
+    return result;
+  }
+
   void loadDataForUser(String userId) async {
     _isLoading = true;
     _transactionsLoaded = false;

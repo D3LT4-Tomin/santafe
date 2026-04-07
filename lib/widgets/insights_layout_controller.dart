@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import '../services/widget_layout_service.dart';
+import '../services/firebase_service.dart';
 
 // ─── Widget IDs ──────────────────────────────────────────────────────────────
 
@@ -28,7 +30,7 @@ extension InsightWidgetIdExtension on InsightWidgetId {
       case InsightWidgetId.bank:
         return 'Bancos';
       case InsightWidgetId.predictions:
-        return 'Predicciones IA';
+        return 'Pronostico IA';
     }
   }
 }
@@ -55,6 +57,7 @@ class InsightsLayoutController extends ChangeNotifier {
       .toList();
 
   bool _isReorderMode = false;
+  bool _isLoaded = false;
 
   // ── Public getters ──────────────────────────────────────────────────────────
 
@@ -68,14 +71,54 @@ class InsightsLayoutController extends ChangeNotifier {
   List<InsightWidgetConfig> get hiddenConfigs =>
       _configs.where((c) => !c.visible).toList();
 
-  // ── Persistence (stub — swap with SharedPreferences as needed) ─────────────
+  // ── Persistence (Firebase) ───────────────────────────────────────────────
+
+  void init() {
+    if (_isLoaded) return;
+    _isLoaded = true;
+    load();
+  }
 
   Future<void> load() async {
-    // No-op until persistence is wired up.
+    final userId = FirebaseService.currentUserId;
+    if (userId == null) return;
+
+    final config = await WidgetLayoutService.getLayoutConfig(userId);
+    if (config == null) return;
+
+    final savedOrder = List<String>.from(config['order'] ?? []);
+    final savedVisibility = Map<String, bool>.from(config['visibility'] ?? {});
+
+    for (int i = 0; i < _configs.length; i++) {
+      final id = _configs[i].id.name;
+
+      final orderIndex = savedOrder.indexOf(id);
+      if (orderIndex != -1 && orderIndex != i) {
+        final targetConfig = _configs.firstWhere((c) => c.id.name == id);
+        _configs.remove(targetConfig);
+        _configs.insert(orderIndex.clamp(0, _configs.length), targetConfig);
+      }
+
+      if (savedVisibility.containsKey(id)) {
+        _configs[i] = _configs[i].copyWith(visible: savedVisibility[id]);
+      }
+    }
+
+    notifyListeners();
   }
 
   Future<void> _save() async {
-    // Persist order + visibility here when ready.
+    final userId = FirebaseService.currentUserId;
+    if (userId == null) return;
+
+    final order = _configs.map((c) => c.id.name).toList();
+    final visibility = {for (var c in _configs) c.id.name: c.visible};
+
+    await WidgetLayoutService.saveLayoutConfig(
+      userId,
+      order: order,
+      visibility: visibility,
+    );
   }
 
   // ── Reorder mode ───────────────────────────────────────────────────────────
