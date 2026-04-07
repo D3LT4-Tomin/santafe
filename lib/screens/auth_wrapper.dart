@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/data_provider.dart';
+import '../providers/learning_provider.dart';
 import 'login_screen.dart';
 import '../shell/app_shell.dart';
 
@@ -28,8 +29,12 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
     if (authProvider.isLoggedIn && authProvider.firebaseUser != null) {
       _dataLoaded = true;
+      final userId = authProvider.firebaseUser!.uid;
       final dataProvider = context.read<DataProvider>();
-      dataProvider.loadDataForUser(authProvider.firebaseUser!.uid);
+      dataProvider.loadDataForUser(userId);
+
+      final learningProvider = context.read<LearningProvider>();
+      learningProvider.loadProgress(userId);
     }
   }
 
@@ -37,7 +42,6 @@ class _AuthWrapperState extends State<AuthWrapper> {
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, _) {
-        // Try to load data when user is logged in
         if (authProvider.isLoggedIn && !_dataLoaded) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _loadUserDataIfNeeded();

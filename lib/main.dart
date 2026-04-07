@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'providers/auth_provider.dart' as app;
 import 'providers/data_provider.dart';
+import 'providers/learning_provider.dart';
 import 'widgets/insights_layout_controller.dart';
 import 'screens/auth_wrapper.dart';
 import 'theme/app_theme.dart';
@@ -32,6 +33,7 @@ class FinanzasApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => app.AuthProvider()),
         ChangeNotifierProvider(create: (_) => DataProvider()),
+        ChangeNotifierProvider(create: (_) => LearningProvider()),
         ChangeNotifierProvider(create: (_) => InsightsLayoutController()),
       ],
       child: const CupertinoApp(

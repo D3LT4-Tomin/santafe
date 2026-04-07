@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../theme/app_theme.dart';
 import '../providers/auth_provider.dart';
+import '../providers/learning_provider.dart';
 import '../widgets/animated_blobs.dart';
 import 'user_settings_screen.dart';
 
@@ -266,13 +267,20 @@ class _AchievementsSection extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  Text(
-                    '${_achievements.where((a) => a.earned).length}/${_achievements.length}',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: AppColors.secondaryLabel,
-                      height: 1.33,
-                    ),
+                  Consumer<LearningProvider>(
+                    builder: (context, lp, _) {
+                      final earnedCount = _achievements
+                          .where((a) => lp.hasBadge(a.badgeId))
+                          .length;
+                      return Text(
+                        '$earnedCount/${_achievements.length}',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.secondaryLabel,
+                          height: 1.33,
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -282,16 +290,25 @@ class _AchievementsSection extends StatelessWidget {
                 child: SizedBox(height: 0.5, width: double.infinity),
               ),
               const SizedBox(height: 16),
-              GridView.count(
-                crossAxisCount: 3,
-                crossAxisSpacing: 14,
-                mainAxisSpacing: 14,
-                childAspectRatio: 0.85,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                children: _achievements
-                    .map((a) => _HexBadge(achievement: a))
-                    .toList(),
+              Consumer<LearningProvider>(
+                builder: (context, lp, _) {
+                  return GridView.count(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 14,
+                    mainAxisSpacing: 14,
+                    childAspectRatio: 0.85,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: _achievements
+                        .map(
+                          (a) => _HexBadge(
+                            achievement: a,
+                            earned: lp.hasBadge(a.badgeId),
+                          ),
+                        )
+                        .toList(),
+                  );
+                },
               ),
             ],
           ),
@@ -302,67 +319,71 @@ class _AchievementsSection extends StatelessWidget {
 }
 
 class _Achievement {
+  final String badgeId;
   final String label;
   final IconData icon;
-  final bool earned;
   const _Achievement({
+    required this.badgeId,
     required this.label,
     required this.icon,
-    required this.earned,
   });
 }
 
 const _achievements = [
   _Achievement(
+    badgeId: 'first_lesson',
     label: 'Primer\nlección',
     icon: CupertinoIcons.pencil,
-    earned: true,
   ),
   _Achievement(
+    badgeId: 'first_savings',
     label: 'Primer\nahorro',
     icon: CupertinoIcons.money_dollar,
-    earned: true,
   ),
   _Achievement(
+    badgeId: 'week_streak',
     label: 'Una semana\nde racha',
     icon: CupertinoIcons.rocket_fill,
-    earned: true,
   ),
   _Achievement(
+    badgeId: 'five_lessons',
     label: '5 lecciones\nseguidas',
     icon: CupertinoIcons.pencil_slash,
-    earned: true,
   ),
   _Achievement(
+    badgeId: 'month_streak',
     label: 'Un mes\nde racha',
     icon: CupertinoIcons.calendar,
-    earned: false,
   ),
   _Achievement(
+    badgeId: 'year_streak',
     label: '365 días\nde racha',
     icon: CupertinoIcons.gift_fill,
-    earned: false,
   ),
   _Achievement(
+    badgeId: 'night_study',
     label: 'Noche\nestudiosa',
     icon: CupertinoIcons.moon_fill,
-    earned: false,
   ),
   _Achievement(
+    badgeId: 'explorer',
     label: 'Explorador',
     icon: CupertinoIcons.cube_box_fill,
-    earned: false,
   ),
-  _Achievement(label: 'Constante', icon: CupertinoIcons.link, earned: false),
+  _Achievement(
+    badgeId: 'constant',
+    label: 'Constante',
+    icon: CupertinoIcons.link,
+  ),
 ];
 
 class _HexBadge extends StatelessWidget {
   final _Achievement achievement;
-  const _HexBadge({required this.achievement});
+  final bool earned;
+  const _HexBadge({required this.achievement, required this.earned});
 
   @override
   Widget build(BuildContext context) {
-    final earned = achievement.earned;
     final iconColor = earned ? AppColors.systemBlue : AppColors.tertiaryLabel;
     final bgColor = earned
         ? AppColors.systemBlue.withValues(alpha: 0.12)

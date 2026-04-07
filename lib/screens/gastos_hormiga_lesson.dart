@@ -1,11 +1,18 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import '../theme/app_theme.dart';
+import '../providers/learning_provider.dart';
+import '../models/learning_model.dart';
 
 class GastosHormigaLesson extends StatelessWidget {
   const GastosHormigaLesson({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
     return CupertinoPageScaffold(
       backgroundColor: AppColors.systemBackground,
       child: Stack(
@@ -94,7 +101,43 @@ class GastosHormigaLesson extends StatelessWidget {
                     color: AppColors.secondaryLabel,
                   ),
                 ),
+                const SizedBox(height: 100),
               ],
+            ),
+          ),
+          Positioned(
+            left: 24,
+            right: 24,
+            bottom: bottomPadding + 20,
+            child: GestureDetector(
+              onTap: () {
+                final lesson = LessonCatalog.getById('gastos_hormiga');
+                if (lesson != null) {
+                  context.read<LearningProvider>().completeLesson(
+                    'gastos_hormiga',
+                    lesson.points,
+                  );
+                }
+                Navigator.of(context).pop();
+              },
+              child: Container(
+                height: 54,
+                decoration: BoxDecoration(
+                  color: AppColors.systemBlue,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Center(
+                  child: Text(
+                    'Terminar lección',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
         ],

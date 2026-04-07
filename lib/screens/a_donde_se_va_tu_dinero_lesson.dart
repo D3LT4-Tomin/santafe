@@ -2,8 +2,11 @@ import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 import '../theme/app_theme.dart';
+import '../providers/learning_provider.dart';
+import '../models/learning_model.dart';
 
 // ─── Entry point ──────────────────────────────────────────────────────────────
 class DondeSeVanLesson extends StatelessWidget {
@@ -84,6 +87,13 @@ class _LessonShellState extends State<_LessonShell>
 
   void _advance() {
     if (_step >= _totalSteps - 1) {
+      final lesson = LessonCatalog.getById('a_donde_se_va_tu_dinero');
+      if (lesson != null) {
+        context.read<LearningProvider>().completeLesson(
+          'a_donde_se_va_tu_dinero',
+          lesson.points,
+        );
+      }
       Navigator.of(context).pop();
       return;
     }
@@ -148,7 +158,9 @@ class _LessonShellState extends State<_LessonShell>
                             animation: _progressAnim,
                             builder: (_, _) => LinearProgressIndicator(
                               value: _progressAnim.value,
-                              backgroundColor: Colors.white.withValues(alpha: 0.10),
+                              backgroundColor: Colors.white.withValues(
+                                alpha: 0.10,
+                              ),
                               valueColor: const AlwaysStoppedAnimation(
                                 AppColors.systemBlue,
                               ),
@@ -770,13 +782,13 @@ class _Step2RankState extends State<_Step2Rank> {
                                     vertical: 3,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: AppColors.systemGreen.withValues(alpha: 
-                                      0.18,
+                                    color: AppColors.systemGreen.withValues(
+                                      alpha: 0.18,
                                     ),
                                     borderRadius: BorderRadius.circular(999),
                                     border: Border.all(
-                                      color: AppColors.systemGreen.withValues(alpha: 
-                                        0.40,
+                                      color: AppColors.systemGreen.withValues(
+                                        alpha: 0.40,
                                       ),
                                     ),
                                   ),
@@ -909,7 +921,10 @@ class _Step4CompletionState extends State<_Step4Completion>
                 const SizedBox(height: 36),
 
                 // Divider
-                Container(height: 1, color: Colors.white.withValues(alpha: 0.08)),
+                Container(
+                  height: 1,
+                  color: Colors.white.withValues(alpha: 0.08),
+                ),
                 const SizedBox(height: 28),
 
                 // Recuerda card
@@ -921,7 +936,9 @@ class _Step4CompletionState extends State<_Step4Completion>
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.10),
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
