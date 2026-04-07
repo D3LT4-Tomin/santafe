@@ -4,24 +4,67 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/tomy_provider.dart';
 import '../theme/app_theme.dart';
+import '../widgets/animated_blobs.dart';
 
 class TomyChatScreen extends StatefulWidget {
   final ScrollController scrollController;
-  const TomyChatScreen({super.key, required this.scrollController});
+  final VoidCallback onBack;
+  const TomyChatScreen({
+    super.key,
+    required this.scrollController,
+    required this.onBack,
+  });
 
   @override
   State<TomyChatScreen> createState() => _TomyChatScreenState();
 }
 
-class _TomyChatScreenState extends State<TomyChatScreen> {
+class _TomyChatScreenState extends State<TomyChatScreen>
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
   TomyProvider? _tomyProvider;
   final TextEditingController _textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   bool _initialized = false;
 
+  late AnimationController _blob1Controller;
+  late AnimationController _blob2Controller;
+  late Animation<double> _blob1Anim;
+  late Animation<double> _blob2Anim;
+  late AnimationController _appearController;
+  late Animation<double> _appearAnim;
+
   @override
   void initState() {
     super.initState();
+    _blob1Controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 25),
+    )..repeat(reverse: true);
+    _blob2Controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 18),
+    )..repeat(reverse: true);
+    _blob1Anim = CurvedAnimation(
+      parent: _blob1Controller,
+      curve: Curves.easeInOut,
+    );
+    _blob2Anim = CurvedAnimation(
+      parent: _blob2Controller,
+      curve: Curves.easeInOut,
+    );
+
+    _appearController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _appearAnim = CurvedAnimation(
+      parent: _appearController,
+      curve: const Cubic(0.34, 1.56, 0.64, 1.0),
+    );
+    _appearController.forward();
+
     WidgetsBinding.instance.addPostFrameCallback((_) => _initProvider());
   }
 
@@ -37,7 +80,15 @@ class _TomyChatScreenState extends State<TomyChatScreen> {
   void dispose() {
     _textController.dispose();
     _focusNode.dispose();
+    _blob1Controller.dispose();
+    _blob2Controller.dispose();
+    _appearController.dispose();
     super.dispose();
+  }
+
+  void _goBack() {
+    FocusScope.of(context).unfocus();
+    widget.onBack();
   }
 
   void _sendMessage() {
@@ -58,6 +109,7 @@ class _TomyChatScreenState extends State<TomyChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     if (!_initialized || _tomyProvider == null) {
       return const ColoredBox(
         color: AppColors.systemBackground,
@@ -72,23 +124,76 @@ class _TomyChatScreenState extends State<TomyChatScreen> {
   }
 
   Widget _buildBody(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final bottomInset = mediaQuery.viewInsets.bottom;
-    final bottomPadding = mediaQuery.padding.bottom;
-    final tabBarHeight = bottomPadding + 65.0;
+    final topPadding = MediaQuery.of(context).padding.top;
 
-    return ColoredBox(
-      color: AppColors.systemBackground,
-      child: Column(
-        children: [
-          Expanded(child: _buildMessageList(bottomPadding)),
-          _buildInputBar(bottomInset, bottomPadding),
-        ],
-      ),
+    return Stack(
+      children: [
+        RepaintBoundary(
+          child: AnimatedBlobs(blob1Anim: _blob1Anim, blob2Anim: _blob2Anim),
+        ),
+        Positioned.fill(
+          child: FadeTransition(
+            opacity: _appearAnim,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 0.04),
+                end: Offset.zero,
+              ).animate(_appearAnim),
+              child: Column(
+                children: [
+                  // Custom header
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: topPadding + 10,
+                      bottom: 10,
+                      left: 16,
+                      right: 16,
+                    ),
+                    child: Row(
+                      children: [
+                        CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: _goBack,
+                          child: Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: AppColors.white05,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: AppColors.white10),
+                            ),
+                            child: const Icon(
+                              CupertinoIcons.back,
+                              color: AppColors.systemBlue,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        const Text(
+                          'Tomy',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.label,
+                            letterSpacing: -0.41,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(child: _buildMessageList()),
+                  _buildInputBar(),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildMessageList(double bottomPadding) {
+  Widget _buildMessageList() {
     final messages = _tomyProvider!.messages;
     final isLoading = _tomyProvider!.isLoading;
 
@@ -99,22 +204,50 @@ class _TomyChatScreenState extends State<TomyChatScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                CupertinoIcons.chat_bubble_2_fill,
-                size: 64,
-                color: AppColors.systemBlue.withValues(alpha: 0.7),
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF0A84FF), Color(0xFF409CFF)],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.systemBlue.withValues(alpha: 0.25),
+                      blurRadius: 20,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  CupertinoIcons.chat_bubble_2_fill,
+                  size: 36,
+                  color: CupertinoColors.white,
+                ),
               ),
               const SizedBox(height: 24),
-              Text(
+              const Text(
                 'Habla con Tomy',
-                style: AppTextStyles.title2.copyWith(color: AppColors.label),
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.label,
+                  letterSpacing: -0.5,
+                  height: 1.2,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
-              Text(
+              const Text(
                 'Tu asistente financiero personal',
-                style: AppTextStyles.subheadline.copyWith(
+                style: TextStyle(
+                  fontSize: 15,
                   color: AppColors.secondaryLabel,
+                  height: 1.33,
+                  letterSpacing: -0.24,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -126,7 +259,7 @@ class _TomyChatScreenState extends State<TomyChatScreen> {
 
     return ListView.builder(
       controller: widget.scrollController,
-      padding: EdgeInsets.only(left: 16, right: 16, top: 90, bottom: 12),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
       itemCount: messages.length + (isLoading ? 1 : 0),
       itemBuilder: (context, index) {
         if (isLoading && index == messages.length) {
@@ -137,53 +270,58 @@ class _TomyChatScreenState extends State<TomyChatScreen> {
     );
   }
 
-  Widget _buildInputBar(double bottomInset, double bottomPadding) {
+  Widget _buildInputBar() {
     final isLoading = _tomyProvider!.isLoading;
-    final tabBarHeight = 65.0;
-    final extraPadding = bottomPadding > 0
-        ? bottomPadding + tabBarHeight
-        : tabBarHeight;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Container(
+      padding: EdgeInsets.fromLTRB(16, 12, 16, bottomPadding + 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1C1C1E),
+        color: AppColors.white05,
         border: Border(top: BorderSide(color: AppColors.white07, width: 0.5)),
-      ),
-      padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 12,
-        bottom: 12 + extraPadding,
       ),
       child: SafeArea(
         top: false,
         bottom: false,
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Expanded(
               child: Container(
-                height: 44,
                 decoration: BoxDecoration(
                   color: AppColors.tertiaryBackground,
-                  borderRadius: BorderRadius.circular(22),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppColors.white07),
                 ),
                 child: CupertinoTextField(
                   controller: _textController,
                   focusNode: _focusNode,
                   placeholder: 'Pregunta a Tomy...',
-                  placeholderStyle: AppTextStyles.body.copyWith(
+                  placeholderStyle: const TextStyle(
                     color: AppColors.tertiaryLabel,
+                    fontSize: 15,
+                    letterSpacing: -0.24,
+                    height: 1.33,
                   ),
-                  style: AppTextStyles.body.copyWith(color: AppColors.label),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  style: const TextStyle(
+                    color: AppColors.label,
+                    fontSize: 15,
+                    letterSpacing: -0.24,
+                    height: 1.33,
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
                   decoration: const BoxDecoration(),
-                  maxLines: 1,
+                  maxLines: 4,
+                  minLines: 1,
                   textInputAction: TextInputAction.send,
                   onSubmitted: (_) => _sendMessage(),
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             GestureDetector(
               onTap: isLoading ? null : _sendMessage,
               child: Container(
@@ -194,10 +332,21 @@ class _TomyChatScreenState extends State<TomyChatScreen> {
                       ? AppColors.tertiaryBackground
                       : AppColors.systemBlue,
                   shape: BoxShape.circle,
+                  boxShadow: isLoading
+                      ? null
+                      : [
+                          BoxShadow(
+                            color: AppColors.systemBlue.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                 ),
-                child: const Icon(
+                child: Icon(
                   CupertinoIcons.arrow_up,
-                  color: AppColors.label,
+                  color: isLoading
+                      ? AppColors.tertiaryLabel
+                      : CupertinoColors.white,
                   size: 20,
                 ),
               ),
@@ -223,13 +372,17 @@ class _TomyChatScreenState extends State<TomyChatScreen> {
               width: 32,
               height: 32,
               decoration: const BoxDecoration(
-                color: AppColors.systemBlue,
                 shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF0A84FF), Color(0xFF409CFF)],
+                ),
               ),
               child: const Icon(
                 CupertinoIcons.person_fill,
                 color: CupertinoColors.white,
-                size: 18,
+                size: 16,
               ),
             ),
             const SizedBox(width: 8),
@@ -238,14 +391,25 @@ class _TomyChatScreenState extends State<TomyChatScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: isUser
-                    ? AppColors.systemBlue
-                    : AppColors.secondaryBackground,
-                borderRadius: BorderRadius.circular(16),
+                color: isUser ? AppColors.systemBlue : AppColors.white05,
+                borderRadius: BorderRadius.circular(16).copyWith(
+                  bottomRight: isUser
+                      ? const Radius.circular(4)
+                      : const Radius.circular(16),
+                  bottomLeft: !isUser
+                      ? const Radius.circular(4)
+                      : const Radius.circular(16),
+                ),
+                border: isUser ? null : Border.all(color: AppColors.white07),
               ),
               child: Text(
                 message.content,
-                style: AppTextStyles.body.copyWith(color: AppColors.label),
+                style: TextStyle(
+                  fontSize: 15,
+                  color: isUser ? CupertinoColors.white : AppColors.label,
+                  height: 1.3,
+                  letterSpacing: -0.24,
+                ),
               ),
             ),
           ),
@@ -254,14 +418,18 @@ class _TomyChatScreenState extends State<TomyChatScreen> {
             Container(
               width: 32,
               height: 32,
-              decoration: const BoxDecoration(
-                color: AppColors.secondaryBackground,
+              decoration: BoxDecoration(
                 shape: BoxShape.circle,
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF0A84FF), Color(0xFF409CFF)],
+                ),
               ),
               child: const Icon(
                 CupertinoIcons.person_fill,
-                color: AppColors.secondaryLabel,
-                size: 18,
+                color: CupertinoColors.white,
+                size: 16,
               ),
             ),
           ],
@@ -279,21 +447,26 @@ class _TomyChatScreenState extends State<TomyChatScreen> {
             width: 32,
             height: 32,
             decoration: const BoxDecoration(
-              color: AppColors.systemBlue,
               shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF0A84FF), Color(0xFF409CFF)],
+              ),
             ),
             child: const Icon(
               CupertinoIcons.person_fill,
               color: CupertinoColors.white,
-              size: 18,
+              size: 16,
             ),
           ),
           const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: AppColors.secondaryBackground,
+              color: AppColors.white05,
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.white07),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,

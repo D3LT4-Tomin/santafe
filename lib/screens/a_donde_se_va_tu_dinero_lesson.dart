@@ -2,11 +2,8 @@ import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 
 import '../theme/app_theme.dart';
-import '../providers/learning_provider.dart';
-import '../models/learning_model.dart';
 
 // ─── Entry point ──────────────────────────────────────────────────────────────
 class DondeSeVanLesson extends StatelessWidget {
@@ -36,10 +33,8 @@ class _LessonShellState extends State<_LessonShell>
   int _step = 0;
   static const int _totalSteps = 5;
 
-  // Step 1 answer
   String? _chosenCategory;
 
-  // Step 3-4 ranking
   final List<_RankItem> _rankItems = [
     _RankItem(
       label: 'Comida a domicilio',
@@ -87,13 +82,6 @@ class _LessonShellState extends State<_LessonShell>
 
   void _advance() {
     if (_step >= _totalSteps - 1) {
-      final lesson = LessonCatalog.getById('a_donde_se_va_tu_dinero');
-      if (lesson != null) {
-        context.read<LearningProvider>().completeLesson(
-          'a_donde_se_va_tu_dinero',
-          lesson.points,
-        );
-      }
       Navigator.of(context).pop();
       return;
     }
@@ -131,7 +119,6 @@ class _LessonShellState extends State<_LessonShell>
       backgroundColor: const Color(0xFF070D1A),
       body: Column(
         children: [
-          // ── Top chrome ──────────────────────────────────────────────────
           SizedBox(
             height: top + 56,
             child: Padding(
@@ -158,30 +145,20 @@ class _LessonShellState extends State<_LessonShell>
                             animation: _progressAnim,
                             builder: (_, _) => LinearProgressIndicator(
                               value: _progressAnim.value,
-                              backgroundColor: Colors.white.withValues(
-                                alpha: 0.10,
-                              ),
-                              valueColor: const AlwaysStoppedAnimation(
-                                AppColors.systemBlue,
-                              ),
+                              backgroundColor: Colors.white.withValues(alpha: 0.10),
+                              valueColor: const AlwaysStoppedAnimation(AppColors.systemBlue),
                             ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                  // Bell icon
-                  const Icon(
-                    CupertinoIcons.bell,
-                    color: Colors.white38,
-                    size: 20,
-                  ),
+                  const Icon(CupertinoIcons.bell, color: Colors.white38, size: 20),
                 ],
               ),
             ),
           ),
 
-          // ── Step content ────────────────────────────────────────────────
           Expanded(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 320),
@@ -217,17 +194,9 @@ class _LessonShellState extends State<_LessonShell>
       case 1:
         return _Step1Reveal(onNext: _advance);
       case 2:
-        return _Step2Rank(
-          items: _rankItems,
-          onNext: _advance,
-          isSelecting: true,
-        );
+        return _Step2Rank(items: _rankItems, onNext: _advance, isSelecting: true);
       case 3:
-        return _Step2Rank(
-          items: _rankItems,
-          onNext: _advance,
-          isSelecting: false,
-        );
+        return _Step2Rank(items: _rankItems, onNext: _advance, isSelecting: false);
       case 4:
         return _Step4Completion(onNext: _advance);
       default:
@@ -244,7 +213,6 @@ class _LessonHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Icon badge
         Container(
           width: 56,
           height: 56,
@@ -406,30 +374,10 @@ class _Step1RevealState extends State<_Step1Reveal>
   late final AnimationController _ctrl;
 
   static const _items = [
-    _RevealItem(
-      'Comida',
-      '\$120',
-      AppColors.systemOrange,
-      CupertinoIcons.cart_fill,
-    ),
-    _RevealItem(
-      'Lista',
-      '\$40',
-      AppColors.systemBlue,
-      CupertinoIcons.list_bullet,
-    ),
-    _RevealItem(
-      'Servicios\nMúsica',
-      '\$15',
-      AppColors.systemPurple,
-      CupertinoIcons.music_note,
-    ),
-    _RevealItem(
-      'Transporte\nUber',
-      '\$80',
-      AppColors.systemGreen,
-      CupertinoIcons.car_fill,
-    ),
+    _RevealItem('Comida', '\$120', AppColors.systemOrange, CupertinoIcons.cart_fill),
+    _RevealItem('Lista', '\$40', AppColors.systemBlue, CupertinoIcons.list_bullet),
+    _RevealItem('Servicios\nMúsica', '\$15', AppColors.systemPurple, CupertinoIcons.music_note),
+    _RevealItem('Transporte\nUber', '\$80', AppColors.systemGreen, CupertinoIcons.car_fill),
   ];
 
   @override
@@ -459,7 +407,6 @@ class _Step1RevealState extends State<_Step1Reveal>
                 const SizedBox(height: 24),
                 const _LessonHeader(),
                 const SizedBox(height: 36),
-                // Section label
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -472,29 +419,103 @@ class _Step1RevealState extends State<_Step1Reveal>
                   ),
                 ),
                 const SizedBox(height: 16),
+                // ── Fixed 2×2 grid using GridView ──────────────────────────
+                // childAspectRatio drives the cell height; 1.3 gives a
+                // comfortable card that always fits its content.
                 GridView.count(
                   crossAxisCount: 2,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
-                  childAspectRatio: 1.5,
+                  childAspectRatio: 1.3,
                   children: List.generate(_items.length, (i) {
                     final item = _items[i];
                     final delay = i * 0.12;
                     return AnimatedBuilder(
                       animation: _ctrl,
                       builder: (_, _) {
-                        final t = (((_ctrl.value - delay) / (1 - delay)).clamp(
-                          0.0,
-                          1.0,
-                        ));
+                        final t = ((_ctrl.value - delay) / (1 - delay)).clamp(0.0, 1.0);
                         final curve = Curves.easeOutCubic.transform(t);
                         return Opacity(
                           opacity: curve,
                           child: Transform.translate(
                             offset: Offset(0, 12 * (1 - curve)),
-                            child: _RevealCard(item: item),
+                            // ── The card itself is a Stack that fills the
+                            //    entire grid cell. StackFit.expand ensures
+                            //    the inner Container stretches to the cell
+                            //    bounds, and the badge is Positioned on top.
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                // Main card
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: item.color.withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: item.color.withValues(alpha: 0.30),
+                                    ),
+                                  ),
+                                  padding: const EdgeInsets.all(14),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Icon(item.icon, color: item.color, size: 22),
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            item.label,
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: Colors.white.withValues(alpha: 0.60),
+                                              height: 1.3,
+                                            ),
+                                          ),
+                                          Text(
+                                            item.amount,
+                                            style: const TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w700,
+                                              color: Colors.white,
+                                              letterSpacing: -0.5,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // +2pt badge — overlaid in top-right corner
+                                Positioned(
+                                  top: 8,
+                                  right: 8,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 7,
+                                      vertical: 3,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.systemGreen.withValues(alpha: 0.20),
+                                      borderRadius: BorderRadius.circular(999),
+                                      border: Border.all(
+                                        color: AppColors.systemGreen.withValues(alpha: 0.40),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      '+2pt',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.systemGreen,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       },
@@ -520,79 +541,6 @@ class _RevealItem {
   const _RevealItem(this.label, this.amount, this.color, this.icon);
 }
 
-class _RevealCard extends StatelessWidget {
-  final _RevealItem item;
-  const _RevealCard({required this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: item.color.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: item.color.withValues(alpha: 0.30)),
-          ),
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Icon(item.icon, color: item.color, size: 22),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.label,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.white.withValues(alpha: 0.60),
-                      height: 1.3,
-                    ),
-                  ),
-                  Text(
-                    item.amount,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        // +2pt badge
-        Positioned(
-          top: 8,
-          right: 8,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-            decoration: BoxDecoration(
-              color: AppColors.systemGreen.withValues(alpha: 0.20),
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(
-                color: AppColors.systemGreen.withValues(alpha: 0.40),
-              ),
-            ),
-            child: const Text(
-              '+2pt',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-                color: AppColors.systemGreen,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 // ─── Step 2 & 3: Rank list ────────────────────────────────────────────────────
 class _RankItem {
   final String label;
@@ -613,7 +561,7 @@ class _RankItem {
 class _Step2Rank extends StatefulWidget {
   final List<_RankItem> items;
   final VoidCallback onNext;
-  final bool isSelecting; // false = show ranked/colored state
+  final bool isSelecting;
 
   const _Step2Rank({
     required this.items,
@@ -628,7 +576,6 @@ class _Step2Rank extends StatefulWidget {
 class _Step2RankState extends State<_Step2Rank> {
   int _rankCounter = 1;
 
-  // For the "revealed" step, show all items pre-selected with point badges
   static const _pointBadges = ['+2pt', '+1pt', '+2pt', '+1pt'];
   static const _revealColors = [
     AppColors.systemOrange,
@@ -641,7 +588,6 @@ class _Step2RankState extends State<_Step2Rank> {
   void initState() {
     super.initState();
     if (!widget.isSelecting) {
-      // Pre-select all for the reveal step
       for (var i = 0; i < widget.items.length; i++) {
         widget.items[i].selected = true;
         widget.items[i].rank = i + 1;
@@ -657,7 +603,6 @@ class _Step2RankState extends State<_Step2Rank> {
         item.selected = false;
         item.rank = null;
         _rankCounter--;
-        // Re-number remaining
         for (final other in widget.items) {
           if (other.selected && other.rank! > removedRank) {
             other.rank = other.rank! - 1;
@@ -699,115 +644,134 @@ class _Step2RankState extends State<_Step2Rank> {
                   ),
                 ),
                 const SizedBox(height: 14),
-                ...List.generate(widget.items.length, (i) {
-                  final item = widget.items[i];
-                  final isSelected = item.selected;
-                  final color = widget.isSelecting
-                      ? item.color
-                      : _revealColors[i];
-                  final badge = !widget.isSelecting ? _pointBadges[i] : null;
+                // ── Use LayoutBuilder so each square is exactly
+                //    (totalWidth - gaps) / itemCount on each side ──────────
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final count = widget.items.length;
+                    const gap = 8.0;
+                    final side = (constraints.maxWidth - gap * (count - 1)) / count;
 
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: GestureDetector(
-                      onTap: widget.isSelecting ? () => _toggle(i) : null,
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 250),
-                        curve: Curves.easeOutCubic,
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? color.withValues(alpha: 0.18)
-                              : Colors.white.withValues(alpha: 0.06),
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: isSelected
-                                ? color.withValues(alpha: 0.50)
-                                : Colors.white.withValues(alpha: 0.10),
-                            width: isSelected ? 1.5 : 1,
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 14,
-                          ),
-                          child: Row(
-                            children: [
-                              // Rank number or icon
-                              AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                width: 32,
-                                height: 32,
-                                decoration: BoxDecoration(
-                                  color: isSelected
-                                      ? color.withValues(alpha: 0.25)
-                                      : Colors.white.withValues(alpha: 0.08),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Center(
-                                  child: isSelected && item.rank != null
-                                      ? Text(
-                                          '${item.rank}',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w700,
-                                            color: color,
-                                          ),
-                                        )
-                                      : Icon(
-                                          item.icon,
-                                          color: Colors.white38,
-                                          size: 16,
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: List.generate(count, (i) {
+                        final item = widget.items[i];
+                        final isSelected = item.selected;
+                        final color = widget.isSelecting ? item.color : _revealColors[i];
+                        final badge = !widget.isSelecting ? _pointBadges[i] : null;
+
+                        return Padding(
+                          padding: EdgeInsets.only(right: i < count - 1 ? gap : 0),
+                          child: GestureDetector(
+                            onTap: widget.isSelecting ? () => _toggle(i) : null,
+                            child: SizedBox(
+                              width: side,
+                              height: side,
+                              child: Stack(
+                                children: [
+                                  // Square card — fills the SizedBox
+                                  Positioned.fill(
+                                    child: AnimatedContainer(
+                                      duration: const Duration(milliseconds: 250),
+                                      curve: Curves.easeOutCubic,
+                                      decoration: BoxDecoration(
+                                        color: isSelected
+                                            ? color.withValues(alpha: 0.18)
+                                            : Colors.white.withValues(alpha: 0.06),
+                                        borderRadius: BorderRadius.circular(14),
+                                        border: Border.all(
+                                          color: isSelected
+                                              ? color.withValues(alpha: 0.50)
+                                              : Colors.white.withValues(alpha: 0.10),
+                                          width: isSelected ? 1.5 : 1,
                                         ),
-                                ),
-                              ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Text(
-                                  item.label,
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                    color: isSelected
-                                        ? Colors.white
-                                        : Colors.white60,
-                                  ),
-                                ),
-                              ),
-                              // Point badge (reveal step only)
-                              if (badge != null)
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 3,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.systemGreen.withValues(
-                                      alpha: 0.18,
-                                    ),
-                                    borderRadius: BorderRadius.circular(999),
-                                    border: Border.all(
-                                      color: AppColors.systemGreen.withValues(
-                                        alpha: 0.40,
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          AnimatedContainer(
+                                            duration: const Duration(milliseconds: 200),
+                                            width: 36,
+                                            height: 36,
+                                            decoration: BoxDecoration(
+                                              color: isSelected
+                                                  ? color.withValues(alpha: 0.25)
+                                                  : Colors.white.withValues(alpha: 0.08),
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                            child: Center(
+                                              child: isSelected && item.rank != null
+                                                  ? Text(
+                                                      '${item.rank}',
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight: FontWeight.w700,
+                                                        color: color,
+                                                      ),
+                                                    )
+                                                  : Icon(
+                                                      item.icon,
+                                                      color: isSelected ? color : Colors.white38,
+                                                      size: 18,
+                                                    ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                                            child: Text(
+                                              item.label,
+                                              textAlign: TextAlign.center,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w500,
+                                                color: isSelected ? Colors.white : Colors.white60,
+                                                height: 1.2,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
-                                  child: Text(
-                                    badge,
-                                    style: const TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.systemGreen,
+                                  // Point badge — sits on top of the card
+                                  if (badge != null)
+                                    Positioned(
+                                      top: 6,
+                                      right: 6,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.systemGreen.withValues(alpha: 0.18),
+                                          borderRadius: BorderRadius.circular(999),
+                                          border: Border.all(
+                                            color: AppColors.systemGreen.withValues(alpha: 0.40),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          badge,
+                                          style: const TextStyle(
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.w700,
+                                            color: AppColors.systemGreen,
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                            ],
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                  );
-                }),
+                        );
+                      }),
+                    );
+                  },
+                ),
                 const SizedBox(height: 32),
               ],
             ),
@@ -870,7 +834,6 @@ class _Step4CompletionState extends State<_Step4Completion>
             child: Column(
               children: [
                 const SizedBox(height: 24),
-                // Lesson icon — animate to "done" state
                 AnimatedBuilder(
                   animation: _fade,
                   builder: (_, _) => Opacity(
@@ -920,14 +883,9 @@ class _Step4CompletionState extends State<_Step4Completion>
                 ),
                 const SizedBox(height: 36),
 
-                // Divider
-                Container(
-                  height: 1,
-                  color: Colors.white.withValues(alpha: 0.08),
-                ),
+                Container(height: 1, color: Colors.white.withValues(alpha: 0.08)),
                 const SizedBox(height: 28),
 
-                // Recuerda card
                 FadeTransition(
                   opacity: _fade,
                   child: Container(
@@ -936,9 +894,7 @@ class _Step4CompletionState extends State<_Step4Completion>
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.10),
-                      ),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -968,22 +924,24 @@ class _Step4CompletionState extends State<_Step4Completion>
                 ),
                 const SizedBox(height: 36),
 
-                // Badges row
                 ScaleTransition(
                   scale: _scale,
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _CompletionBadge(
-                        icon: CupertinoIcons.star_fill,
-                        color: const Color(0xFFFFCC00),
-                        label: '10\npuntos',
+                      Expanded(
+                        child: _CompletionBadge(
+                          icon: CupertinoIcons.star_fill,
+                          color: const Color(0xFFFFCC00),
+                          label: '10\npuntos',
+                        ),
                       ),
                       const SizedBox(width: 16),
-                      _CompletionBadge(
-                        icon: CupertinoIcons.flame_fill,
-                        color: AppColors.systemOrange,
-                        label: 'Racha\nactiva',
+                      Expanded(
+                        child: _CompletionBadge(
+                          icon: CupertinoIcons.flame_fill,
+                          color: AppColors.systemOrange,
+                          label: 'Racha\nactiva',
+                        ),
                       ),
                     ],
                   ),
@@ -1013,7 +971,7 @@ class _CompletionBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 120,
+      width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),

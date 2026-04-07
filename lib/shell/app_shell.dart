@@ -22,17 +22,21 @@ class AppShell extends StatefulWidget {
   State<AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends State<AppShell> {
+class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
   bool _isInLesson = false;
+  bool _isTapTransition = false;
+  int _tapTargetIndex = -1;
+
+  late final AnimationController _tapSlideController;
+  late final Animation<double> _tapSlideAnim;
 
   final List<ScrollController> _scrollControllers = List.generate(
     5,
     (_) => ScrollController(),
   );
 
-  final _searchBarOpacity = ValueNotifier<double>(1.0);
   double _lastScrollOffset = 0;
 
   final List<GlobalKey<NavigatorState>> _navigatorKeys = List.generate(
@@ -46,6 +50,15 @@ class _AppShellState extends State<AppShell> {
   @override
   void initState() {
     super.initState();
+
+    _tapSlideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 350),
+    );
+    _tapSlideAnim = CurvedAnimation(
+      parent: _tapSlideController,
+      curve: Curves.easeOutCubic,
+    );
 
     _navigatorObservers = List.generate(
       5,
@@ -61,12 +74,15 @@ class _AppShellState extends State<AppShell> {
       InsightsScreen(scrollController: _scrollControllers[1]),
       CuentaScreen(scrollController: _scrollControllers[2]),
       AprenderScreen(scrollController: _scrollControllers[3]),
-      TomyChatScreen(scrollController: _scrollControllers[4]),
+      TomyChatScreen(
+        scrollController: _scrollControllers[4],
+        onBack: () => _onTabSelected(3),
+      ),
     ];
 
     _pageController.addListener(() {
       final newIndex = _pageController.page!.round();
-      if (newIndex != _selectedIndex) {
+      if (newIndex != _selectedIndex && !_isTapTransition) {
         _setSelectedIndex(newIndex);
       }
     });
@@ -87,7 +103,6 @@ class _AppShellState extends State<AppShell> {
         setState(() => _isInLesson = inLesson);
       }
     } else {
-      // If navigator is not yet built, assume not in lesson
       if (_isInLesson) {
         setState(() => _isInLesson = false);
       }
@@ -96,31 +111,15 @@ class _AppShellState extends State<AppShell> {
 
   @override
   void dispose() {
+    _tapSlideController.dispose();
     _pageController.dispose();
     for (var controller in _scrollControllers) {
       controller.dispose();
     }
-    _searchBarOpacity.dispose();
     super.dispose();
   }
 
-  void _onScroll() {
-    final controller = _scrollControllers[_selectedIndex];
-    final offset = controller.offset;
-    final maxScroll = controller.position.maxScrollExtent;
-    final delta = offset - _lastScrollOffset;
-    _lastScrollOffset = offset;
-
-    if (offset < 20) {
-      _searchBarOpacity.value = 1.0;
-    } else if (delta > 2 && _searchBarOpacity.value == 1.0) {
-      _searchBarOpacity.value = 0.0;
-    } else if (delta < -2 &&
-        _searchBarOpacity.value == 0.0 &&
-        offset < maxScroll - 20) {
-      _searchBarOpacity.value = 1.0;
-    }
-  }
+  void _onScroll() {}
 
   void _setSelectedIndex(int index) {
     if (_selectedIndex != index) {
@@ -136,7 +135,7 @@ class _AppShellState extends State<AppShell> {
     }
   }
 
-  void _onTabSelected(int index) {
+  Future<void> _onTabSelected(int index) async {
     HapticFeedback.selectionClick();
 
     if (index == _selectedIndex) {
@@ -152,8 +151,22 @@ class _AppShellState extends State<AppShell> {
       return;
     }
 
+    // Tap transition: slide up from bottom
+    _isTapTransition = true;
+    _tapTargetIndex = index;
+    _tapSlideController.reset();
+
+    // Run animation
+    await _tapSlideController.forward();
+
+    // Behind the scenes, jump PageView to target
     _setSelectedIndex(index);
     _pageController.jumpToPage(index);
+
+    // Reset
+    _tapSlideController.reset();
+    _tapTargetIndex = -1;
+    _isTapTransition = false;
   }
 
   void _showAddExpenseSheet() {
@@ -162,11 +175,6 @@ class _AppShellState extends State<AppShell> {
       context: context,
       builder: (_) => const AddExpenseSheet(),
     );
-  }
-
-  void _showSearchChat() {
-    HapticFeedback.mediumImpact();
-    _onTabSelected(4);
   }
 
   bool _canPopShell() {
@@ -186,6 +194,7 @@ class _AppShellState extends State<AppShell> {
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
+    final showChat = _selectedIndex == 4;
 
     return PopScope(
       canPop: _canPopShell(),
@@ -194,8 +203,10 @@ class _AppShellState extends State<AppShell> {
         backgroundColor: AppColors.systemBackground,
         child: Stack(
           children: [
+            // PageView for swipe navigation
             PageView(
               controller: _pageController,
+              physics: const BouncingScrollPhysics(),
               children: List.generate(_screens.length, (index) {
                 return _TabNavigator(
                   navigatorKey: _navigatorKeys[index],
@@ -205,14 +216,34 @@ class _AppShellState extends State<AppShell> {
               }),
             ),
 
-            if (!_isInLesson) ...[
+            // Tap transition overlay: slide up from bottom
+            if (_isTapTransition && _tapTargetIndex >= 0)
+              AnimatedBuilder(
+                animation: _tapSlideAnim,
+                builder: (context, child) {
+                  return Positioned.fill(
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0, 1),
+                        end: Offset.zero,
+                      ).animate(_tapSlideAnim),
+                      child: _TabNavigator(
+                        navigatorKey: _navigatorKeys[_tapTargetIndex],
+                        screen: _screens[_tapTargetIndex],
+                        observers: [_navigatorObservers[_tapTargetIndex]],
+                      ),
+                    ),
+                  );
+                },
+              ),
+
+            if (!_isInLesson && !showChat) ...[
               Positioned(
                 top: 0,
                 left: 0,
                 right: 0,
                 child: IgnorePointer(child: _buildHeaderChrome(topPadding)),
               ),
-
               Positioned(
                 top: 0,
                 left: 0,
@@ -228,7 +259,7 @@ class _AppShellState extends State<AppShell> {
                 child: FabButton(onTap: _showAddExpenseSheet),
               ),
 
-            if (!_isInLesson)
+            if (!_isInLesson && !showChat)
               Positioned(
                 left: 0,
                 right: 0,
@@ -289,10 +320,7 @@ class _AppShellState extends State<AppShell> {
         left: 16,
         right: 8,
       ),
-      child: HeaderRow(
-        searchBarOpacity: _searchBarOpacity,
-        onSearchPressed: _showSearchChat,
-      ),
+      child: const HeaderRow(),
     );
   }
 }
@@ -313,16 +341,7 @@ class _TabNavigator extends StatelessWidget {
     return Navigator(
       key: navigatorKey,
       observers: observers,
-      onGenerateRoute: (settings) {
-        if (screen is TomyChatScreen) {
-          return PageRouteBuilder(
-            settings: settings,
-            pageBuilder: (_, __, ___) => screen,
-            transitionsBuilder: (_, animation, __, child) => child,
-          );
-        }
-        return CupertinoPageRoute(builder: (_) => screen, settings: settings);
-      },
+      onGenerateRoute: (_) => CupertinoPageRoute(builder: (_) => screen),
     );
   }
 }

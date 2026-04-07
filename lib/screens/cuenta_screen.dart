@@ -28,8 +28,6 @@ class _CuentaScreenState extends State<CuentaScreen>
   late AnimationController _appearController;
   late Animation<double> _appearAnim;
 
-  final _searchBarOpacity = ValueNotifier<double>(1.0);
-
   @override
   void initState() {
     super.initState();
@@ -41,10 +39,14 @@ class _CuentaScreenState extends State<CuentaScreen>
       vsync: this,
       duration: const Duration(seconds: 18),
     )..repeat(reverse: true);
-    _blob1Anim =
-        CurvedAnimation(parent: _blob1Controller, curve: Curves.easeInOut);
-    _blob2Anim =
-        CurvedAnimation(parent: _blob2Controller, curve: Curves.easeInOut);
+    _blob1Anim = CurvedAnimation(
+      parent: _blob1Controller,
+      curve: Curves.easeInOut,
+    );
+    _blob2Anim = CurvedAnimation(
+      parent: _blob2Controller,
+      curve: Curves.easeInOut,
+    );
 
     _appearController = AnimationController(
       vsync: this,
@@ -62,7 +64,6 @@ class _CuentaScreenState extends State<CuentaScreen>
     _blob1Controller.dispose();
     _blob2Controller.dispose();
     _appearController.dispose();
-    _searchBarOpacity.dispose();
     super.dispose();
   }
 
@@ -124,10 +125,7 @@ class _CuentaScreenState extends State<CuentaScreen>
               left: 16,
               right: 8,
             ),
-            child: HeaderRow(
-              searchBarOpacity: _searchBarOpacity,
-              onSearchPressed: () {},
-            ),
+            child: const HeaderRow(),
           ),
         ),
       ],
@@ -336,8 +334,8 @@ class _NetWorthPill extends StatelessWidget {
 
 class _SectionCard extends StatelessWidget {
   final String title;
-  final String? subtitle;   // optional total amount shown under the label
-  final String? badge;      // optional count badge, e.g. "2 cuentas"
+  final String? subtitle; // optional total amount shown under the label
+  final String? badge; // optional count badge, e.g. "2 cuentas"
   final Color badgeColor;
   final VoidCallback onAdd;
   final List<Widget> children;
@@ -409,7 +407,9 @@ class _SectionCard extends StatelessWidget {
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 3),
+                                      horizontal: 8,
+                                      vertical: 3,
+                                    ),
                                     child: Text(
                                       badge!,
                                       style: TextStyle(
@@ -542,9 +542,9 @@ class _BankAccountsSection extends StatelessWidget {
       subtitle: '\$132,080.00',
       badge: '${accounts.length} cuentas',
       badgeColor: AppColors.systemBlue,
-      onAdd: () => Navigator.of(context).push(
-        CupertinoPageRoute(builder: (_) => const AddBankAccountScreen()),
-      ),
+      onAdd: () => Navigator.of(
+        context,
+      ).push(CupertinoPageRoute(builder: (_) => const AddBankAccountScreen())),
       children: accounts.isEmpty
           ? [const _EmptyState(message: 'Conecta tu primer banco')]
           : [
@@ -712,9 +712,9 @@ class _CashSection extends StatelessWidget {
       subtitle: '\$6,250.00',
       badge: '${wallets.length} carteras',
       badgeColor: AppColors.systemGreen,
-      onAdd: () => Navigator.of(context).push(
-        CupertinoPageRoute(builder: (_) => const AddCashAccountScreen()),
-      ),
+      onAdd: () => Navigator.of(
+        context,
+      ).push(CupertinoPageRoute(builder: (_) => const AddCashAccountScreen())),
       children: wallets.isEmpty
           ? [const _EmptyState(message: 'Agrega tu primera cartera')]
           : [
@@ -843,9 +843,9 @@ class _InvestmentsSection extends StatelessWidget {
       subtitle: '\$12,430.25',
       badge: '+14.2%',
       badgeColor: AppColors.systemGreen,
-      onAdd: () => Navigator.of(context).push(
-        CupertinoPageRoute(builder: (_) => const AddInvestmentScreen()),
-      ),
+      onAdd: () => Navigator.of(
+        context,
+      ).push(CupertinoPageRoute(builder: (_) => const AddInvestmentScreen())),
       children: investments.isEmpty
           ? [const _EmptyState(message: 'Vincula tu primera inversión')]
           : [
@@ -888,8 +888,7 @@ class _InvestmentRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final changeColor =
-        positive ? AppColors.systemGreen : AppColors.systemRed;
+    final changeColor = positive ? AppColors.systemGreen : AppColors.systemRed;
     final changeIcon = positive
         ? CupertinoIcons.arrow_up_right
         : CupertinoIcons.arrow_down_right;
