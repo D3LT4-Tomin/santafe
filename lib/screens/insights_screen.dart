@@ -17,6 +17,7 @@ import 'package:flutter/material.dart'
 import 'package:provider/provider.dart';
 
 import '../theme/app_theme.dart';
+import '../providers/auth_provider.dart' as auth;
 import '../providers/data_provider.dart';
 import '../widgets/animated_blobs.dart';
 import '../widgets/cards.dart';
@@ -45,7 +46,11 @@ class _InsightsScreenState extends State<InsightsScreen>
   @override
   void initState() {
     super.initState();
-    context.read<InsightsLayoutController>().init();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initController();
+      _listenToAuthChanges();
+    });
 
     _blob1Controller = AnimationController(
       vsync: this,
@@ -94,6 +99,19 @@ class _InsightsScreenState extends State<InsightsScreen>
     _appearController.dispose();
     _donutController.dispose();
     super.dispose();
+  }
+
+  void _initController() {
+    context.read<InsightsLayoutController>().init();
+  }
+
+  void _listenToAuthChanges() {
+    context.read<auth.AuthProvider>().addListener(() {
+      final authProvider = context.read<auth.AuthProvider>();
+      if (authProvider.isLoggedIn) {
+        context.read<InsightsLayoutController>().reload();
+      }
+    });
   }
 
   // ── Add-widget bottom sheet ─────────────────────────────────────────────────
@@ -321,10 +339,12 @@ class _InsightsScreenState extends State<InsightsScreen>
       itemCount: configs.length,
       itemBuilder: (context, index) {
         final config = configs[index];
+        final isPinned = controller.isPinned(config.id);
         return _ReorderableItem(
           key: ValueKey(config.id),
           index: index,
-          onDelete: () => controller.remove(config.id),
+          isPinned: isPinned,
+          onDelete: isPinned ? null : () => controller.remove(config.id),
           child: _buildWidgetById(config.id, isReorderMode: true),
         );
       },
@@ -739,20 +759,20 @@ class _InsightsScreenState extends State<InsightsScreen>
 
 class _ReorderableItem extends StatelessWidget {
   final int index;
-  final VoidCallback onDelete;
+  final VoidCallback? onDelete;
   final Widget child;
+  final bool isPinned;
 
   const _ReorderableItem({
     super.key,
     required this.index,
     required this.onDelete,
     required this.child,
+    this.isPinned = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    // No horizontal padding here — every card carries its own Padding(horizontal:16).
-    // We only add bottom spacing between items.
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Stack(
@@ -760,38 +780,37 @@ class _ReorderableItem extends StatelessWidget {
         children: [
           ReorderableDragStartListener(index: index, child: child),
 
-          // ── Delete badge — small, flush to top-right corner of card ─────
-          Positioned(
-            top: -8,
-            right:
-                10, // aligns with the card's inner right edge (16px card pad − 6px)
-            child: GestureDetector(
-              onTap: onDelete,
-              behavior: HitTestBehavior.opaque,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: AppColors.systemRed,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.28),
-                      blurRadius: 5,
-                      offset: const Offset(0, 1),
+          if (!isPinned)
+            Positioned(
+              top: -8,
+              right: 10,
+              child: GestureDetector(
+                onTap: onDelete,
+                behavior: HitTestBehavior.opaque,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: AppColors.systemRed,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.28),
+                        blurRadius: 5,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: Icon(
+                      CupertinoIcons.minus,
+                      size: 10,
+                      color: Colors.white,
                     ),
-                  ],
-                ),
-                child: const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: Icon(
-                    CupertinoIcons.minus,
-                    size: 10,
-                    color: Colors.white,
                   ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );

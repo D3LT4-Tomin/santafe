@@ -52,6 +52,8 @@ class InsightWidgetConfig {
 class InsightsLayoutController extends ChangeNotifier {
   static const _defaultOrder = InsightWidgetId.values;
 
+  static const Set<InsightWidgetId> _pinnedWidgets = {InsightWidgetId.bank};
+
   final List<InsightWidgetConfig> _configs = _defaultOrder
       .map((id) => InsightWidgetConfig(id: id, visible: true))
       .toList();
@@ -65,18 +67,40 @@ class InsightsLayoutController extends ChangeNotifier {
 
   List<InsightWidgetConfig> get configs => List.unmodifiable(_configs);
 
-  List<InsightWidgetConfig> get visibleConfigs =>
-      _configs.where((c) => c.visible).toList();
+  List<InsightWidgetConfig> get visibleConfigs {
+    final pinned = _configs
+        .where((c) => c.visible && _pinnedWidgets.contains(c.id))
+        .toList();
+    final others = _configs
+        .where((c) => c.visible && !_pinnedWidgets.contains(c.id))
+        .toList();
+    return [...pinned, ...others];
+  }
 
-  List<InsightWidgetConfig> get hiddenConfigs =>
-      _configs.where((c) => !c.visible).toList();
+  List<InsightWidgetConfig> get hiddenConfigs => _configs
+      .where((c) => !c.visible && !_pinnedWidgets.contains(c.id))
+      .toList();
+
+  bool isPinned(InsightWidgetId id) => _pinnedWidgets.contains(id);
 
   // ── Persistence (Firebase) ───────────────────────────────────────────────
 
   void init() {
+    _loadIfNeeded();
+  }
+
+  Future<void> reload() async {
+    _isLoaded = false;
+    await _loadIfNeeded();
+  }
+
+  Future<void> _loadIfNeeded() async {
     if (_isLoaded) return;
+    final userId = FirebaseService.currentUserId;
+    if (userId == null) return;
+
     _isLoaded = true;
-    load();
+    await load();
   }
 
   Future<void> load() async {
@@ -89,22 +113,53 @@ class InsightsLayoutController extends ChangeNotifier {
     final savedOrder = List<String>.from(config['order'] ?? []);
     final savedVisibility = Map<String, bool>.from(config['visibility'] ?? {});
 
-    for (int i = 0; i < _configs.length; i++) {
-      final id = _configs[i].id.name;
+    final newConfigs = <InsightWidgetConfig>[];
 
-      final orderIndex = savedOrder.indexOf(id);
-      if (orderIndex != -1 && orderIndex != i) {
-        final targetConfig = _configs.firstWhere((c) => c.id.name == id);
-        _configs.remove(targetConfig);
-        _configs.insert(orderIndex.clamp(0, _configs.length), targetConfig);
+    for (final idStr in savedOrder) {
+      final existing = _configs.firstWhere(
+        (c) => c.id.name == idStr,
+        orElse: () => InsightWidgetConfig(
+          id: InsightWidgetId.values.firstWhere(
+            (e) => e.name == idStr,
+            orElse: () => InsightWidgetId.stats,
+          ),
+          visible: false,
+        ),
+      );
+      var isVisible = savedVisibility[idStr] ?? existing.visible;
+      if (_pinnedWidgets.contains(existing.id)) {
+        isVisible = true;
       }
+      newConfigs.add(InsightWidgetConfig(id: existing.id, visible: isVisible));
+    }
 
-      if (savedVisibility.containsKey(id)) {
-        _configs[i] = _configs[i].copyWith(visible: savedVisibility[id]);
+    for (final config in _configs) {
+      if (!savedOrder.contains(config.id.name)) {
+        var isVisible = savedVisibility[config.id.name] ?? config.visible;
+        if (_pinnedWidgets.contains(config.id)) {
+          isVisible = true;
+        }
+        newConfigs.add(InsightWidgetConfig(id: config.id, visible: isVisible));
       }
     }
 
+    _configs.clear();
+    _configs.addAll(newConfigs);
+
+    _ensurePinnedAtTop();
+
     notifyListeners();
+  }
+
+  void _ensurePinnedAtTop() {
+    final pinnedConfigs = _configs
+        .where((c) => _pinnedWidgets.contains(c.id))
+        .toList();
+    final otherConfigs = _configs
+        .where((c) => !_pinnedWidgets.contains(c.id))
+        .toList();
+    _configs.clear();
+    _configs.addAll([...pinnedConfigs, ...otherConfigs]);
   }
 
   Future<void> _save() async {
@@ -138,12 +193,15 @@ class InsightsLayoutController extends ChangeNotifier {
   // ── Reorder ────────────────────────────────────────────────────────────────
 
   void reorder(int oldIndex, int newIndex) {
-    // ReorderableListView works only on visible items; map back to full list.
     final visible = visibleConfigs;
     if (oldIndex >= visible.length) return;
-    if (newIndex > oldIndex) newIndex -= 1;
 
     final movedId = visible[oldIndex].id;
+    if (_pinnedWidgets.contains(movedId) && oldIndex == 0) return;
+
+    if (newIndex > oldIndex) newIndex -= 1;
+    if (newIndex <= 0 && _pinnedWidgets.contains(visible.first.id)) return;
+
     final targetId = visible[newIndex].id;
 
     final fullOld = _configs.indexWhere((c) => c.id == movedId);
@@ -152,15 +210,20 @@ class InsightsLayoutController extends ChangeNotifier {
 
     final item = _configs.removeAt(fullOld);
     _configs.insert(fullNew, item);
+
+    _ensurePinnedAtTop();
     notifyListeners();
   }
 
   // ── Remove / Add ───────────────────────────────────────────────────────────
 
   void remove(InsightWidgetId id) {
+    if (_pinnedWidgets.contains(id)) return;
+
     final i = _configs.indexWhere((c) => c.id == id);
     if (i == -1) return;
     _configs[i] = _configs[i].copyWith(visible: false);
+    _save();
     notifyListeners();
   }
 
@@ -168,6 +231,7 @@ class InsightsLayoutController extends ChangeNotifier {
     final i = _configs.indexWhere((c) => c.id == id);
     if (i == -1) return;
     _configs[i] = _configs[i].copyWith(visible: true);
+    _save();
     notifyListeners();
   }
 
