@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/data_provider.dart';
 import '../models/account_model.dart';
@@ -127,10 +126,10 @@ class _AddInvestmentScreenState extends State<AddInvestmentScreen> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.systemGreen.withOpacity(0.1),
+                color: AppColors.systemGreen. withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: AppColors.systemGreen.withOpacity(0.2),
+                  color: AppColors.systemGreen. withValues(alpha: 0.2),
                 ),
               ),
               child: Column(
@@ -138,7 +137,7 @@ class _AddInvestmentScreenState extends State<AddInvestmentScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppColors.systemGreen.withOpacity(0.15),
+                      color: AppColors.systemGreen. withValues(alpha: 0.15),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -220,10 +219,10 @@ class _AddInvestmentScreenState extends State<AddInvestmentScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.systemBlue.withOpacity(0.08),
+                color: AppColors.systemBlue. withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: AppColors.systemBlue.withOpacity(0.15),
+                  color: AppColors.systemBlue. withValues(alpha: 0.15),
                 ),
               ),
               child: const Row(

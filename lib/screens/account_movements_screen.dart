@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../models/expense_data.dart';
@@ -107,7 +106,7 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
           widget.accountName,
           style: const TextStyle(color: AppColors.label),
         ),
-        backgroundColor: AppColors.frostedBlue.withOpacity(0.5),
+        backgroundColor: AppColors.frostedBlue. withValues(alpha: 0.5),
         border: null,
       ),
       child: Consumer<DataProvider>(

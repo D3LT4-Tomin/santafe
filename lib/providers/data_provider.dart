@@ -115,25 +115,25 @@ class DataProvider extends ChangeNotifier {
       final snapshot = await FirebaseService.userAccountsRef(
         userId,
       ).limit(1).get();
-      print('Accounts count: ${snapshot.docs.length}');
+      // print('Accounts count: ${snapshot.docs.length}');
 
       if (snapshot.docs.isEmpty && !_isSeeded) {
-        print('No accounts found, running seed...');
+        // print('No accounts found, running seed...');
         _isSeeded = true;
         await _seedData(userId);
       } else {
-        print('Accounts exist or already seeded, skipping seed');
+        // print('Accounts exist or already seeded, skipping seed');
         _isSeeded = true;
       }
     } catch (e) {
-      print('_checkAndSeedData failed: $e');
+      // print('_checkAndSeedData failed: $e');
       _error = 'Failed to check seed data: $e';
       _isSeeded = true;
     }
   }
 
   Future<void> _seedData(String userId) async {
-    print('Starting seed data...');
+    // print('Starting seed data...');
 
     try {
       await FirebaseService.userAccountsRef(userId).add({
@@ -160,7 +160,7 @@ class DataProvider extends ChangeNotifier {
       final accounts = accountsSnapshot.docs;
 
       if (accounts.isEmpty) {
-        print('No accounts created, skipping transaction seed');
+        // print('No accounts created, skipping transaction seed');
         _isSeeded = true;
         return;
       }
@@ -197,10 +197,10 @@ class DataProvider extends ChangeNotifier {
         });
       }
 
-      print('Seed data completed successfully');
+      // print('Seed data completed successfully');
       _isSeeded = true;
     } catch (e) {
-      print('Seed data failed: $e');
+      // print('Seed data failed: $e');
       _error = 'Failed to seed data: $e';
     }
   }
@@ -280,7 +280,7 @@ class DataProvider extends ChangeNotifier {
 
       await accountRef.update({'balance': newBalance});
     } catch (e) {
-      print('Error actualizando saldo: $e');
+      // print('Error actualizando saldo: $e');
     }
   }
 

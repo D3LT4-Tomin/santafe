@@ -294,9 +294,9 @@ class _NetWorthPill extends StatelessWidget {
     return Expanded(
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color. withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.15)),
+          border: Border.all(color: color. withValues(alpha: 0.15)),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
@@ -404,7 +404,7 @@ class _SectionCard extends StatelessWidget {
                                 const SizedBox(width: 10),
                                 DecoratedBox(
                                   decoration: BoxDecoration(
-                                    color: badgeColor.withOpacity(0.12),
+                                    color: badgeColor. withValues(alpha: 0.12),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Padding(
@@ -430,11 +430,11 @@ class _SectionCard extends StatelessWidget {
                   // Add button — tight, no extra padding
                   CupertinoButton(
                     padding: EdgeInsets.zero,
-                    minSize: 36,
+                    minimumSize: const Size(36, 36),
                     onPressed: onAdd,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        color: AppColors.systemBlue.withOpacity(0.10),
+                        color: AppColors.systemBlue. withValues(alpha: 0.10),
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: const SizedBox(
@@ -765,7 +765,7 @@ class _CashRow extends StatelessWidget {
           children: [
             DecoratedBox(
               decoration: BoxDecoration(
-                color: color.withOpacity(0.12),
+                color: color. withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: SizedBox(
@@ -911,7 +911,7 @@ class _InvestmentRow extends StatelessWidget {
           children: [
             DecoratedBox(
               decoration: BoxDecoration(
-                color: color.withOpacity(0.12),
+                color: color. withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: SizedBox(
