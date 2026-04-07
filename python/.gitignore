@@ -1,0 +1,43 @@
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Generated data and analytics
+userdb_stats_snapshot.json
+firestore_viability_report.json
+seeded_users_registry.jsonl
+
+# Generated charts
+charts/
+charts_viability/
+
+# Firebase credentials 
+*.json
+!requirements.txt
+!.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local

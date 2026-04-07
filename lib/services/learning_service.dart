@@ -101,7 +101,7 @@ class LearningService {
         }
       });
     } catch (e) {
-      print('Error completing lesson: $e');
+      // print('Error completing lesson: $e');
     }
   }
 

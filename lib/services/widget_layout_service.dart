@@ -14,7 +14,7 @@ class WidgetLayoutService {
       }
       return null;
     } catch (e) {
-      print('Error loading widget layout: $e');
+      // print('Error loading widget layout: $e');
       return null;
     }
   }
@@ -31,7 +31,7 @@ class WidgetLayoutService {
         'updatedAt': Timestamp.now(),
       });
     } catch (e) {
-      print('Error saving widget layout: $e');
+      // print('Error saving widget layout: $e');
     }
   }
 }
