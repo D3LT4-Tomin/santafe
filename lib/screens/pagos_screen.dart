@@ -17,29 +17,34 @@ class _PagosScreenState extends State<PagosScreen>
     with TickerProviderStateMixin {
   late AnimationController _blob1Controller;
   late AnimationController _blob2Controller;
-  late Animation<double>   _blob1Anim;
-  late Animation<double>   _blob2Anim;
-
-  final _searchBarOpacity = ValueNotifier<double>(1.0);
+  late Animation<double> _blob1Anim;
+  late Animation<double> _blob2Anim;
 
   @override
   void initState() {
     super.initState();
     _blob1Controller = AnimationController(
-      vsync: this, duration: const Duration(seconds: 25),
+      vsync: this,
+      duration: const Duration(seconds: 25),
     )..repeat(reverse: true);
     _blob2Controller = AnimationController(
-      vsync: this, duration: const Duration(seconds: 18),
+      vsync: this,
+      duration: const Duration(seconds: 18),
     )..repeat(reverse: true);
-    _blob1Anim = CurvedAnimation(parent: _blob1Controller, curve: Curves.easeInOut);
-    _blob2Anim = CurvedAnimation(parent: _blob2Controller, curve: Curves.easeInOut);
+    _blob1Anim = CurvedAnimation(
+      parent: _blob1Controller,
+      curve: Curves.easeInOut,
+    );
+    _blob2Anim = CurvedAnimation(
+      parent: _blob2Controller,
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
   void dispose() {
     _blob1Controller.dispose();
     _blob2Controller.dispose();
-    _searchBarOpacity.dispose();
     super.dispose();
   }
 
@@ -79,10 +84,7 @@ class _PagosScreenState extends State<PagosScreen>
                   const SizedBox(height: 16),
                   const Text('Pagos', style: AppTextStyles.title3),
                   const SizedBox(height: 6),
-                  const Text(
-                    'Próximamente',
-                    style: AppTextStyles.subheadline,
-                  ),
+                  const Text('Próximamente', style: AppTextStyles.subheadline),
                 ],
               ),
             ),
@@ -90,16 +92,23 @@ class _PagosScreenState extends State<PagosScreen>
 
           // ── Header ───────────────────────────────────────────────
           Positioned(
-            top: 0, left: 0, right: 0,
+            top: 0,
+            left: 0,
+            right: 0,
             child: IgnorePointer(child: _buildHeaderChrome(topPadding)),
           ),
           Positioned(
-            top: 0, left: 0, right: 0,
+            top: 0,
+            left: 0,
+            right: 0,
             child: Padding(
               padding: EdgeInsets.only(
-                top: topPadding + 10, bottom: 20, left: 16, right: 8,
+                top: topPadding + 10,
+                bottom: 20,
+                left: 16,
+                right: 8,
               ),
-              child: HeaderRow(searchBarOpacity: _searchBarOpacity),
+              child: const HeaderRow(),
             ),
           ),
         ],

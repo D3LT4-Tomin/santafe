@@ -15,13 +15,16 @@ class ExpenseDetailScreen extends StatelessWidget {
     final amountColor = isExpense ? AppColors.systemRed : AppColors.systemGreen;
     final amountPrefix = isExpense ? '-' : '+';
     final amountAbs = transaction.amount.abs().toStringAsFixed(2);
+    final formattedAbs = amountAbs.split('.');
+    final amountMain = formattedAbs[0];
+    final amountDecimal = formattedAbs.length > 1 ? formattedAbs[1] : '00';
 
     return CupertinoPageScaffold(
       backgroundColor: AppColors.systemBackground,
       navigationBar: CupertinoNavigationBar(
         middle: Text(
           isExpense ? 'Detalle del Gasto' : 'Detalle del Ingreso',
-          style: const TextStyle(color: AppColors.label),
+          style: AppTextStyles.headline,
         ),
         backgroundColor: AppColors.frostedBlue.withValues(alpha: 0.5),
         border: null,
@@ -36,6 +39,13 @@ class ExpenseDetailScreen extends StatelessWidget {
                 color: AppColors.white05,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: AppColors.white10),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x4D000000),
+                    blurRadius: 30,
+                    spreadRadius: 5,
+                  ),
+                ],
               ),
               child: Column(
                 children: [
@@ -47,21 +57,41 @@ class ExpenseDetailScreen extends StatelessWidget {
                     color: amountColor,
                   ),
                   const SizedBox(height: 12),
-                  Text(
-                    '$amountPrefix\$$amountAbs',
-                    style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.w700,
-                      color: amountColor,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'MXN',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.secondaryLabel,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        '$amountPrefix\$$amountMain',
+                        style: TextStyle(
+                          fontSize: 40,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.37,
+                          color: amountColor,
+                          height: 1.21,
+                        ),
+                      ),
+                      Text(
+                        '.$amountDecimal',
+                        style: AppTextStyles.title2.copyWith(
+                          color: amountColor,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Text(
+                          'MXN',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: -0.24,
+                            color: AppColors.secondaryLabel,
+                            height: 1.33,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -73,13 +103,16 @@ class ExpenseDetailScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.white05,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.white10),
+                border: Border.all(color: AppColors.white07),
               ),
               child: Column(
                 children: [
                   _DetailRow(label: 'Descripción', value: transaction.title),
                   _DetailRow(label: 'Categoría', value: transaction.category),
-                  _DetailRow(label: 'Cuenta', value: transaction.origin),
+                  _DetailRow(
+                    label: 'Cuenta',
+                    value: transaction.accountName ?? transaction.origin,
+                  ),
                   _DetailRow(
                     label: 'Fecha',
                     value: _formatDate(transaction.createdAt),
@@ -107,21 +140,22 @@ class ExpenseDetailScreen extends StatelessWidget {
                     color: AppColors.systemRed.withValues(alpha: 0.25),
                   ),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
+                    const Icon(
                       CupertinoIcons.trash,
                       color: AppColors.systemRed,
                       size: 18,
                     ),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Text(
                       'Eliminar transacción',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: AppColors.systemRed,
+                        letterSpacing: -0.24,
                       ),
                     ),
                   ],
@@ -227,16 +261,16 @@ class _DetailRow extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: AppTextStyles.subheadline.copyWith(
               fontSize: 15,
-              color: AppColors.secondaryLabel,
+              fontWeight: FontWeight.w400,
             ),
           ),
           Text(
             value,
-            style: TextStyle(
+            style: AppTextStyles.body.copyWith(
               fontSize: 15,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
               color: valueColor ?? AppColors.label,
             ),
           ),
