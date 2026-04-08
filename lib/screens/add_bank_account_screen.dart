@@ -153,16 +153,14 @@ class _AddBankAccountScreenState extends State<AddBankAccountScreen> {
             const SizedBox(height: 16),
             _buildTextField(
               controller: _numberController,
-              placeholder: 'Número de cuenta (últimos 4 dígitos)',
+              placeholder: 'Últimos 4 dígitos de la tarjeta',
               icon: CupertinoIcons.number,
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 16),
             _buildMoneyField(
               controller: _balanceController,
-              placeholder: _subtype == BankAccountSubtype.credit
-                  ? '0.00'
-                  : '0.00',
+              placeholder: '0.00',
               helperText: _subtype == BankAccountSubtype.credit
                   ? 'DEUDA ACTUAL'
                   : 'SALDO ACTUAL',

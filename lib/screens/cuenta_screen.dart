@@ -647,33 +647,13 @@ class _BankAccountRow extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 2),
-                  Row(
-                    children: [
-                      Container(
-                        width: 5,
-                        height: 5,
-                        decoration: BoxDecoration(
-                          color: isCredit
-                              ? AppColors.systemPurple
-                              : AppColors.systemGreen,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                      Flexible(
-                        child: Text(
-                          isCredit
-                              ? _buildCreditSubtitle(account)
-                              : 'Sincronizado · ${account.accountNumber ?? '••••'}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: AppColors.secondaryLabel,
-                            height: 1.33,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    'Sincronizado · ${account.accountNumber ?? '••••'}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.secondaryLabel,
+                      height: 1.33,
+                    ),
                   ),
                 ],
               ),
@@ -691,15 +671,14 @@ class _BankAccountRow extends StatelessWidget {
                     height: 1.33,
                   ),
                 ),
-                if (isCredit && (account.creditLimit ?? 0) > 0) ...[
+                if (isCredit) ...[
                   const SizedBox(height: 2),
                   Text(
-                    '${((account.balance / account.creditLimit!) * 100).toStringAsFixed(0)}% usado',
+                    _buildCreditInfoText(account),
                     style: TextStyle(
-                      fontSize: 11,
-                      color: account.balance > account.creditLimit! * 0.8
-                          ? AppColors.systemRed
-                          : AppColors.secondaryLabel,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: _getCreditInfoColor(account),
                     ),
                   ),
                 ],
@@ -717,18 +696,15 @@ class _BankAccountRow extends StatelessWidget {
     );
   }
 
-  String _buildCreditSubtitle(AccountModel account) {
+  String _buildCreditInfoText(AccountModel account) {
     final parts = <String>[];
-    if (account.creditLimit != null && account.creditLimit! > 0) {
-      parts.add('\$${_formatCurrency(account.creditLimit!)}');
-    }
-    if (account.cutOffDay != null) {
-      parts.add('Corte día ${account.cutOffDay}');
-    }
-    if (account.paymentDay != null) {
-      parts.add('Pago día ${account.paymentDay}');
-    }
-    return parts.isEmpty ? account.accountNumber ?? '••••' : parts.join(' · ');
+    if (account.cutOffDay != null) parts.add('Corte ${account.cutOffDay}');
+    if (account.paymentDay != null) parts.add('Pago ${account.paymentDay}');
+    return parts.isEmpty ? '' : parts.join(' · ');
+  }
+
+  Color _getCreditInfoColor(AccountModel account) {
+    return AppColors.systemPurple;
   }
 
   String _formatCurrency(double amount) {
