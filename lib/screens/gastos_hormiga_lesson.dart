@@ -8,8 +8,14 @@ import '../theme/app_theme.dart';
 import '../providers/learning_provider.dart';
 
 // ─── Entry point ──────────────────────────────────────────────────────────────
+// ─── Entry point ──────────────────────────────────────────────────────────────
 class GastosHormigaLesson extends StatelessWidget {
   const GastosHormigaLesson({super.key});
+
+  static Route<void> route() => MaterialPageRoute(
+    fullscreenDialog: true,
+    builder: (_) => const GastosHormigaLesson(),
+  );
 
   static Route<void> route() => MaterialPageRoute(
     fullscreenDialog: true,
