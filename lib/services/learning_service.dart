@@ -44,8 +44,9 @@ class LearningService {
   static Future<void> completeLesson(
     String uid,
     String lessonId,
-    int points,
-  ) async {
+    int points, {
+    String? badgeId,
+  }) async {
     final docRef = progressDoc(uid);
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -76,6 +77,10 @@ class LearningService {
             badges,
           );
 
+          if (badgeId != null && !newBadges.contains(badgeId)) {
+            newBadges.add(badgeId);
+          }
+
           if (!weekdaysCompleted.contains(weekday)) {
             weekdaysCompleted.add(weekday);
           }
@@ -96,6 +101,12 @@ class LearningService {
             'weekdaysCompleted': weekdaysCompleted,
             'lastCompletedDate': today.toIso8601String(),
             'lastStreakDate': today.toIso8601String(),
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
+        } else if (badgeId != null && !badges.contains(badgeId)) {
+          badges.add(badgeId);
+          transaction.update(docRef, {
+            'badges': badges,
             'updatedAt': FieldValue.serverTimestamp(),
           });
         }

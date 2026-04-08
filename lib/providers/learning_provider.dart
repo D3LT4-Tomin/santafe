@@ -102,12 +102,21 @@ class LearningProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> completeLesson(String lessonId, int points) async {
+  Future<void> completeLesson(
+    String lessonId,
+    int points, {
+    String? badgeId,
+  }) async {
     final userId = FirebaseService.currentUserId;
     if (userId == null) return;
 
     try {
-      await LearningService.completeLesson(userId, lessonId, points);
+      await LearningService.completeLesson(
+        userId,
+        lessonId,
+        points,
+        badgeId: badgeId,
+      );
     } catch (e) {
       _error = e.toString();
       notifyListeners();

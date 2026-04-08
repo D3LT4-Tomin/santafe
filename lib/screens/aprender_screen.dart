@@ -1210,6 +1210,7 @@ class _GenericLessonContentState extends State<_GenericLessonContent>
       context.read<LearningProvider>().completeLesson(
         widget.lessonId,
         lesson.points,
+        badgeId: lesson.badgeId,
       );
     }
     Navigator.of(context).pop();

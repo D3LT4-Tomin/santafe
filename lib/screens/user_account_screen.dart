@@ -341,6 +341,11 @@ const _achievements = [
     icon: CupertinoIcons.money_dollar,
   ),
   _Achievement(
+    badgeId: 'cazador_gastos',
+    label: 'Cazador de\ngastos',
+    icon: CupertinoIcons.money_dollar_circle_fill,
+  ),
+  _Achievement(
     badgeId: 'week_streak',
     label: 'Una semana\nde racha',
     icon: CupertinoIcons.rocket_fill,

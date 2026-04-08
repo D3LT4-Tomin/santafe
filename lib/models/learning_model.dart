@@ -85,6 +85,7 @@ class LessonCatalog {
       category: 'Planeación',
       durationMinutes: 8,
       points: 100,
+      badgeId: 'cazador_gastos',
     ),
     LessonModel(
       id: 'emergencias_ahorros',
@@ -198,6 +199,13 @@ class BadgeCatalog {
       label: 'Primer ahorro',
       iconName: 'money_dollar',
       description: 'Completa la lección de ahorro básico',
+      requirement: 1,
+    ),
+    BadgeModel(
+      id: 'cazador_gastos',
+      label: 'Cazador de gastos',
+      iconName: 'ant_fill',
+      description: 'Completa la lección de gastos hormiga',
       requirement: 1,
     ),
     BadgeModel(
