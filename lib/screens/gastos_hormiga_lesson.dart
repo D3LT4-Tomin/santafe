@@ -17,11 +17,6 @@ class GastosHormigaLesson extends StatelessWidget {
     builder: (_) => const GastosHormigaLesson(),
   );
 
-  static Route<void> route() => MaterialPageRoute(
-    fullscreenDialog: true,
-    builder: (_) => const GastosHormigaLesson(),
-  );
-
   @override
   Widget build(BuildContext context) {
     return const _LessonShell();

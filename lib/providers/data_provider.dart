@@ -244,24 +244,54 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future<void> _seedData(String userId) async {
-    // print('Starting seed data...');
-
     try {
       await FirebaseService.userAccountsRef(userId).add({
-        'name': 'Cuenta Corriente',
+        'name': 'BBVA Débito',
         'accountNumber': '****4521',
-        'balance': 1250.00,
+        'balance': 8500.00,
         'type': 'bank',
-        'logoUrl': null,
+        'bankSubtype': 'debit',
+        'createdAt': Timestamp.now(),
+      });
+
+      await FirebaseService.userAccountsRef(userId).add({
+        'name': 'Santander Crédito',
+        'accountNumber': '****8923',
+        'balance': 3500.00,
+        'type': 'bank',
+        'bankSubtype': 'credit',
+        'creditLimit': 20000.00,
         'createdAt': Timestamp.now(),
       });
 
       await FirebaseService.userAccountsRef(userId).add({
         'name': 'Ahorros',
         'accountNumber': '****8932',
-        'balance': 8500.00,
+        'balance': 12500.00,
         'type': 'cash',
-        'logoUrl': null,
+        'createdAt': Timestamp.now(),
+      });
+
+      await FirebaseService.userAccountsRef(userId).add({
+        'name': 'Cartera Principal',
+        'balance': 2500.00,
+        'type': 'cash',
+        'createdAt': Timestamp.now(),
+      });
+
+      await FirebaseService.userAccountsRef(userId).add({
+        'name': 'Cetes Directo',
+        'balance': 15000.00,
+        'type': 'investment',
+        'returnRate': 11.25,
+        'createdAt': Timestamp.now(),
+      });
+
+      await FirebaseService.userAccountsRef(userId).add({
+        'name': 'Crypto Wallet',
+        'balance': 5200.00,
+        'type': 'investment',
+        'returnRate': -5.3,
         'createdAt': Timestamp.now(),
       });
 
@@ -282,6 +312,14 @@ class DataProvider extends ChangeNotifier {
       final accountName2 = accounts.length > 1
           ? accounts[1].data()['name'] as String
           : accountName1;
+      final accountId3 = accounts.length > 2 ? accounts[2].id : accountId1;
+      final accountName3 = accounts.length > 2
+          ? accounts[2].data()['name'] as String
+          : accountName1;
+      final accountId4 = accounts.length > 3 ? accounts[3].id : accountId1;
+      final accountName4 = accounts.length > 3
+          ? accounts[3].data()['name'] as String
+          : accountName1;
 
       final allExpenses = [...kAllExpenses, ...kAdditionalExpenses];
       for (int i = 0; i < allExpenses.length; i++) {
@@ -290,8 +328,25 @@ class DataProvider extends ChangeNotifier {
             ? -_parseAmount(expense.amount)
             : _parseAmount(expense.amount);
 
-        final accountId = i % 2 == 0 ? accountId1 : accountId2;
-        final accountName = i % 2 == 0 ? accountName1 : accountName2;
+        String accountId;
+        String accountName;
+        switch (i % 4) {
+          case 0:
+            accountId = accountId1;
+            accountName = accountName1;
+            break;
+          case 1:
+            accountId = accountId2;
+            accountName = accountName2;
+            break;
+          case 2:
+            accountId = accountId3;
+            accountName = accountName3;
+            break;
+          default:
+            accountId = accountId4;
+            accountName = accountName4;
+        }
 
         await FirebaseService.userTransactionsRef(userId).add({
           'title': expense.title,

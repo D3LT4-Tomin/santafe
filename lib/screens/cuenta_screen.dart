@@ -2,8 +2,11 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 import '../theme/app_theme.dart';
+import '../providers/data_provider.dart';
+import '../models/account_model.dart';
 import '../widgets/animated_blobs.dart';
 import '../widgets/header_row.dart';
 import '../screens/add_bank_account_screen.dart';
@@ -169,110 +172,106 @@ class _NetWorthCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.white05,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.white07),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Label
-              const Text(
-                'PATRIMONIO NETO',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.6,
-                  color: AppColors.secondaryLabel,
-                  height: 1.33,
-                ),
-              ),
-              const SizedBox(height: 8),
+    return Consumer<DataProvider>(
+      builder: (context, data, _) {
+        final totalBalance = data.totalBalance;
+        final bankAccounts = data.accounts
+            .where((a) => a.type == AccountType.bank)
+            .toList();
+        final cashAccounts = data.accounts
+            .where((a) => a.type == AccountType.cash)
+            .toList();
+        final investmentAccounts = data.accounts
+            .where((a) => a.type == AccountType.investment)
+            .toList();
 
-              // Amount
-              const Text(
-                '\$145,410.25',
-                style: TextStyle(
-                  fontSize: 34,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.label,
-                  height: 1.1,
-                  letterSpacing: -1.0,
-                ),
-              ),
-              const SizedBox(height: 6),
+        final bankTotal = bankAccounts.fold(0.0, (sum, a) => sum + a.balance);
+        final cashTotal = cashAccounts.fold(0.0, (sum, a) => sum + a.balance);
+        final investmentTotal = investmentAccounts.fold(
+          0.0,
+          (sum, a) => sum + a.balance,
+        );
 
-              // Delta row
-              Row(
-                children: const [
-                  Icon(
-                    CupertinoIcons.arrow_up_right,
-                    color: AppColors.systemGreen,
-                    size: 12,
-                  ),
-                  SizedBox(width: 4),
-                  Text(
-                    '+\$3,240.00',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.systemGreen,
-                      height: 1.4,
-                    ),
-                  ),
-                  SizedBox(width: 6),
-                  Text(
-                    'este mes',
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.white05,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppColors.white07),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'PATRIMONIO NETO',
                     style: TextStyle(
                       fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.6,
                       color: AppColors.secondaryLabel,
-                      height: 1.4,
+                      height: 1.33,
                     ),
                   ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '\$${_formatCurrency(totalBalance)}',
+                    style: const TextStyle(
+                      fontSize: 34,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.label,
+                      height: 1.1,
+                      letterSpacing: -1.0,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const ColoredBox(
+                    color: AppColors.separator,
+                    child: SizedBox(height: 0.5, width: double.infinity),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      _NetWorthPill(
+                        label: 'BANCOS',
+                        value: '\$${_formatCurrency(bankTotal)}',
+                        color: AppColors.systemBlue,
+                      ),
+                      const SizedBox(width: 10),
+                      _NetWorthPill(
+                        label: 'EFECTIVO',
+                        value: '\$${_formatCurrency(cashTotal)}',
+                        color: AppColors.systemGreen,
+                      ),
+                      const SizedBox(width: 10),
+                      _NetWorthPill(
+                        label: 'INVERSIONES',
+                        value: '\$${_formatCurrency(investmentTotal)}',
+                        color: AppColors.systemPurple,
+                      ),
+                    ],
+                  ),
                 ],
               ),
-              const SizedBox(height: 20),
-
-              // Divider
-              const ColoredBox(
-                color: AppColors.separator,
-                child: SizedBox(height: 0.5, width: double.infinity),
-              ),
-              const SizedBox(height: 16),
-
-              // Pills
-              const Row(
-                children: [
-                  _NetWorthPill(
-                    label: 'BANCOS',
-                    value: '\$132,080',
-                    color: AppColors.systemBlue,
-                  ),
-                  SizedBox(width: 10),
-                  _NetWorthPill(
-                    label: 'EFECTIVO',
-                    value: '\$6,250',
-                    color: AppColors.systemGreen,
-                  ),
-                  SizedBox(width: 10),
-                  _NetWorthPill(
-                    label: 'INVERSIONES',
-                    value: '\$7,080',
-                    color: AppColors.systemPurple,
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
+  }
+
+  String _formatCurrency(double amount) {
+    if (amount >= 0) {
+      return amount
+          .toStringAsFixed(2)
+          .replaceAllMapped(
+            RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+            (Match m) => '${m[1]},',
+          );
+    }
+    return amount.toStringAsFixed(2);
   }
 }
 
@@ -292,9 +291,9 @@ class _NetWorthPill extends StatelessWidget {
     return Expanded(
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: color. withValues(alpha: 0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color. withValues(alpha: 0.15)),
+          border: Border.all(color: color.withValues(alpha: 0.15)),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
@@ -402,7 +401,7 @@ class _SectionCard extends StatelessWidget {
                                 const SizedBox(width: 10),
                                 DecoratedBox(
                                   decoration: BoxDecoration(
-                                    color: badgeColor. withValues(alpha: 0.12),
+                                    color: badgeColor.withValues(alpha: 0.12),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Padding(
@@ -434,7 +433,7 @@ class _SectionCard extends StatelessWidget {
                     onPressed: onAdd,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        color: AppColors.systemBlue. withValues(alpha: 0.10),
+                        color: AppColors.systemBlue.withValues(alpha: 0.10),
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: const SizedBox(
@@ -522,62 +521,65 @@ class _BankAccountsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const accounts = [
-      (
-        name: 'BBVA Nómina',
-        number: '•••• 5678',
-        balance: '\$42,850.00',
-        logo: 'https://www.bbva.com/favicon.ico',
-      ),
-      (
-        name: 'Scotiabank',
-        number: '•••• 1234',
-        balance: '\$89,230.00',
-        logo: 'https://www.scotiabank.cl/favicon.ico',
-      ),
-    ];
+    return Consumer<DataProvider>(
+      builder: (context, data, _) {
+        final bankAccounts = data.accounts
+            .where((a) => a.type == AccountType.bank)
+            .toList();
+        final totalBalance = bankAccounts.fold(
+          0.0,
+          (sum, a) => sum + a.balance,
+        );
 
-    return _SectionCard(
-      title: 'CUENTAS BANCARIAS',
-      subtitle: '\$132,080.00',
-      badge: '${accounts.length} cuentas',
-      badgeColor: AppColors.systemBlue,
-      onAdd: () => Navigator.of(
-        context,
-      ).push(CupertinoPageRoute(builder: (_) => const AddBankAccountScreen())),
-      children: accounts.isEmpty
-          ? [const _EmptyState(message: 'Conecta tu primer banco')]
-          : [
-              for (int i = 0; i < accounts.length; i++) ...[
-                _BankAccountRow(
-                  bankName: accounts[i].name,
-                  accountNumber: accounts[i].number,
-                  balance: accounts[i].balance,
-                  logoUrl: accounts[i].logo,
-                ),
-                if (i < accounts.length - 1) const _RowSeparator(),
-              ],
-              const SizedBox(height: 4),
-            ],
+        return _SectionCard(
+          title: 'CUENTAS BANCARIAS',
+          subtitle: '\$${_formatCurrency(totalBalance)}',
+          badge:
+              '${bankAccounts.length} ${bankAccounts.length == 1 ? 'cuenta' : 'cuentas'}',
+          badgeColor: AppColors.systemBlue,
+          onAdd: () => Navigator.of(context).push(
+            CupertinoPageRoute(builder: (_) => const AddBankAccountScreen()),
+          ),
+          children: bankAccounts.isEmpty
+              ? [const _EmptyState(message: 'Conecta tu primer banco')]
+              : [
+                  for (int i = 0; i < bankAccounts.length; i++) ...[
+                    _BankAccountRow(account: bankAccounts[i]),
+                    if (i < bankAccounts.length - 1) const _RowSeparator(),
+                  ],
+                  const SizedBox(height: 4),
+                ],
+        );
+      },
     );
+  }
+
+  String _formatCurrency(double amount) {
+    return amount
+        .toStringAsFixed(2)
+        .replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]},',
+        );
   }
 }
 
 class _BankAccountRow extends StatelessWidget {
-  final String bankName;
-  final String accountNumber;
-  final String balance;
-  final String logoUrl;
+  final AccountModel account;
 
-  const _BankAccountRow({
-    required this.bankName,
-    required this.accountNumber,
-    required this.balance,
-    required this.logoUrl,
-  });
+  const _BankAccountRow({required this.account});
 
   @override
   Widget build(BuildContext context) {
+    final isCredit = account.bankSubtype == BankAccountSubtype.credit;
+    final subtypeColor = isCredit
+        ? AppColors.systemPurple
+        : AppColors.systemBlue;
+    final subtypeIcon = isCredit
+        ? CupertinoIcons.creditcard
+        : CupertinoIcons.creditcard_fill;
+    final subtypeLabel = isCredit ? 'Crédito' : 'Débito';
+
     return CupertinoButton(
       padding: EdgeInsets.zero,
       onPressed: () {
@@ -585,8 +587,8 @@ class _BankAccountRow extends StatelessWidget {
         Navigator.of(context).push(
           CupertinoPageRoute(
             builder: (_) => AccountMovementsScreen(
-              accountId: bankName,
-              accountName: bankName,
+              accountId: account.id!,
+              accountName: account.name,
             ),
           ),
         );
@@ -595,45 +597,54 @@ class _BankAccountRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
         child: Row(
           children: [
-            // Bank logo container
             DecoratedBox(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: subtypeColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: SizedBox(
-                  width: 40,
-                  height: 40,
-                  child: Image.network(
-                    logoUrl,
-                    fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) => const Icon(
-                      CupertinoIcons.building_2_fill,
-                      color: AppColors.systemBlue,
-                      size: 20,
-                    ),
-                  ),
-                ),
+              child: SizedBox(
+                width: 40,
+                height: 40,
+                child: Icon(subtypeIcon, color: subtypeColor, size: 20),
               ),
             ),
             const SizedBox(width: 12),
-
-            // Name + sync status
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    bankName,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.label,
-                      letterSpacing: -0.2,
-                      height: 1.33,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        account.name,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.label,
+                          letterSpacing: -0.2,
+                          height: 1.33,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: subtypeColor.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          subtypeLabel,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: subtypeColor,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 2),
                   Row(
@@ -641,18 +652,25 @@ class _BankAccountRow extends StatelessWidget {
                       Container(
                         width: 5,
                         height: 5,
-                        decoration: const BoxDecoration(
-                          color: AppColors.systemGreen,
+                        decoration: BoxDecoration(
+                          color: isCredit
+                              ? AppColors.systemPurple
+                              : AppColors.systemGreen,
                           shape: BoxShape.circle,
                         ),
                       ),
                       const SizedBox(width: 5),
-                      Text(
-                        'Sincronizado · $accountNumber',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.secondaryLabel,
-                          height: 1.33,
+                      Flexible(
+                        child: Text(
+                          isCredit
+                              ? _buildCreditSubtitle(account)
+                              : 'Sincronizado · ${account.accountNumber ?? '••••'}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.secondaryLabel,
+                            height: 1.33,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -660,17 +678,32 @@ class _BankAccountRow extends StatelessWidget {
                 ],
               ),
             ),
-
-            // Balance + chevron
-            Text(
-              balance,
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: AppColors.label,
-                letterSpacing: -0.2,
-                height: 1.33,
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  '\$${_formatCurrency(account.balance)}',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.label,
+                    letterSpacing: -0.2,
+                    height: 1.33,
+                  ),
+                ),
+                if (isCredit && (account.creditLimit ?? 0) > 0) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    '${((account.balance / account.creditLimit!) * 100).toStringAsFixed(0)}% usado',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: account.balance > account.creditLimit! * 0.8
+                          ? AppColors.systemRed
+                          : AppColors.secondaryLabel,
+                    ),
+                  ),
+                ],
+              ],
             ),
             const SizedBox(width: 6),
             const Icon(
@@ -682,6 +715,29 @@ class _BankAccountRow extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _buildCreditSubtitle(AccountModel account) {
+    final parts = <String>[];
+    if (account.creditLimit != null && account.creditLimit! > 0) {
+      parts.add('\$${_formatCurrency(account.creditLimit!)}');
+    }
+    if (account.cutOffDay != null) {
+      parts.add('Corte día ${account.cutOffDay}');
+    }
+    if (account.paymentDay != null) {
+      parts.add('Pago día ${account.paymentDay}');
+    }
+    return parts.isEmpty ? account.accountNumber ?? '••••' : parts.join(' · ');
+  }
+
+  String _formatCurrency(double amount) {
+    return amount
+        .toStringAsFixed(2)
+        .replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]},',
+        );
   }
 }
 
@@ -692,59 +748,53 @@ class _CashSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const wallets = [
-      (
-        name: 'Cartera Principal',
-        amount: '\$1,250.00',
-        icon: CupertinoIcons.money_dollar,
-        color: AppColors.systemBlue,
-      ),
-      (
-        name: 'Bajo el colchón',
-        amount: '\$5,000.00',
-        icon: CupertinoIcons.square_stack,
-        color: AppColors.systemPurple,
-      ),
-    ];
+    return Consumer<DataProvider>(
+      builder: (context, data, _) {
+        final cashAccounts = data.accounts
+            .where((a) => a.type == AccountType.cash)
+            .toList();
+        final totalBalance = cashAccounts.fold(
+          0.0,
+          (sum, a) => sum + a.balance,
+        );
 
-    return _SectionCard(
-      title: 'MI EFECTIVO',
-      subtitle: '\$6,250.00',
-      badge: '${wallets.length} carteras',
-      badgeColor: AppColors.systemGreen,
-      onAdd: () => Navigator.of(
-        context,
-      ).push(CupertinoPageRoute(builder: (_) => const AddCashAccountScreen())),
-      children: wallets.isEmpty
-          ? [const _EmptyState(message: 'Agrega tu primera cartera')]
-          : [
-              for (int i = 0; i < wallets.length; i++) ...[
-                _CashRow(
-                  name: wallets[i].name,
-                  amount: wallets[i].amount,
-                  icon: wallets[i].icon,
-                  color: wallets[i].color,
-                ),
-                if (i < wallets.length - 1) const _RowSeparator(),
-              ],
-              const SizedBox(height: 4),
-            ],
+        return _SectionCard(
+          title: 'MI EFECTIVO',
+          subtitle: '\$${_formatCurrency(totalBalance)}',
+          badge:
+              '${cashAccounts.length} ${cashAccounts.length == 1 ? 'cartera' : 'carteras'}',
+          badgeColor: AppColors.systemGreen,
+          onAdd: () => Navigator.of(context).push(
+            CupertinoPageRoute(builder: (_) => const AddCashAccountScreen()),
+          ),
+          children: cashAccounts.isEmpty
+              ? [const _EmptyState(message: 'Agrega tu primera cartera')]
+              : [
+                  for (int i = 0; i < cashAccounts.length; i++) ...[
+                    _CashRow(account: cashAccounts[i]),
+                    if (i < cashAccounts.length - 1) const _RowSeparator(),
+                  ],
+                  const SizedBox(height: 4),
+                ],
+        );
+      },
     );
+  }
+
+  String _formatCurrency(double amount) {
+    return amount
+        .toStringAsFixed(2)
+        .replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]},',
+        );
   }
 }
 
 class _CashRow extends StatelessWidget {
-  final String name;
-  final String amount;
-  final IconData icon;
-  final Color color;
+  final AccountModel account;
 
-  const _CashRow({
-    required this.name,
-    required this.amount,
-    required this.icon,
-    required this.color,
-  });
+  const _CashRow({required this.account});
 
   @override
   Widget build(BuildContext context) {
@@ -754,8 +804,10 @@ class _CashRow extends StatelessWidget {
         HapticFeedback.selectionClick();
         Navigator.of(context).push(
           CupertinoPageRoute(
-            builder: (_) =>
-                AccountMovementsScreen(accountId: name, accountName: name),
+            builder: (_) => AccountMovementsScreen(
+              accountId: account.id!,
+              accountName: account.name,
+            ),
           ),
         );
       },
@@ -765,19 +817,23 @@ class _CashRow extends StatelessWidget {
           children: [
             DecoratedBox(
               decoration: BoxDecoration(
-                color: color. withValues(alpha: 0.12),
+                color: AppColors.systemGreen.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: SizedBox(
+              child: const SizedBox(
                 width: 40,
                 height: 40,
-                child: Icon(icon, color: color, size: 20),
+                child: Icon(
+                  CupertinoIcons.money_dollar,
+                  color: AppColors.systemGreen,
+                  size: 20,
+                ),
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                name,
+                account.name,
                 style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
@@ -788,7 +844,7 @@ class _CashRow extends StatelessWidget {
               ),
             ),
             Text(
-              amount,
+              '\$${_formatCurrency(account.balance)}',
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
@@ -808,6 +864,15 @@ class _CashRow extends StatelessWidget {
       ),
     );
   }
+
+  String _formatCurrency(double amount) {
+    return amount
+        .toStringAsFixed(2)
+        .replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]},',
+        );
+  }
 }
 
 // ─── Investments Section ──────────────────────────────────────────────────────
@@ -817,81 +882,66 @@ class _InvestmentsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const investments = [
-      (
-        name: 'Cripto',
-        subtitle: 'Portafolio digital',
-        balance: '\$4,120',
-        change: '+8.3%',
-        positive: true,
-        icon: CupertinoIcons.arrow_up_arrow_down_circle_fill,
-        color: AppColors.systemOrange,
-      ),
-      (
-        name: 'Acciones',
-        subtitle: 'Mercado de valores',
-        balance: '\$8,310',
-        change: '+14.2%',
-        positive: true,
-        icon: CupertinoIcons.graph_square_fill,
-        color: AppColors.systemPurple,
-      ),
-    ];
+    return Consumer<DataProvider>(
+      builder: (context, data, _) {
+        final investmentAccounts = data.accounts
+            .where((a) => a.type == AccountType.investment)
+            .toList();
+        final totalBalance = investmentAccounts.fold(
+          0.0,
+          (sum, a) => sum + a.balance,
+        );
 
-    return _SectionCard(
-      title: 'INVERSIONES',
-      subtitle: '\$12,430.25',
-      badge: '+14.2%',
-      badgeColor: AppColors.systemGreen,
-      onAdd: () => Navigator.of(
-        context,
-      ).push(CupertinoPageRoute(builder: (_) => const AddInvestmentScreen())),
-      children: investments.isEmpty
-          ? [const _EmptyState(message: 'Vincula tu primera inversión')]
-          : [
-              for (int i = 0; i < investments.length; i++) ...[
-                _InvestmentRow(
-                  name: investments[i].name,
-                  subtitle: investments[i].subtitle,
-                  balance: investments[i].balance,
-                  change: investments[i].change,
-                  positive: investments[i].positive,
-                  icon: investments[i].icon,
-                  color: investments[i].color,
-                ),
-                if (i < investments.length - 1) const _RowSeparator(),
-              ],
-              const SizedBox(height: 4),
-            ],
+        return _SectionCard(
+          title: 'INVERSIONES',
+          subtitle: '\$${_formatCurrency(totalBalance)}',
+          badge: investmentAccounts.isNotEmpty
+              ? '${investmentAccounts.length}'
+              : null,
+          badgeColor: AppColors.systemPurple,
+          onAdd: () => Navigator.of(context).push(
+            CupertinoPageRoute(builder: (_) => const AddInvestmentScreen()),
+          ),
+          children: investmentAccounts.isEmpty
+              ? [const _EmptyState(message: 'Vincula tu primera inversión')]
+              : [
+                  for (int i = 0; i < investmentAccounts.length; i++) ...[
+                    _InvestmentRow(account: investmentAccounts[i]),
+                    if (i < investmentAccounts.length - 1)
+                      const _RowSeparator(),
+                  ],
+                  const SizedBox(height: 4),
+                ],
+        );
+      },
     );
+  }
+
+  String _formatCurrency(double amount) {
+    return amount
+        .toStringAsFixed(2)
+        .replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]},',
+        );
   }
 }
 
 class _InvestmentRow extends StatelessWidget {
-  final String name;
-  final String subtitle;
-  final String balance;
-  final String change;
-  final bool positive;
-  final IconData icon;
-  final Color color;
+  final AccountModel account;
 
-  const _InvestmentRow({
-    required this.name,
-    required this.subtitle,
-    required this.balance,
-    required this.change,
-    required this.positive,
-    required this.icon,
-    required this.color,
-  });
+  const _InvestmentRow({required this.account});
 
   @override
   Widget build(BuildContext context) {
-    final changeColor = positive ? AppColors.systemGreen : AppColors.systemRed;
-    final changeIcon = positive
+    final isPositive = (account.returnRate ?? 0) >= 0;
+    final changeColor = isPositive
+        ? AppColors.systemGreen
+        : AppColors.systemRed;
+    final changeIcon = isPositive
         ? CupertinoIcons.arrow_up_right
         : CupertinoIcons.arrow_down_right;
+    final returnRate = account.returnRate ?? 0;
 
     return CupertinoButton(
       padding: EdgeInsets.zero,
@@ -899,8 +949,10 @@ class _InvestmentRow extends StatelessWidget {
         HapticFeedback.selectionClick();
         Navigator.of(context).push(
           CupertinoPageRoute(
-            builder: (_) =>
-                AccountMovementsScreen(accountId: name, accountName: name),
+            builder: (_) => AccountMovementsScreen(
+              accountId: account.id!,
+              accountName: account.name,
+            ),
           ),
         );
       },
@@ -910,13 +962,17 @@ class _InvestmentRow extends StatelessWidget {
           children: [
             DecoratedBox(
               decoration: BoxDecoration(
-                color: color. withValues(alpha: 0.12),
+                color: AppColors.systemPurple.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: SizedBox(
+              child: const SizedBox(
                 width: 40,
                 height: 40,
-                child: Icon(icon, color: color, size: 20),
+                child: Icon(
+                  CupertinoIcons.graph_square_fill,
+                  color: AppColors.systemPurple,
+                  size: 20,
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -925,7 +981,7 @@ class _InvestmentRow extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    name,
+                    account.name,
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -936,7 +992,9 @@ class _InvestmentRow extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    subtitle,
+                    returnRate > 0
+                        ? 'Rendimiento: ${returnRate.toStringAsFixed(1)}%'
+                        : 'Sin rendimiento',
                     style: const TextStyle(
                       fontSize: 12,
                       color: AppColors.secondaryLabel,
@@ -950,7 +1008,7 @@ class _InvestmentRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  balance,
+                  '\$${_formatCurrency(account.balance)}',
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -965,7 +1023,7 @@ class _InvestmentRow extends StatelessWidget {
                     Icon(changeIcon, color: changeColor, size: 11),
                     const SizedBox(width: 3),
                     Text(
-                      change,
+                      '${returnRate >= 0 ? '+' : ''}${returnRate.toStringAsFixed(1)}%',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -987,5 +1045,14 @@ class _InvestmentRow extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _formatCurrency(double amount) {
+    return amount
+        .toStringAsFixed(2)
+        .replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]},',
+        );
   }
 }

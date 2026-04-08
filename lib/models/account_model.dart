@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum AccountType { bank, cash, investment }
 
+enum BankAccountSubtype { debit, credit }
+
 class AccountModel {
   final String? id;
   final String name;
@@ -11,6 +13,10 @@ class AccountModel {
   final String? logoUrl;
   final DateTime createdAt;
   final double? returnRate;
+  final BankAccountSubtype? bankSubtype;
+  final double? creditLimit;
+  final int? cutOffDay;
+  final int? paymentDay;
 
   AccountModel({
     this.id,
@@ -21,10 +27,21 @@ class AccountModel {
     this.logoUrl,
     required this.createdAt,
     this.returnRate,
+    this.bankSubtype,
+    this.creditLimit,
+    this.cutOffDay,
+    this.paymentDay,
   });
 
   factory AccountModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
+    BankAccountSubtype? subtype;
+    if (data['bankSubtype'] != null) {
+      subtype = BankAccountSubtype.values.firstWhere(
+        (e) => e.name == data['bankSubtype'],
+        orElse: () => BankAccountSubtype.debit,
+      );
+    }
     return AccountModel(
       id: doc.id,
       name: data['name'] ?? '',
@@ -37,6 +54,10 @@ class AccountModel {
       logoUrl: data['logoUrl'],
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       returnRate: data['returnRate']?.toDouble(),
+      bankSubtype: subtype,
+      creditLimit: data['creditLimit']?.toDouble(),
+      cutOffDay: data['cutOffDay'] as int?,
+      paymentDay: data['paymentDay'] as int?,
     );
   }
 
@@ -49,6 +70,10 @@ class AccountModel {
       'logoUrl': logoUrl,
       'createdAt': Timestamp.fromDate(createdAt),
       'returnRate': returnRate,
+      'bankSubtype': bankSubtype?.name,
+      'creditLimit': creditLimit,
+      'cutOffDay': cutOffDay,
+      'paymentDay': paymentDay,
     };
   }
 
@@ -61,6 +86,10 @@ class AccountModel {
     String? logoUrl,
     DateTime? createdAt,
     double? returnRate,
+    BankAccountSubtype? bankSubtype,
+    double? creditLimit,
+    int? cutOffDay,
+    int? paymentDay,
   }) {
     return AccountModel(
       id: id ?? this.id,
@@ -71,6 +100,10 @@ class AccountModel {
       logoUrl: logoUrl ?? this.logoUrl,
       createdAt: createdAt ?? this.createdAt,
       returnRate: returnRate ?? this.returnRate,
+      bankSubtype: bankSubtype ?? this.bankSubtype,
+      creditLimit: creditLimit ?? this.creditLimit,
+      cutOffDay: cutOffDay ?? this.cutOffDay,
+      paymentDay: paymentDay ?? this.paymentDay,
     );
   }
 
