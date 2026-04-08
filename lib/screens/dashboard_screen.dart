@@ -22,8 +22,10 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen>
     with TickerProviderStateMixin {
-  bool _showMoreExpenses = false;
+  int _visibleExpensesCount = 10; // Start with 10, load 10 more each time
   FilterSelection _filterSelection = const FilterSelection();
+  bool _isHeaderVisible = true;
+  double _lastScrollPosition = 0;
 
   final List<String> _filterCategories = List.from(kFilterCategories);
 
@@ -65,14 +67,29 @@ class _DashboardScreenState extends State<DashboardScreen>
       curve: const Cubic(0.34, 1.56, 0.64, 1.0),
     );
     _appearController.forward();
+
+    // Hide/show header based on scroll position
+    widget.scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    widget.scrollController.removeListener(_onScroll);
     _blob1Controller.dispose();
     _blob2Controller.dispose();
     _appearController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (widget.scrollController.position.pixels < _lastScrollPosition &&
+        !_isHeaderVisible) {
+      setState(() => _isHeaderVisible = true);
+    } else if (widget.scrollController.position.pixels > _lastScrollPosition &&
+        _isHeaderVisible) {
+      setState(() => _isHeaderVisible = false);
+    }
+    _lastScrollPosition = widget.scrollController.position.pixels;
   }
 
   @override
@@ -112,8 +129,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                         const TipCard(),
                         const SizedBox(height: 28),
                         _buildRecentExpenses(dataProvider.transactions),
-                        const SizedBox(height: 28),
-                        const WeeklySummaryCard(),
                       ],
                     ),
                   ),
@@ -128,14 +143,17 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   Widget _buildRecentExpenses(List<TransactionModel> transactions) {
     final filtered = transactions
-        .where((t) => _filterSelection.matches(t.category, t.origin, t.tipo))
+        .where(
+          (t) => _filterSelection.matches(
+            t.category,
+            t.origin,
+            t.tipo,
+            t.createdAt,
+          ),
+        )
         .toList();
-    const initialCount = 5;
-    final showingAll = _showMoreExpenses || filtered.length <= initialCount;
-    final visibleExpenses = showingAll
-        ? filtered
-        : filtered.take(initialCount).toList();
-    final hasMore = filtered.length > initialCount;
+    final visibleExpenses = filtered.take(_visibleExpensesCount).toList();
+    final hasMore = filtered.length > _visibleExpensesCount;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,15 +174,28 @@ class _DashboardScreenState extends State<DashboardScreen>
                   ),
                 ),
               ),
-              FilterButton(
-                selection: _filterSelection,
-                categories: _filterCategories,
-                origins: kFilterOrigins,
-                tipos: kFilterTipos,
-                onApply: (sel) => setState(() {
-                  _filterSelection = sel;
-                  _showMoreExpenses = false;
-                }),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DateFilterButton(
+                    selection: _filterSelection,
+                    onApply: (sel) => setState(() {
+                      _filterSelection = sel;
+                      _visibleExpensesCount = 10; // Reset to initial count
+                    }),
+                  ),
+                  const SizedBox(width: 8),
+                  FilterButton(
+                    selection: _filterSelection,
+                    categories: _filterCategories,
+                    origins: kFilterOrigins,
+                    tipos: kFilterTipos,
+                    onApply: (sel) => setState(() {
+                      _filterSelection = sel;
+                      _visibleExpensesCount = 10; // Reset to initial count
+                    }),
+                  ),
+                ],
               ),
             ],
           ),
@@ -189,14 +220,26 @@ class _DashboardScreenState extends State<DashboardScreen>
                         for (final transaction in visibleExpenses)
                           ExpenseRow(transaction: transaction),
                         if (hasMore)
-                          ShowMoreButton(
-                            expanded: _showMoreExpenses,
+                          GestureDetector(
+                            behavior: HitTestBehavior.opaque,
                             onTap: () {
                               HapticFeedback.selectionClick();
-                              setState(
-                                () => _showMoreExpenses = !_showMoreExpenses,
-                              );
+                              setState(() {
+                                _visibleExpensesCount += 10; // Load 10 more
+                              });
                             },
+                            child: Container(
+                              height: 48,
+                              alignment: Alignment.center,
+                              child: Text(
+                                'Ver más (${filtered.length - _visibleExpensesCount} restantes)',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.systemBlue,
+                                ),
+                              ),
+                            ),
                           ),
                       ],
               ),
@@ -236,7 +279,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             GestureDetector(
               onTap: () => setState(() {
                 _filterSelection = const FilterSelection();
-                _showMoreExpenses = false;
+                _visibleExpensesCount = 10; // Reset to initial count
               }),
               child: const Text(
                 'Limpiar filtros',

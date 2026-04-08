@@ -108,7 +108,7 @@ class _PagosScreenState extends State<PagosScreen>
                 left: 16,
                 right: 8,
               ),
-              child: const HeaderRow(),
+              child: HeaderRow(searchBarOpacity: ValueNotifier<double>(0.0)),
             ),
           ),
         ],

@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
@@ -9,10 +12,12 @@ import '../widgets/animated_blobs.dart';
 class TomyChatScreen extends StatefulWidget {
   final ScrollController scrollController;
   final VoidCallback onBack;
+  final bool isOverlay;
   const TomyChatScreen({
     super.key,
     required this.scrollController,
     required this.onBack,
+    this.isOverlay = false,
   });
 
   @override
@@ -65,7 +70,19 @@ class _TomyChatScreenState extends State<TomyChatScreen>
     );
     _appearController.forward();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) => _initProvider());
+    // For overlay mode, initialize immediately to prevent loading delay
+    if (widget.isOverlay) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) return;
+        final userId = context.read<AuthProvider>().user?.id ?? '';
+        _tomyProvider = TomyProvider(userId: userId);
+        await _tomyProvider!.loadHistory();
+        if (mounted) setState(() => _initialized = true);
+      });
+    } else {
+      // For regular screen mode, initialize after frame
+      WidgetsBinding.instance.addPostFrameCallback((_) => _initProvider());
+    }
   }
 
   Future<void> _initProvider() async {
@@ -111,16 +128,35 @@ class _TomyChatScreenState extends State<TomyChatScreen>
   Widget build(BuildContext context) {
     super.build(context);
     if (!_initialized || _tomyProvider == null) {
-      return const ColoredBox(
-        color: AppColors.systemBackground,
-        child: Center(child: CupertinoActivityIndicator()),
-      );
+      // Show transparent background for overlay mode, colored for regular mode
+      if (widget.isOverlay) {
+        return const ColoredBox(
+          color: Colors.transparent,
+          child: Center(child: CupertinoActivityIndicator()),
+        );
+      } else {
+        return const ColoredBox(
+          color: AppColors.systemBackground,
+          child: Center(child: CupertinoActivityIndicator()),
+        );
+      }
     }
 
-    return ListenableBuilder(
-      listenable: _tomyProvider!,
-      builder: (context, _) => _buildBody(context),
-    );
+    // For overlay mode, return a transparent container
+    if (widget.isOverlay) {
+      return Container(
+        color: Colors.transparent,
+        child: ListenableBuilder(
+          listenable: _tomyProvider!,
+          builder: (context, _) => _buildBody(context),
+        ),
+      );
+    } else {
+      return ListenableBuilder(
+        listenable: _tomyProvider!,
+        builder: (context, _) => _buildBody(context),
+      );
+    }
   }
 
   Widget _buildBody(BuildContext context) {
@@ -128,9 +164,20 @@ class _TomyChatScreenState extends State<TomyChatScreen>
 
     return Stack(
       children: [
-        RepaintBoundary(
-          child: AnimatedBlobs(blob1Anim: _blob1Anim, blob2Anim: _blob2Anim),
-        ),
+        // Only show blurred background blobs if NOT in overlay mode
+        if (!widget.isOverlay)
+          RepaintBoundary(
+            child: ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: AnimatedBlobs(
+                  blob1Anim: _blob1Anim,
+                  blob2Anim: _blob2Anim,
+                ),
+              ),
+            ),
+          ),
+        // Chat content with fade and slide animation
         Positioned.fill(
           child: FadeTransition(
             opacity: _appearAnim,
@@ -275,11 +322,7 @@ class _TomyChatScreenState extends State<TomyChatScreen>
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Container(
-      padding: EdgeInsets.fromLTRB(16, 12, 16, bottomPadding + 12),
-      decoration: BoxDecoration(
-        color: AppColors.white05,
-        border: Border(top: BorderSide(color: AppColors.white07, width: 0.5)),
-      ),
+      margin: EdgeInsets.fromLTRB(16, 12, 16, bottomPadding + 12),
       child: SafeArea(
         top: false,
         bottom: false,
@@ -391,7 +434,11 @@ class _TomyChatScreenState extends State<TomyChatScreen>
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: isUser ? AppColors.systemBlue : AppColors.white05,
+                color: isUser
+                    ? AppColors.systemBlue
+                    : AppColors.white05.withValues(
+                        alpha: 0.6,
+                      ), // Reduced opacity for assistant bubbles
                 borderRadius: BorderRadius.circular(16).copyWith(
                   bottomRight: isUser
                       ? const Radius.circular(4)
@@ -464,7 +511,9 @@ class _TomyChatScreenState extends State<TomyChatScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: AppColors.white05,
+              color: AppColors.white05.withValues(
+                alpha: 0.6,
+              ), // Match assistant bubble opacity
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: AppColors.white07),
             ),

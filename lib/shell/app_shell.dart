@@ -22,25 +22,22 @@ class AppShell extends StatefulWidget {
   State<AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
+class _AppShellState extends State<AppShell> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
   bool _isInLesson = false;
-  bool _isTapTransition = false;
-  int _tapTargetIndex = -1;
-
-  late final AnimationController _tapSlideController;
-  late final Animation<double> _tapSlideAnim;
+  bool _isChatMode = false; // New variable to track chat overlay mode
 
   final List<ScrollController> _scrollControllers = List.generate(
-    5,
+    4,
     (_) => ScrollController(),
   );
 
+  final _searchBarOpacity = ValueNotifier<double>(1.0);
   double _lastScrollOffset = 0;
 
   final List<GlobalKey<NavigatorState>> _navigatorKeys = List.generate(
-    5,
+    4,
     (_) => GlobalKey<NavigatorState>(),
   );
 
@@ -51,17 +48,8 @@ class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    _tapSlideController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 350),
-    );
-    _tapSlideAnim = CurvedAnimation(
-      parent: _tapSlideController,
-      curve: Curves.easeOutCubic,
-    );
-
     _navigatorObservers = List.generate(
-      5,
+      4,
       (index) => _ShellNavigatorObserver(() {
         if (index == _selectedIndex) {
           _updateLessonState();
@@ -74,15 +62,11 @@ class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
       InsightsScreen(scrollController: _scrollControllers[1]),
       CuentaScreen(scrollController: _scrollControllers[2]),
       AprenderScreen(scrollController: _scrollControllers[3]),
-      TomyChatScreen(
-        scrollController: _scrollControllers[4],
-        onBack: () => _onTabSelected(3),
-      ),
     ];
 
     _pageController.addListener(() {
       final newIndex = _pageController.page!.round();
-      if (newIndex != _selectedIndex && !_isTapTransition) {
+      if (newIndex != _selectedIndex) {
         _setSelectedIndex(newIndex);
       }
     });
@@ -103,6 +87,7 @@ class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
         setState(() => _isInLesson = inLesson);
       }
     } else {
+      // If navigator is not yet built, assume not in lesson
       if (_isInLesson) {
         setState(() => _isInLesson = false);
       }
@@ -111,15 +96,34 @@ class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _tapSlideController.dispose();
     _pageController.dispose();
     for (var controller in _scrollControllers) {
       controller.dispose();
     }
+    _searchBarOpacity.dispose();
     super.dispose();
   }
 
-  void _onScroll() {}
+  void _onScroll() {
+    final controller = _scrollControllers[_selectedIndex];
+    final offset = controller.offset;
+    final maxScroll = controller.position.maxScrollExtent;
+    final delta = offset - _lastScrollOffset;
+    _lastScrollOffset = offset;
+
+    // Only close search bar when on dashboard screen and scrolling down
+    if (_selectedIndex == 0) {
+      if (offset < 20) {
+        _searchBarOpacity.value = 1.0;
+      } else if (delta > 2 && _searchBarOpacity.value == 1.0) {
+        _searchBarOpacity.value = 0.0;
+      } else if (delta < -2 &&
+          _searchBarOpacity.value == 0.0 &&
+          offset < maxScroll - 20) {
+        _searchBarOpacity.value = 1.0;
+      }
+    }
+  }
 
   void _setSelectedIndex(int index) {
     if (_selectedIndex != index) {
@@ -128,6 +132,10 @@ class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
       setState(() {
         _selectedIndex = index;
         _lastScrollOffset = 0;
+        // Show search bar when selecting dashboard
+        if (index == 0) {
+          _searchBarOpacity.value = 1.0;
+        }
       });
 
       _scrollControllers[_selectedIndex].addListener(_onScroll);
@@ -135,7 +143,7 @@ class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
     }
   }
 
-  Future<void> _onTabSelected(int index) async {
+  void _onTabSelected(int index) {
     HapticFeedback.selectionClick();
 
     if (index == _selectedIndex) {
@@ -151,22 +159,8 @@ class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
       return;
     }
 
-    // Tap transition: slide up from bottom
-    _isTapTransition = true;
-    _tapTargetIndex = index;
-    _tapSlideController.reset();
-
-    // Run animation
-    await _tapSlideController.forward();
-
-    // Behind the scenes, jump PageView to target
     _setSelectedIndex(index);
     _pageController.jumpToPage(index);
-
-    // Reset
-    _tapSlideController.reset();
-    _tapTargetIndex = -1;
-    _isTapTransition = false;
   }
 
   void _showAddExpenseSheet() {
@@ -177,6 +171,14 @@ class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
     );
   }
 
+  void _showSearchChat() {
+    HapticFeedback.mediumImpact();
+    // Open chat overlay directly without going through a tab
+    setState(() {
+      _isChatMode = true;
+    });
+  }
+
   bool _canPopShell() {
     final nav = _navigatorKeys[_selectedIndex].currentState;
     return nav == null || !nav.canPop();
@@ -184,6 +186,11 @@ class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
 
   void _onPopInvokedWithResult(bool didPop, Object? result) {
     if (didPop) return;
+
+    if (_isChatMode) {
+      setState(() => _isChatMode = false);
+      return;
+    }
 
     final nav = _navigatorKeys[_selectedIndex].currentState;
     if (nav != null && nav.canPop()) {
@@ -194,7 +201,6 @@ class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
-    final showChat = _selectedIndex == 4;
 
     return PopScope(
       canPop: _canPopShell(),
@@ -203,47 +209,60 @@ class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
         backgroundColor: AppColors.systemBackground,
         child: Stack(
           children: [
-            // PageView for swipe navigation
-            PageView(
-              controller: _pageController,
-              physics: const BouncingScrollPhysics(),
-              children: List.generate(_screens.length, (index) {
-                return _TabNavigator(
-                  navigatorKey: _navigatorKeys[index],
-                  screen: _screens[index],
-                  observers: [_navigatorObservers[index]],
-                );
-              }),
+            // Scale down and dim the main content when chat mode is active
+            AnimatedScale(
+              scale: _isChatMode ? 0.92 : 1.0,
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.easeOutCubic,
+              child: AnimatedOpacity(
+                opacity: _isChatMode ? 0.3 : 1.0,
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeOutCubic,
+                child: PageView(
+                  controller: _pageController,
+                  children: List.generate(_screens.length, (index) {
+                    return _TabNavigator(
+                      navigatorKey: _navigatorKeys[index],
+                      screen: _screens[index],
+                      observers: [_navigatorObservers[index]],
+                    );
+                  }),
+                ),
+              ),
             ),
 
-            // Tap transition overlay: slide up from bottom
-            if (_isTapTransition && _tapTargetIndex >= 0)
-              AnimatedBuilder(
-                animation: _tapSlideAnim,
-                builder: (context, child) {
-                  return Positioned.fill(
-                    child: SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0, 1),
-                        end: Offset.zero,
-                      ).animate(_tapSlideAnim),
-                      child: _TabNavigator(
-                        navigatorKey: _navigatorKeys[_tapTargetIndex],
-                        screen: _screens[_tapTargetIndex],
-                        observers: [_navigatorObservers[_tapTargetIndex]],
-                      ),
-                    ),
-                  );
-                },
+            // Dark backdrop overlay for chat
+            if (_isChatMode)
+              Positioned.fill(
+                child: AnimatedOpacity(
+                  opacity: 0.4,
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeOutCubic,
+                  child: GestureDetector(
+                    onTap: () => setState(() => _isChatMode = false),
+                    child: Container(color: Colors.black),
+                  ),
+                ),
               ),
 
-            if (!_isInLesson && !showChat) ...[
+            // Chat overlay when search bar is pressed (transparent background)
+            if (_isChatMode)
+              Positioned.fill(
+                child: TomyChatScreen(
+                  scrollController: _scrollControllers[3],
+                  onBack: () => setState(() => _isChatMode = false),
+                  isOverlay: true, // This will make it transparent
+                ),
+              ),
+
+            if (!_isInLesson && !_isChatMode) ...[
               Positioned(
                 top: 0,
                 left: 0,
                 right: 0,
                 child: IgnorePointer(child: _buildHeaderChrome(topPadding)),
               ),
+
               Positioned(
                 top: 0,
                 left: 0,
@@ -252,14 +271,14 @@ class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
               ),
             ],
 
-            if (_selectedIndex == 0 && !_isInLesson)
+            if (_selectedIndex == 0 && !_isInLesson && !_isChatMode)
               Positioned(
                 right: 20,
                 bottom: MediaQuery.of(context).padding.bottom + 70,
                 child: FabButton(onTap: _showAddExpenseSheet),
               ),
 
-            if (!_isInLesson && !showChat)
+            if (!_isInLesson && !_isChatMode)
               Positioned(
                 left: 0,
                 right: 0,
@@ -320,7 +339,10 @@ class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
         left: 16,
         right: 8,
       ),
-      child: const HeaderRow(),
+      child: HeaderRow(
+        searchBarOpacity: _searchBarOpacity,
+        onSearchPressed: _showSearchChat,
+      ),
     );
   }
 }
@@ -341,7 +363,16 @@ class _TabNavigator extends StatelessWidget {
     return Navigator(
       key: navigatorKey,
       observers: observers,
-      onGenerateRoute: (_) => CupertinoPageRoute(builder: (_) => screen),
+      onGenerateRoute: (settings) {
+        if (screen is TomyChatScreen) {
+          return PageRouteBuilder(
+            settings: settings,
+            pageBuilder: (_, __, ___) => screen,
+            transitionsBuilder: (_, animation, __, child) => child,
+          );
+        }
+        return CupertinoPageRoute(builder: (_) => screen, settings: settings);
+      },
     );
   }
 }
