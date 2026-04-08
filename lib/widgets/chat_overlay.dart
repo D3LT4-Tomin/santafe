@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
+import '../providers/data_provider.dart';
+import '../services/app_api_service.dart';
 
 class ChatOverlay extends StatefulWidget {
   final VoidCallback onClose;
@@ -16,6 +19,8 @@ class _ChatOverlayState extends State<ChatOverlay>
   late Animation<double> _fadeAnim;
   late Animation<Offset> _slideAnim;
   final TextEditingController _textController = TextEditingController();
+
+  bool _isLoading = false;
 
   final List<Map<String, dynamic>> _messages = [
     {
@@ -48,30 +53,51 @@ class _ChatOverlayState extends State<ChatOverlay>
     super.dispose();
   }
 
-  void _sendMessage() {
-    if (_textController.text.trim().isEmpty) return;
+  Future<void> _sendMessage() async {
+    final text = _textController.text.trim();
+    if (text.isEmpty) return;
+
+    final data = context.read<DataProvider>();
+    final transactions = data.transactions;
+
+    final currentUserData = context.read<DataProvider>();
 
     setState(() {
-      _messages.add({
-        'isUser': true,
-        'text': _textController.text.trim(),
-        'time': 'Ahora',
-      });
+      _messages.add({'isUser': true, 'text': text, 'time': 'Ahora'});
       _textController.clear();
+      _isLoading = true;
     });
 
-    // Mock response
-    Future.delayed(const Duration(seconds: 1), () {
-      if (!mounted) return;
-      setState(() {
-        _messages.add({
-          'isUser': false,
-          'text':
-              'Estoy analizando tus gastos para darte la mejor recomendación...',
-          'time': 'Ahora',
+    try {
+      final response = await AppApiService.chatWithContext(
+        currentUserData,
+        text,
+        transactions: transactions,
+      );
+
+      if (mounted && response != null) {
+        setState(() {
+          _messages.add({
+            'isUser': false,
+            'text': response['response'],
+            'time': 'Ahora',
+          });
+          _isLoading = false;
         });
-      });
-    });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _messages.add({
+            'isUser': false,
+            'text':
+                'Hubo un error al procesar tu solicitud. Inténtalo de nuevo.',
+            'time': 'Ahora',
+          });
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override

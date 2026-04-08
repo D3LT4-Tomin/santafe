@@ -2,34 +2,67 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../screens/insights_screen.dart';
+import '../services/app_api_service.dart';
+import '../providers/data_provider.dart';
+import 'package:provider/provider.dart';
 
 // ─── Tip Card ─────────────────────────────────────────────────────────────────
-class TipCard extends StatelessWidget {
+class TipCard extends StatefulWidget {
   const TipCard({super.key});
 
   @override
+  State<TipCard> createState() => TipCardState();
+}
+
+class TipCardState extends State<TipCard> {
+  Map<String, dynamic>? _userCluster;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadApiData();
+  }
+
+  Future<void> _loadApiData() async {
+    final data = context.read<DataProvider>();
+    final cluster = await AppApiService.getUserCluster(data);
+
+    if (mounted) {
+      setState(() {
+        _userCluster = cluster;
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16),
+    final clusterName = _isLoading
+        ? 'Cargando...'
+        : (_userCluster?['cluster_label'] ?? 'Usuario');
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: AppColors.blueTipBg,
-          borderRadius: BorderRadius.all(Radius.circular(16)),
+          borderRadius: const BorderRadius.all(Radius.circular(16)),
           border: Border.fromBorderSide(
-            BorderSide(color: AppColors.blueTipBorder, width: 0.5),
+            const BorderSide(color: AppColors.blueTipBorder, width: 0.5),
           ),
         ),
         child: Padding(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               DecoratedBox(
                 decoration: BoxDecoration(
-                  color: Color(0x330A84FF),
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color: const Color(0x330A84FF),
+                  borderRadius: const BorderRadius.all(Radius.circular(10)),
                 ),
-                child: SizedBox(
+                child: const SizedBox(
                   width: 36,
                   height: 36,
                   child: Icon(
@@ -39,12 +72,12 @@ class TipCard extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Tip del día',
                       style: TextStyle(
                         fontSize: 13,
@@ -54,9 +87,9 @@ class TipCard extends StatelessWidget {
                         height: 1.38,
                       ),
                     ),
-                    SizedBox(height: 3),
+                    const SizedBox(height: 3),
                     Text(
-                      '¿Sabías que puedes abrir una cuenta Nivel 1 en 5 minutos con tu CURP?',
+                      'Según tu perfil "$clusterName", te recomendamos revisar tus gastos de ocio.',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
@@ -68,8 +101,8 @@ class TipCard extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(width: 8),
-              Icon(
+              const SizedBox(width: 8),
+              const Icon(
                 CupertinoIcons.chevron_right,
                 size: 14,
                 color: AppColors.secondaryLabel,

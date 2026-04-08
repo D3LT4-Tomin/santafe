@@ -18,6 +18,7 @@ import 'package:provider/provider.dart';
 
 import '../theme/app_theme.dart';
 import '../providers/data_provider.dart';
+import '../services/app_api_service.dart';
 import '../widgets/animated_blobs.dart';
 import '../widgets/cards.dart';
 import '../widgets/savings_projection_card.dart';
@@ -1191,6 +1192,10 @@ class _PredictionsCard extends StatefulWidget {
 class _PredictionsCardState extends State<_PredictionsCard>
     with SingleTickerProviderStateMixin {
   _PredictionMode _mode = _PredictionMode.savings;
+  Map<String, dynamic>? _apiContext;
+  Map<String, dynamic>? _insightsData;
+  bool _isLoadingApi = false;
+  bool _isLoadingInsights = false;
 
   late final AnimationController _crossfadeController;
   late final Animation<double> _crossfadeAnim;
@@ -1200,6 +1205,29 @@ class _PredictionsCardState extends State<_PredictionsCard>
     initialPage: 1,
   );
   int _currentMonth = 1;
+  String? _clusterLabel;
+  String? _forecastTier;
+  double? _predictedSpend;
+
+  String? _getInsightText(int index) {
+    if (_insightsData == null) return null;
+    final recommendations = _insightsData!['recommendations'] as List?;
+    if (recommendations == null || recommendations.isEmpty) return null;
+    if (index >= recommendations.length) return null;
+    return recommendations[index];
+  }
+
+  String? _getClusterLabel() {
+    return _insightsData?['cluster_label'] ?? _clusterLabel;
+  }
+
+  String? _getForecastTier() {
+    return _insightsData?['forecast']?['tier'] ?? _forecastTier;
+  }
+
+  double? _getForecastedSpend() {
+    return _insightsData?['forecast']?['next_month_spend'] ?? _predictedSpend;
+  }
 
   static const _savingsMonths = [
     _MonthData(
@@ -1280,6 +1308,8 @@ class _PredictionsCardState extends State<_PredictionsCard>
   @override
   void initState() {
     super.initState();
+    _fetchApiContext();
+    _fetchInsights();
     _crossfadeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
@@ -1289,6 +1319,59 @@ class _PredictionsCardState extends State<_PredictionsCard>
       parent: _crossfadeController,
       curve: Curves.easeInOut,
     );
+  }
+
+  Future<void> _fetchApiContext() async {
+    setState(() => _isLoadingApi = true);
+
+    final data = context.read<DataProvider>();
+    final contextData = await AppApiService.getUserSummary(data);
+
+    if (mounted) {
+      setState(() {
+        _apiContext = contextData;
+        _clusterLabel = contextData != null
+            ? contextData['cluster_label']
+            : null;
+        _forecastTier = contextData != null
+            ? contextData['spending_tier']
+            : null;
+        _predictedSpend = contextData != null
+            ? contextData['predicted_spend']
+            : null;
+        _isLoadingApi = false;
+      });
+    }
+  }
+
+  Future<void> _fetchInsights() async {
+    setState(() => _isLoadingInsights = true);
+
+    final data = context.read<DataProvider>();
+    final transactions = data.transactions;
+
+    final insightsData = await AppApiService.generateInsights(
+      data,
+      transactions.isNotEmpty ? transactions : null,
+    );
+
+    if (mounted) {
+      setState(() {
+        _insightsData = insightsData;
+        _isLoadingInsights = false;
+      });
+    }
+  }
+
+  String _getSavingsAmount(int month) {
+    if (_mode == _PredictionMode.savings && _predictedSpend != null) {
+      final base = _predictedSpend! * 0.3;
+      final adjustments = [0.3, 0.5, 0.6, 0.7, 0.8];
+      if (month >= 0 && month < adjustments.length) {
+        return '\$${(base * adjustments[month]).round()}';
+      }
+    }
+    return _savingsMonths[month].amount;
   }
 
   @override
@@ -1437,10 +1520,12 @@ class _PredictionsCardState extends State<_PredictionsCard>
                           ? _SavingsDetails(
                               key: ValueKey('savings_$_currentMonth'),
                               selectedMonth: _currentMonth,
+                              insights: _insightsData,
                             )
                           : _ExpensesDetails(
                               key: ValueKey('expenses_$_currentMonth'),
                               selectedMonth: _currentMonth,
+                              insights: _insightsData,
                             ),
                     ),
                   ],
@@ -1617,15 +1702,30 @@ class _MonthChip extends StatelessWidget {
 
 class _SavingsDetails extends StatelessWidget {
   final int selectedMonth;
-  const _SavingsDetails({super.key, required this.selectedMonth});
+  final Map<String, dynamic>? insights;
+  const _SavingsDetails({
+    super.key,
+    required this.selectedMonth,
+    this.insights,
+  });
 
-  static const _insights = [
+  static const _insightsStatic = [
     'Mes anterior. Ahorraste \$390, un buen punto de partida.',
     'A este ritmo alcanzarás tu meta en 8 meses. Ahorrando \$50 más/mes podrías lograrlo en 6.',
     'Proyección positiva. Mayo podría ser tu mejor mes del trimestre.',
     'Ahorro consistente. Considera incrementar \$30 más este mes.',
     'Tendencia sólida. Julio marca el ritmo más alto del semestre.',
   ];
+
+  String? _getDynamicInsight() {
+    if (insights != null) {
+      final recommendations = insights!['recommendations'] as List?;
+      if (recommendations != null && recommendations.isNotEmpty) {
+        return recommendations[0];
+      }
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1657,7 +1757,12 @@ class _SavingsDetails extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         _InsightBox(
-          text: _insights[selectedMonth.clamp(0, _insights.length - 1)],
+          text:
+              _getDynamicInsight() ??
+              _insightsStatic[selectedMonth.clamp(
+                0,
+                _insightsStatic.length - 1,
+              )],
         ),
       ],
     );
@@ -1666,7 +1771,12 @@ class _SavingsDetails extends StatelessWidget {
 
 class _ExpensesDetails extends StatelessWidget {
   final int selectedMonth;
-  const _ExpensesDetails({super.key, required this.selectedMonth});
+  final Map<String, dynamic>? insights;
+  const _ExpensesDetails({
+    super.key,
+    required this.selectedMonth,
+    this.insights,
+  });
 
   static const _categories = [
     _CategoryData(
@@ -1703,13 +1813,23 @@ class _ExpensesDetails extends StatelessWidget {
     ),
   ];
 
-  static const _insights = [
+  static const _insightsStatic = [
     'Mes anterior. Total gastado: \$1,250. Base de comparación.',
     'Se proyecta +4% en gastos totales. La categoría Comida es la de mayor riesgo.',
     'Leve mejora respecto a Abril. Ocio y Otros muestran tendencia positiva.',
     'Atención: Junio proyecta +5%. Revisar gastos de Comida y Transporte.',
     'Rebote a la baja en Julio. Buen control en categorías variables.',
   ];
+
+  String? _getDynamicInsight() {
+    if (insights != null) {
+      final recommendations = insights!['recommendations'] as List?;
+      if (recommendations != null && recommendations.isNotEmpty) {
+        return recommendations[0];
+      }
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1742,7 +1862,12 @@ class _ExpensesDetails extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         _InsightBox(
-          text: _insights[selectedMonth.clamp(0, _insights.length - 1)],
+          text:
+              _getDynamicInsight() ??
+              _insightsStatic[selectedMonth.clamp(
+                0,
+                _insightsStatic.length - 1,
+              )],
         ),
       ],
     );
