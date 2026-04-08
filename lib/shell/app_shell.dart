@@ -107,22 +107,7 @@ class _AppShellState extends State<AppShell> {
   void _onScroll() {
     final controller = _scrollControllers[_selectedIndex];
     final offset = controller.offset;
-    final maxScroll = controller.position.maxScrollExtent;
-    final delta = offset - _lastScrollOffset;
     _lastScrollOffset = offset;
-
-    // Only close search bar when on dashboard screen and scrolling down
-    if (_selectedIndex == 0) {
-      if (offset < 20) {
-        _searchBarOpacity.value = 1.0;
-      } else if (delta > 2 && _searchBarOpacity.value == 1.0) {
-        _searchBarOpacity.value = 0.0;
-      } else if (delta < -2 &&
-          _searchBarOpacity.value == 0.0 &&
-          offset < maxScroll - 20) {
-        _searchBarOpacity.value = 1.0;
-      }
-    }
   }
 
   void _setSelectedIndex(int index) {
@@ -132,10 +117,6 @@ class _AppShellState extends State<AppShell> {
       setState(() {
         _selectedIndex = index;
         _lastScrollOffset = 0;
-        // Show search bar when selecting dashboard
-        if (index == 0) {
-          _searchBarOpacity.value = 1.0;
-        }
       });
 
       _scrollControllers[_selectedIndex].addListener(_onScroll);
@@ -271,7 +252,7 @@ class _AppShellState extends State<AppShell> {
               ),
             ],
 
-            if (_selectedIndex == 0 && !_isInLesson && !_isChatMode)
+            if (!_isInLesson && !_isChatMode)
               Positioned(
                 right: 20,
                 bottom: MediaQuery.of(context).padding.bottom + 70,

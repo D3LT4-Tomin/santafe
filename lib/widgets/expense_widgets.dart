@@ -67,7 +67,12 @@ class ExpenseRow extends StatelessWidget {
     final amount = transaction?.amount ?? 0;
     final isIncome = amount > 0;
     final prefix = isIncome ? '+\$' : '-\$';
-    return '$prefix${amount.abs().toStringAsFixed(2)}';
+    final parts = amount.abs().toStringAsFixed(2).split('.');
+    final main = parts[0].replaceAllMapped(
+      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+      (match) => '${match[1]},',
+    );
+    return '$prefix$main.${parts[1]}';
   }
 
   @override

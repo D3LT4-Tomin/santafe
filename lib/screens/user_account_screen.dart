@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -94,7 +95,7 @@ class _UserAccountScreenState extends State<UserAccountScreen>
                     const SizedBox(height: 28),
                     const _PlanCard(),
                     const SizedBox(height: 28),
-                    _SettingsRow(
+                    _GlassSettingsRow(
                       icon: CupertinoIcons.gear_alt_fill,
                       color: AppColors.systemBlue,
                       label: 'Configuración',
@@ -128,6 +129,42 @@ class _UserAccountScreenState extends State<UserAccountScreen>
   }
 }
 
+// ─── Glass Card Container ─────────────────────────────────────────────────────
+/// Wraps any child in a frosted-glass card with [sigmaX]/[sigmaY] blur,
+/// a subtle white-tinted fill, and a soft border.
+class _GlassCard extends StatelessWidget {
+  final Widget child;
+  final double sigmaX;
+  final double sigmaY;
+  final BorderRadius? borderRadius;
+
+  const _GlassCard({
+    required this.child,
+    this.sigmaX = 18,
+    this.sigmaY = 18,
+    this.borderRadius,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final radius = borderRadius ?? BorderRadius.circular(16);
+    return ClipRRect(
+      borderRadius: radius,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: sigmaX, sigmaY: sigmaY),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.white05,
+            borderRadius: radius,
+            border: Border.all(color: AppColors.white07),
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
 // ─── Profile Header ───────────────────────────────────────────────────────────
 class _ProfileHeader extends StatelessWidget {
   const _ProfileHeader();
@@ -151,12 +188,7 @@ class _ProfileHeader extends StatelessWidget {
 
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: AppColors.white05,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.white07),
-            ),
+          child: _GlassCard(
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
@@ -164,9 +196,9 @@ class _ProfileHeader extends StatelessWidget {
                   Container(
                     width: 56,
                     height: 56,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: const LinearGradient(
+                      gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [Color(0xFF0A84FF), Color(0xFF409CFF)],
@@ -229,12 +261,7 @@ class _AchievementsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.white05,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.white07),
-        ),
+      child: _GlassCard(
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -478,12 +505,7 @@ class _PlanCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.white05,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.white07),
-        ),
+      child: _GlassCard(
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -611,8 +633,8 @@ class _RowSeparator extends StatelessWidget {
   }
 }
 
-// ─── Settings Row ─────────────────────────────────────────────────────────────
-class _SettingsRow extends StatelessWidget {
+// ─── Glass Settings Row ───────────────────────────────────────────────────────
+class _GlassSettingsRow extends StatelessWidget {
   final IconData icon;
   final Color color;
   final String label;
@@ -620,7 +642,7 @@ class _SettingsRow extends StatelessWidget {
   final VoidCallback onTap;
   final bool isLast;
 
-  const _SettingsRow({
+  const _GlassSettingsRow({
     required this.icon,
     required this.color,
     required this.label,
@@ -631,46 +653,52 @@ class _SettingsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: () {
-            HapticFeedback.selectionClick();
-            onTap();
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-            child: Row(
-              children: [
-                Container(
-                  width: 30,
-                  height: 30,
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.14),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(icon, size: 16, color: color),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.label,
-                      height: 1.33,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: _GlassCard(
+        child: Column(
+          children: [
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: () {
+                HapticFeedback.selectionClick();
+                onTap();
+              },
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.14),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(icon, size: 16, color: color),
                     ),
-                  ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        label,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.label,
+                          height: 1.33,
+                        ),
+                      ),
+                    ),
+                    trailing,
+                  ],
                 ),
-                trailing,
-              ],
+              ),
             ),
-          ),
+            if (!isLast) const _RowSeparator(),
+          ],
         ),
-        if (!isLast) const _RowSeparator(),
-      ],
+      ),
     );
   }
 }

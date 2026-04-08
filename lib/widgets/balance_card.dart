@@ -24,9 +24,21 @@ class _BalanceCardState extends State<BalanceCard> {
             ? formattedBalance[1]
             : '00';
 
+        // Add commas to the main part of the balance
+        final formattedBalanceMain = balanceMain.replaceAllMapped(
+          RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+          (match) => '${match[1]},',
+        );
+
         final weeklyPrefix = weeklyIncome >= 0 ? '+' : '';
-        final weeklyText =
-            '$weeklyPrefix\$${weeklyIncome.toStringAsFixed(0)} esta semana';
+        final weeklyMain = weeklyIncome
+            .abs()
+            .toStringAsFixed(0)
+            .replaceAllMapped(
+              RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+              (match) => '${match[1]},',
+            );
+        final weeklyText = '$weeklyPrefix\$$weeklyMain esta semana';
 
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -63,7 +75,7 @@ class _BalanceCardState extends State<BalanceCard> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        '\$$balanceMain',
+                        '\$$formattedBalanceMain',
                         style: const TextStyle(
                           fontSize: 40,
                           fontWeight: FontWeight.w700,

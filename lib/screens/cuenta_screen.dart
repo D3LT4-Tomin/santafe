@@ -263,12 +263,12 @@ class _NetWorthCard extends StatelessWidget {
   }
 
   String _formatCurrency(double amount) {
-    return amount
-        .toStringAsFixed(2)
-        .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
+    final parts = amount.toStringAsFixed(2).split('.');
+    final main = parts[0].replaceAllMapped(
+      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+      (match) => '${match[1]},',
+    );
+    return '$main.${parts[1]}';
   }
 }
 
@@ -360,13 +360,11 @@ class _SectionCard extends StatelessWidget {
           children: [
             // ── Header ──────────────────────────────────────────────────────
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 18, 14, 0),
+              padding: const EdgeInsets.fromLTRB(16, 18, 14, 0),
               child: Row(
                 children: [
                   // Section label (Expanded so add button never overflows)
-                  const Expanded(child: SizedBox()),
                   Expanded(
-                    flex: 10,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -552,12 +550,12 @@ class _BankAccountsSection extends StatelessWidget {
   }
 
   String _formatCurrency(double amount) {
-    return amount
-        .toStringAsFixed(2)
-        .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
+    final parts = amount.toStringAsFixed(2).split('.');
+    final main = parts[0].replaceAllMapped(
+      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+      (match) => '${match[1]},',
+    );
+    return '$main.${parts[1]}';
   }
 }
 
@@ -701,12 +699,12 @@ class _BankAccountRow extends StatelessWidget {
   }
 
   String _formatCurrency(double amount) {
-    return amount
-        .toStringAsFixed(2)
-        .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
+    final parts = amount.toStringAsFixed(2).split('.');
+    final main = parts[0].replaceAllMapped(
+      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+      (match) => '${match[1]},',
+    );
+    return '$main.${parts[1]}';
   }
 }
 
@@ -751,12 +749,12 @@ class _CashSection extends StatelessWidget {
   }
 
   String _formatCurrency(double amount) {
-    return amount
-        .toStringAsFixed(2)
-        .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
+    final parts = amount.toStringAsFixed(2).split('.');
+    final main = parts[0].replaceAllMapped(
+      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+      (match) => '${match[1]},',
+    );
+    return '$main.${parts[1]}';
   }
 }
 
@@ -835,12 +833,12 @@ class _CashRow extends StatelessWidget {
   }
 
   String _formatCurrency(double amount) {
-    return amount
-        .toStringAsFixed(2)
-        .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
+    final parts = amount.toStringAsFixed(2).split('.');
+    final main = parts[0].replaceAllMapped(
+      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+      (match) => '${match[1]},',
+    );
+    return '$main.${parts[1]}';
   }
 }
 // ─── Investments Section ──────────────────────────────────────────────────────
@@ -886,12 +884,12 @@ class _InvestmentsSection extends StatelessWidget {
   }
 
   String _formatCurrency(double amount) {
-    return amount
-        .toStringAsFixed(2)
-        .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
+    final parts = amount.toStringAsFixed(2).split('.');
+    final main = parts[0].replaceAllMapped(
+      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+      (match) => '${match[1]},',
+    );
+    return '$main.${parts[1]}';
   }
 }
 
@@ -1016,11 +1014,11 @@ class _InvestmentRow extends StatelessWidget {
   }
 
   String _formatCurrency(double amount) {
-    return amount
-        .toStringAsFixed(2)
-        .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
+    final parts = amount.toStringAsFixed(2).split('.');
+    final main = parts[0].replaceAllMapped(
+      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+      (match) => '${match[1]},',
+    );
+    return '$main.${parts[1]}';
   }
 }
