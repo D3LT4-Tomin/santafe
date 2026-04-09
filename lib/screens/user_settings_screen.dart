@@ -74,9 +74,8 @@ class _UserSettingsScreenState extends State<UserSettingsScreen>
 
     return Stack(
       children: [
-        RepaintBoundary(
-          child: AnimatedBlobs(blob1Anim: _blob1Anim, blob2Anim: _blob2Anim),
-        ),
+        // Solid gray background
+        Positioned.fill(child: Container(color: AppColors.secondaryBackground)),
         Positioned.fill(
           child: SingleChildScrollView(
             controller: widget.scrollController ?? ScrollController(),
