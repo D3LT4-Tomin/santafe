@@ -803,8 +803,8 @@ class _SwipeableWidgetState extends State<_SwipeableWidget> {
             },
       child: Stack(
         children: [
-          // Delete indicator (behind)
-          if (!isPinned)
+          // Delete indicator (behind) - only show when dragging left
+          if (!isPinned && _dragExtent < 0)
             Positioned.fill(
               child: Container(
                 alignment: Alignment.centerRight,
@@ -815,9 +815,7 @@ class _SwipeableWidgetState extends State<_SwipeableWidget> {
                 ),
                 child: Icon(
                   CupertinoIcons.trash,
-                  color: AppColors.systemRed.withValues(
-                    alpha: _dragExtent.abs() / 100,
-                  ),
+                  color: AppColors.systemRed,
                   size: 24,
                 ),
               ),
