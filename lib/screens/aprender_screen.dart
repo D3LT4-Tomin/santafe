@@ -96,7 +96,9 @@ class _AprenderScreenState extends State<AprenderScreen>
                     _ActivityCard(),
                     SizedBox(height: 12),
                     _WeekStrip(),
-                    SizedBox(height: 32),
+                    const SizedBox(height: 24),
+                    const _AchievementsSection(),
+                    const SizedBox(height: 32),
 
                     // ── Módulos ───────────────────────────────────────────
                     _ModulesSection(),
@@ -1579,3 +1581,220 @@ class _HexPainter extends CustomPainter {
   bool shouldRepaint(_HexPainter old) =>
       old.fillColor != fillColor || old.borderColor != borderColor;
 }
+
+// ─── Achievements Section ─────────────────────────────────────────────────────
+class _AchievementsSection extends StatefulWidget {
+  const _AchievementsSection();
+
+  @override
+  State<_AchievementsSection> createState() => _AchievementsSectionState();
+}
+
+class _AchievementsSectionState extends State<_AchievementsSection> {
+  final PageController _pageController = PageController(viewportFraction: 1.0);
+  int _currentPage = 0;
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final achievements = _badgeInfoList;
+    final pages = <List<_BadgeInfo>>[];
+    for (var i = 0; i < achievements.length; i += 3) {
+      pages.add(
+        achievements.sublist(
+          i,
+          (i + 3 > achievements.length) ? achievements.length : i + 3,
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.black07),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: AppColors.systemGreen.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      CupertinoIcons.star_fill,
+                      color: AppColors.systemGreen,
+                      size: 16,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  const Text(
+                    'Logros',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.label,
+                      letterSpacing: -0.41,
+                      height: 1.29,
+                    ),
+                  ),
+                  const Spacer(),
+                  Consumer<LearningProvider>(
+                    builder: (context, lp, _) {
+                      final earnedCount = _badgeInfoList
+                          .where((a) => lp.hasBadge(a.badgeId))
+                          .length;
+                      return Text(
+                        '$earnedCount/${_badgeInfoList.length}',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.secondaryLabel,
+                          height: 1.33,
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              ColoredBox(
+                color: AppColors.separator,
+                child: SizedBox(height: 0.5, width: double.infinity),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                height: 130,
+                child: PageView.builder(
+                  controller: _pageController,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentPage = index;
+                    });
+                  },
+                  itemCount: pages.length,
+                  itemBuilder: (context, pageIndex) {
+                    return Consumer<LearningProvider>(
+                      builder: (context, lp, _) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: pages[pageIndex].map((a) {
+                            return _HexBadge(
+                              badgeInfo: a,
+                              earned: lp.hasBadge(a.badgeId),
+                            );
+                          }).toList(),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+              if (pages.length > 1) ...[
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(pages.length, (index) {
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      margin: const EdgeInsets.symmetric(horizontal: 3),
+                      width: _currentPage == index ? 16 : 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: _currentPage == index
+                            ? AppColors.systemGreen
+                            : AppColors.tertiaryLabel,
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    );
+                  }),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Badge info list ────────────────────────────────────────────────────────
+
+class _Achievement {
+  final String badgeId;
+  final String label;
+  final IconData icon;
+  const _Achievement({
+    required this.badgeId,
+    required this.label,
+    required this.icon,
+  });
+}
+
+const _achievements = [
+  _Achievement(
+    badgeId: 'first_lesson',
+    label: 'Primer\nlección',
+    icon: CupertinoIcons.pencil,
+  ),
+  _Achievement(
+    badgeId: 'first_savings',
+    label: 'Primer\nahorro',
+    icon: CupertinoIcons.money_dollar,
+  ),
+  _Achievement(
+    badgeId: 'cazador_gastos',
+    label: 'Cazador de\ngastos',
+    icon: CupertinoIcons.money_dollar_circle_fill,
+  ),
+  _Achievement(
+    badgeId: 'week_streak',
+    label: 'Una semana\nde racha',
+    icon: CupertinoIcons.rocket_fill,
+  ),
+  _Achievement(
+    badgeId: 'five_lessons',
+    label: '5 lecciones\nseguidas',
+    icon: CupertinoIcons.pencil_slash,
+  ),
+  _Achievement(
+    badgeId: 'month_streak',
+    label: 'Un mes\nde racha',
+    icon: CupertinoIcons.calendar,
+  ),
+  _Achievement(
+    badgeId: 'year_streak',
+    label: '365 días\nde racha',
+    icon: CupertinoIcons.gift_fill,
+  ),
+  _Achievement(
+    badgeId: 'night_study',
+    label: 'Noche\nestudiosa',
+    icon: CupertinoIcons.moon_fill,
+  ),
+  _Achievement(
+    badgeId: 'explorer',
+    label: 'Explorador',
+    icon: CupertinoIcons.cube_box_fill,
+  ),
+  _Achievement(
+    badgeId: 'constant',
+    label: 'Constante',
+    icon: CupertinoIcons.link,
+  ),
+];
+
+// End of file
