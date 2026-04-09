@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/account_model.dart';
+import '../models/user_model.dart';
 import 'firebase_service.dart';
+import 'subscription_service.dart';
 
 class AccountService {
   static Future<List<AccountModel>> getAccounts(String userId) async {
@@ -20,6 +22,12 @@ class AccountService {
   }
 
   static Future<void> addAccount(String userId, AccountModel account) async {
+    // Verificar si el usuario puede crear más cuentas según su plan
+    final canCreate = await SubscriptionService.canCreateAccount(userId);
+    if (!canCreate) {
+      throw Exception('Has alcanzado el límite de cuentas para tu plan actual');
+    }
+
     await FirebaseService.userAccountsRef(userId).add(account.toFirestore());
   }
 

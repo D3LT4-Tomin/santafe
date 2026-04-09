@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
@@ -7,8 +6,10 @@ import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
 import '../providers/auth_provider.dart';
 import '../providers/learning_provider.dart';
+import '../providers/subscription_provider.dart';
 import '../widgets/animated_blobs.dart';
 import 'user_settings_screen.dart';
+import 'subscription_screen.dart';
 
 class UserAccountScreen extends StatefulWidget {
   final ScrollController? scrollController;
@@ -56,6 +57,10 @@ class _UserAccountScreenState extends State<UserAccountScreen>
       curve: const Cubic(0.34, 1.56, 0.64, 1.0),
     );
     _appearController.forward();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<SubscriptionProvider>(context, listen: false).loadPlan();
+    });
   }
 
   @override
@@ -75,11 +80,37 @@ class _UserAccountScreenState extends State<UserAccountScreen>
         RepaintBoundary(
           child: AnimatedBlobs(blob1Anim: _blob1Anim, blob2Anim: _blob2Anim),
         ),
+
+        // Botón de regreso grande y visible
+        Positioned(
+          top: topPadding + 8,
+          left: 16,
+          child: GestureDetector(
+            onTap: () {
+              HapticFeedback.lightImpact();
+              Navigator.of(context).pop();
+            },
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: CupertinoColors.white.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                CupertinoIcons.chevron_left,
+                size: 24,
+                color: CupertinoColors.white,
+              ),
+            ),
+          ),
+        ),
+
         Positioned.fill(
           child: SingleChildScrollView(
             controller: widget.scrollController ?? ScrollController(),
             physics: const BouncingScrollPhysics(),
-            padding: EdgeInsets.only(top: topPadding + 76, bottom: 120),
+            padding: EdgeInsets.only(top: topPadding + 70, bottom: 120),
             child: FadeTransition(
               opacity: _appearAnim,
               child: SlideTransition(
@@ -129,9 +160,6 @@ class _UserAccountScreenState extends State<UserAccountScreen>
   }
 }
 
-// ─── Glass Card Container ─────────────────────────────────────────────────────
-/// Wraps any child in a frosted-glass card with [sigmaX]/[sigmaY] blur,
-/// a subtle white-tinted fill, and a soft border.
 class _GlassCard extends StatelessWidget {
   final Widget child;
   final double sigmaX;
@@ -148,99 +176,181 @@ class _GlassCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final radius = borderRadius ?? BorderRadius.circular(16);
-    return ClipRRect(
-      borderRadius: radius,
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: sigmaX, sigmaY: sigmaY),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: AppColors.white05,
-            borderRadius: radius,
-            border: Border.all(color: AppColors.white07),
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: ClipRRect(
+        borderRadius: radius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: sigmaX, sigmaY: sigmaY),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.white05,
+              borderRadius: radius,
+              border: Border.all(color: AppColors.white07),
+            ),
+            child: child,
           ),
-          child: child,
         ),
       ),
     );
   }
 }
 
-// ─── Profile Header ───────────────────────────────────────────────────────────
 class _ProfileHeader extends StatelessWidget {
   const _ProfileHeader();
-
-  String _getInitials(String name) {
-    if (name.isEmpty) return 'U';
-    final parts = name.trim().split(' ');
-    if (parts.length >= 2) {
-      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
-    }
-    return name[0].toUpperCase();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(
-      builder: (context, authProvider, _) {
+      builder: (context, authProvider, child) {
         final user = authProvider.user;
-        final displayName = user?.displayName ?? 'Usuario';
-        final initials = _getInitials(displayName);
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            children: [
+              Container(
+                width: 88,
+                height: 88,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      CupertinoColors.systemPurple,
+                      CupertinoColors.systemIndigo,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: CupertinoColors.systemPurple.withValues(
+                        alpha: 0.4,
+                      ),
+                      blurRadius: 24,
+                      offset: const Offset(0, 12),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Text(
+                    (user?.displayName ?? user?.email ?? 'U')[0].toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.w600,
+                      color: CupertinoColors.white,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                user?.displayName ?? 'Usuario',
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.label,
+                  letterSpacing: -0.41,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                user?.email ?? '',
+                style: const TextStyle(
+                  fontSize: 15,
+                  color: AppColors.secondaryLabel,
+                  letterSpacing: -0.24,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _AchievementsSection extends StatelessWidget {
+  const _AchievementsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<LearningProvider>(
+      builder: (context, learningProvider, child) {
+        final lessonsCompleted = learningProvider.completedLessonsCount;
+        final totalLessons = learningProvider.totalLessonsCount;
+        final progress = totalLessons > 0
+            ? lessonsCompleted / totalLessons
+            : 0.0;
 
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: _GlassCard(
             child: Padding(
               padding: const EdgeInsets.all(20),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 56,
-                    height: 56,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Color(0xFF0A84FF), Color(0xFF409CFF)],
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Progreso de aprendizaje',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.label,
+                          letterSpacing: -0.24,
+                        ),
                       ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        initials,
+                      Text(
+                        '$lessonsCompleted / $totalLessons',
                         style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          color: CupertinoColors.white,
-                          letterSpacing: -0.5,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.secondaryLabel,
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          displayName,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.label,
-                            height: 1.2,
-                            letterSpacing: -0.3,
+                  const SizedBox(height: 12),
+                  Stack(
+                    children: [
+                      Container(
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: AppColors.white10,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      FractionallySizedBox(
+                        widthFactor: progress,
+                        child: Container(
+                          height: 8,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                CupertinoColors.systemPurple,
+                                CupertinoColors.systemIndigo,
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(4),
                           ),
                         ),
-                        const SizedBox(height: 3),
-                        Text(
-                          user?.email ?? '',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: AppColors.secondaryLabel,
-                            height: 1.33,
-                          ),
-                        ),
-                      ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    progress < 0.3
+                        ? '¡Sigue aprendiendo!'
+                        : progress < 0.7
+                        ? '¡Vas muy bien!'
+                        : '¡Casi terminas!',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: AppColors.secondaryLabel,
                     ),
                   ),
                 ],
@@ -253,339 +363,172 @@ class _ProfileHeader extends StatelessWidget {
   }
 }
 
-// ─── Achievements Section ─────────────────────────────────────────────────────
-class _AchievementsSection extends StatelessWidget {
-  const _AchievementsSection();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: _GlassCard(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: AppColors.systemBlue.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(
-                      CupertinoIcons.star_fill,
-                      color: AppColors.systemBlue,
-                      size: 16,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  const Text(
-                    'Logros',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.label,
-                      letterSpacing: -0.41,
-                      height: 1.29,
-                    ),
-                  ),
-                  const Spacer(),
-                  Consumer<LearningProvider>(
-                    builder: (context, lp, _) {
-                      final earnedCount = _achievements
-                          .where((a) => lp.hasBadge(a.badgeId))
-                          .length;
-                      return Text(
-                        '$earnedCount/${_achievements.length}',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: AppColors.secondaryLabel,
-                          height: 1.33,
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              const ColoredBox(
-                color: AppColors.separator,
-                child: SizedBox(height: 0.5, width: double.infinity),
-              ),
-              const SizedBox(height: 16),
-              Consumer<LearningProvider>(
-                builder: (context, lp, _) {
-                  return GridView.count(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 14,
-                    mainAxisSpacing: 14,
-                    childAspectRatio: 0.85,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: _achievements
-                        .map(
-                          (a) => _HexBadge(
-                            achievement: a,
-                            earned: lp.hasBadge(a.badgeId),
-                          ),
-                        )
-                        .toList(),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _Achievement {
-  final String badgeId;
-  final String label;
-  final IconData icon;
-  const _Achievement({
-    required this.badgeId,
-    required this.label,
-    required this.icon,
-  });
-}
-
-const _achievements = [
-  _Achievement(
-    badgeId: 'first_lesson',
-    label: 'Primer\nlección',
-    icon: CupertinoIcons.pencil,
-  ),
-  _Achievement(
-    badgeId: 'first_savings',
-    label: 'Primer\nahorro',
-    icon: CupertinoIcons.money_dollar,
-  ),
-  _Achievement(
-    badgeId: 'cazador_gastos',
-    label: 'Cazador de\ngastos',
-    icon: CupertinoIcons.money_dollar_circle_fill,
-  ),
-  _Achievement(
-    badgeId: 'week_streak',
-    label: 'Una semana\nde racha',
-    icon: CupertinoIcons.rocket_fill,
-  ),
-  _Achievement(
-    badgeId: 'five_lessons',
-    label: '5 lecciones\nseguidas',
-    icon: CupertinoIcons.pencil_slash,
-  ),
-  _Achievement(
-    badgeId: 'month_streak',
-    label: 'Un mes\nde racha',
-    icon: CupertinoIcons.calendar,
-  ),
-  _Achievement(
-    badgeId: 'year_streak',
-    label: '365 días\nde racha',
-    icon: CupertinoIcons.gift_fill,
-  ),
-  _Achievement(
-    badgeId: 'night_study',
-    label: 'Noche\nestudiosa',
-    icon: CupertinoIcons.moon_fill,
-  ),
-  _Achievement(
-    badgeId: 'explorer',
-    label: 'Explorador',
-    icon: CupertinoIcons.cube_box_fill,
-  ),
-  _Achievement(
-    badgeId: 'constant',
-    label: 'Constante',
-    icon: CupertinoIcons.link,
-  ),
-];
-
-class _HexBadge extends StatelessWidget {
-  final _Achievement achievement;
-  final bool earned;
-  const _HexBadge({required this.achievement, required this.earned});
-
-  @override
-  Widget build(BuildContext context) {
-    final iconColor = earned ? AppColors.systemBlue : AppColors.tertiaryLabel;
-    final bgColor = earned
-        ? AppColors.systemBlue.withValues(alpha: 0.12)
-        : AppColors.white05;
-    final borderColor = earned
-        ? AppColors.systemBlue.withValues(alpha: 0.28)
-        : AppColors.white07;
-    final labelColor = earned ? AppColors.label : AppColors.tertiaryLabel;
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(
-          width: 76,
-          height: 76,
-          child: CustomPaint(
-            painter: _HexPainter(fillColor: bgColor, borderColor: borderColor),
-            child: Center(
-              child: Icon(achievement.icon, color: iconColor, size: 26),
-            ),
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          achievement.label,
-          textAlign: TextAlign.center,
-          maxLines: 2,
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w500,
-            color: labelColor,
-            height: 1.3,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _HexPainter extends CustomPainter {
-  final Color fillColor;
-  final Color borderColor;
-  const _HexPainter({required this.fillColor, required this.borderColor});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final cx = size.width / 2;
-    final cy = size.height / 2;
-    final r = math.min(cx, cy) - 1.5;
-    final path = Path();
-    for (var i = 0; i < 6; i++) {
-      final angle = (i * 60 - 30) * math.pi / 180;
-      final x = cx + r * math.cos(angle);
-      final y = cy + r * math.sin(angle);
-      if (i == 0) {
-        path.moveTo(x, y);
-      } else {
-        path.lineTo(x, y);
-      }
-    }
-    path.close();
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = fillColor
-        ..style = PaintingStyle.fill,
-    );
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = borderColor
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.5,
-    );
-  }
-
-  @override
-  bool shouldRepaint(_HexPainter old) =>
-      old.fillColor != fillColor || old.borderColor != borderColor;
-}
-
-// ─── Plan Card ────────────────────────────────────────────────────────────────
 class _PlanCard extends StatelessWidget {
   const _PlanCard();
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: _GlassCard(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: AppColors.systemPurple.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(8),
+    return Consumer<SubscriptionProvider>(
+      builder: (context, provider, child) {
+        final isPremium = provider.isPremium;
+        final limits = provider.limits;
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: GestureDetector(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              Navigator.of(context).push(
+                CupertinoPageRoute(
+                  builder: (context) => const SubscriptionScreen(),
+                ),
+              );
+            },
+            child: _GlassCard(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: isPremium
+                                  ? [
+                                      CupertinoColors.systemPurple,
+                                      CupertinoColors.systemIndigo,
+                                    ]
+                                  : [
+                                      CupertinoColors.systemGrey,
+                                      CupertinoColors.systemGrey2,
+                                    ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            isPremium
+                                ? CupertinoIcons.star_fill
+                                : CupertinoIcons.star,
+                            color: CupertinoColors.white,
+                            size: 16,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            isPremium ? 'Plan Premium' : 'Plan Básico',
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.label,
+                              letterSpacing: -0.41,
+                              height: 1.29,
+                            ),
+                          ),
+                        ),
+                        const Icon(
+                          CupertinoIcons.chevron_right,
+                          size: 16,
+                          color: AppColors.tertiaryLabel,
+                        ),
+                      ],
                     ),
-                    child: const Icon(
-                      CupertinoIcons.sparkles,
-                      color: AppColors.systemPurple,
-                      size: 16,
+                    const SizedBox(height: 12),
+                    Text(
+                      isPremium
+                          ? 'Acceso completo a todas las funciones'
+                          : 'Funciones básicas disponibles',
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: AppColors.secondaryLabel,
+                        height: 1.33,
+                        letterSpacing: -0.24,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  const Text(
-                    'Plan gratuito',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.label,
-                      letterSpacing: -0.41,
-                      height: 1.29,
+                    const SizedBox(height: 16),
+                    const ColoredBox(
+                      color: AppColors.separator,
+                      child: SizedBox(height: 0.5, width: double.infinity),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'Cuentas básicas y seguimiento de gastos',
-                style: TextStyle(
-                  fontSize: 15,
-                  color: AppColors.secondaryLabel,
-                  height: 1.33,
-                  letterSpacing: -0.24,
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        _Feature(
+                          icon: isPremium
+                              ? CupertinoIcons.checkmark_circle_fill
+                              : CupertinoIcons.checkmark_circle,
+                          label: isPremium
+                              ? 'Cuentas ilimitadas'
+                              : 'Hasta ${limits.maxAccounts} cuentas',
+                        ),
+                        const SizedBox(width: 16),
+                        _Feature(
+                          icon: isPremium
+                              ? CupertinoIcons.checkmark_circle_fill
+                              : CupertinoIcons.checkmark_circle,
+                          label: isPremium
+                              ? 'Transacciones ilimitadas'
+                              : '100 transacciones',
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        _Feature(
+                          icon: isPremium
+                              ? CupertinoIcons.checkmark_circle_fill
+                              : CupertinoIcons.checkmark_circle,
+                          label: 'Resumen semanal',
+                        ),
+                        const SizedBox(width: 16),
+                        _Feature(
+                          icon: isPremium
+                              ? CupertinoIcons.checkmark_circle_fill
+                              : CupertinoIcons.checkmark_circle,
+                          label: 'Metas de ahorro',
+                        ),
+                      ],
+                    ),
+                    if (!isPremium) ...[
+                      const SizedBox(height: 16),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [
+                              CupertinoColors.systemPurple,
+                              CupertinoColors.systemIndigo,
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'Mejorar a Premium',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: CupertinoColors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
-              const ColoredBox(
-                color: AppColors.separator,
-                child: SizedBox(height: 0.5, width: double.infinity),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  _Feature(
-                    icon: CupertinoIcons.checkmark_circle_fill,
-                    label: 'Hasta 3 cuentas',
-                  ),
-                  const SizedBox(width: 16),
-                  _Feature(
-                    icon: CupertinoIcons.checkmark_circle_fill,
-                    label: 'Resumen semanal',
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  _Feature(
-                    icon: CupertinoIcons.checkmark_circle_fill,
-                    label: 'Categorías básicas',
-                  ),
-                  const SizedBox(width: 16),
-                  _Feature(
-                    icon: CupertinoIcons.checkmark_circle_fill,
-                    label: 'Metas de ahorro',
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
@@ -600,7 +543,7 @@ class _Feature extends StatelessWidget {
     return Expanded(
       child: Row(
         children: [
-          Icon(icon, color: AppColors.systemPurple, size: 14),
+          Icon(icon, size: 16, color: CupertinoColors.systemGreen),
           const SizedBox(width: 6),
           Flexible(
             child: Text(
@@ -608,8 +551,9 @@ class _Feature extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 13,
                 color: AppColors.secondaryLabel,
-                height: 1.3,
+                height: 1.38,
               ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -618,22 +562,6 @@ class _Feature extends StatelessWidget {
   }
 }
 
-// ─── Shared row separator ─────────────────────────────────────────────────────
-class _RowSeparator extends StatelessWidget {
-  const _RowSeparator();
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.only(left: 56),
-      child: ColoredBox(
-        color: AppColors.separator,
-        child: SizedBox(height: 0.5, width: double.infinity),
-      ),
-    );
-  }
-}
-
-// ─── Glass Settings Row ───────────────────────────────────────────────────────
 class _GlassSettingsRow extends StatelessWidget {
   final IconData icon;
   final Color color;
@@ -655,18 +583,25 @@ class _GlassSettingsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: _GlassCard(
-        child: Column(
-          children: [
-            CupertinoButton(
-              padding: EdgeInsets.zero,
-              onPressed: () {
-                HapticFeedback.selectionClick();
-                onTap();
-              },
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+      child: CupertinoButton(
+        padding: EdgeInsets.zero,
+        onPressed: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppColors.white05,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.white07),
+          ),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 13,
+                ),
                 child: Row(
                   children: [
                     Container(
@@ -694,16 +629,22 @@ class _GlassSettingsRow extends StatelessWidget {
                   ],
                 ),
               ),
-            ),
-            if (!isLast) const _RowSeparator(),
-          ],
+              if (!isLast)
+                Padding(
+                  padding: const EdgeInsets.only(left: 58),
+                  child: ColoredBox(
+                    color: AppColors.separator,
+                    child: const SizedBox(height: 0.5, width: double.infinity),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-// ─── Trailing Chevron ─────────────────────────────────────────────────────────
 class _TrailingChevron extends StatelessWidget {
   const _TrailingChevron();
   @override

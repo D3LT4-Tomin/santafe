@@ -6,6 +6,8 @@ import '../theme/app_theme.dart';
 import '../widgets/animated_blobs.dart';
 import '../providers/auth_provider.dart';
 import '../providers/data_provider.dart';
+import '../providers/subscription_provider.dart';
+import 'subscription_screen.dart';
 
 class UserSettingsScreen extends StatefulWidget {
   final ScrollController? scrollController;
@@ -58,6 +60,10 @@ class _UserSettingsScreenState extends State<UserSettingsScreen>
       curve: const Cubic(0.34, 1.56, 0.64, 1.0),
     );
     _appearController.forward();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<SubscriptionProvider>(context, listen: false).loadPlan();
+    });
   }
 
   @override
@@ -77,11 +83,37 @@ class _UserSettingsScreenState extends State<UserSettingsScreen>
         RepaintBoundary(
           child: AnimatedBlobs(blob1Anim: _blob1Anim, blob2Anim: _blob2Anim),
         ),
+
+        // Botón de regreso grande y visible
+        Positioned(
+          top: topPadding + 8,
+          left: 16,
+          child: GestureDetector(
+            onTap: () {
+              HapticFeedback.lightImpact();
+              Navigator.of(context).pop();
+            },
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: CupertinoColors.white.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                CupertinoIcons.chevron_left,
+                size: 24,
+                color: CupertinoColors.white,
+              ),
+            ),
+          ),
+        ),
+
         Positioned.fill(
           child: SingleChildScrollView(
             controller: widget.scrollController ?? ScrollController(),
             physics: const BouncingScrollPhysics(),
-            padding: EdgeInsets.only(top: topPadding + 76, bottom: 80),
+            padding: EdgeInsets.only(top: topPadding + 70, bottom: 80),
             child: FadeTransition(
               opacity: _appearAnim,
               child: SlideTransition(
@@ -91,7 +123,24 @@ class _UserSettingsScreenState extends State<UserSettingsScreen>
                 ).animate(_appearAnim),
                 child: Column(
                   children: [
-                    // ── Configuración general ─────────────────────────
+                    Consumer<SubscriptionProvider>(
+                      builder: (context, subscriptionProvider, child) {
+                        return _SubscriptionCard(
+                          isPremium: subscriptionProvider.isPremium,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                builder: (context) =>
+                                    const SubscriptionScreen(),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 28),
+
                     _SettingsSection(
                       title: 'CONFIGURACIÓN',
                       rows: [
@@ -115,21 +164,12 @@ class _UserSettingsScreenState extends State<UserSettingsScreen>
                           label: 'Exportar datos',
                           trailing: const _TrailingChevron(),
                           onTap: () {},
-                        ),
-                        _SettingsRow(
-                          icon: CupertinoIcons.trash,
-                          color: AppColors.systemRed,
-                          label: 'Eliminar cuenta',
-                          trailing: const _TrailingChevron(),
-                          isDestructive: true,
-                          onTap: () {},
                           isLast: true,
                         ),
                       ],
                     ),
                     const SizedBox(height: 28),
 
-                    // ── Seguridad ─────────────────────────────────────
                     _SettingsSection(
                       title: 'SEGURIDAD',
                       rows: [
@@ -159,7 +199,6 @@ class _UserSettingsScreenState extends State<UserSettingsScreen>
                     ),
                     const SizedBox(height: 28),
 
-                    // ── Notificaciones ────────────────────────────────
                     _SettingsSection(
                       title: 'NOTIFICACIONES',
                       rows: [
@@ -201,11 +240,25 @@ class _UserSettingsScreenState extends State<UserSettingsScreen>
                     ),
                     const SizedBox(height: 28),
 
-                    // ── Cerrar sesión ─────────────────────────────────
+                    _SettingsSection(
+                      title: 'ZONA PELIGRO',
+                      rows: [
+                        _SettingsRow(
+                          icon: CupertinoIcons.trash,
+                          color: AppColors.systemRed,
+                          label: 'Eliminar cuenta',
+                          trailing: const _TrailingChevron(),
+                          isDestructive: true,
+                          onTap: () {},
+                          isLast: true,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 28),
+
                     const _SignOutButton(),
                     const SizedBox(height: 12),
 
-                    // ── Version ───────────────────────────────────────
                     const Text(
                       'Finanzas v1.0.0',
                       style: TextStyle(
@@ -225,7 +278,117 @@ class _UserSettingsScreenState extends State<UserSettingsScreen>
   }
 }
 
-// ─── Settings Section ─────────────────────────────────────────────────────────
+class _SubscriptionCard extends StatelessWidget {
+  final bool isPremium;
+  final VoidCallback onTap;
+
+  const _SubscriptionCard({required this.isPremium, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: CupertinoButton(
+        padding: EdgeInsets.zero,
+        onPressed: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: isPremium
+                  ? [CupertinoColors.systemPurple, CupertinoColors.systemIndigo]
+                  : [CupertinoColors.systemGrey, CupertinoColors.systemGrey2],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color:
+                    (isPremium
+                            ? CupertinoColors.systemPurple
+                            : CupertinoColors.systemGrey)
+                        .withValues(alpha: 0.3),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        isPremium
+                            ? CupertinoIcons.star_fill
+                            : CupertinoIcons.star,
+                        color: CupertinoColors.white,
+                        size: 24,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        isPremium ? 'Plan Premium' : 'Plan Básico',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: CupertinoColors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Icon(
+                    CupertinoIcons.chevron_right,
+                    color: CupertinoColors.white,
+                    size: 20,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                isPremium
+                    ? 'Acceso completo a todas las funciones'
+                    : 'Funciones básicas disponibles',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: CupertinoColors.white.withValues(alpha: 0.9),
+                ),
+              ),
+              if (!isPremium) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: CupertinoColors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    'Mejorar a Premium',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: CupertinoColors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _SettingsSection extends StatelessWidget {
   final String title;
   final List<Widget> rows;
@@ -265,7 +428,6 @@ class _SettingsSection extends StatelessWidget {
   }
 }
 
-// ─── Shared row separator ─────────────────────────────────────────────────────
 class _RowSeparator extends StatelessWidget {
   const _RowSeparator();
   @override
@@ -280,7 +442,6 @@ class _RowSeparator extends StatelessWidget {
   }
 }
 
-// ─── Settings Row ─────────────────────────────────────────────────────────────
 class _SettingsRow extends StatelessWidget {
   final IconData icon;
   final Color color;
@@ -354,7 +515,6 @@ class _SettingsRow extends StatelessWidget {
   }
 }
 
-// ─── Toggle Row ───────────────────────────────────────────────────────────────
 class _ToggleRow extends StatelessWidget {
   final IconData icon;
   final Color color;
@@ -434,7 +594,6 @@ class _ToggleRow extends StatelessWidget {
   }
 }
 
-// ─── Trailing helpers ─────────────────────────────────────────────────────────
 class _TrailingChevron extends StatelessWidget {
   const _TrailingChevron();
   @override
@@ -470,7 +629,6 @@ class _TrailingValue extends StatelessWidget {
   }
 }
 
-// ─── Sign Out Button ──────────────────────────────────────────────────────────
 class _SignOutButton extends StatelessWidget {
   const _SignOutButton();
 
@@ -491,7 +649,9 @@ class _SignOutButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.systemRed.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.systemRed.withValues(alpha: 0.18)),
+            border: Border.all(
+              color: AppColors.systemRed.withValues(alpha: 0.18),
+            ),
           ),
           child: const SizedBox(
             width: double.infinity,

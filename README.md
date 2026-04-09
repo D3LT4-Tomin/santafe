@@ -9,6 +9,7 @@ Santafe is the repo for Tomin, our Flutter finance app built for the Talentland 
 - Real-time data sync through Firestore listeners
 - Tomy AI chat integration
 - Responsive Flutter UI for mobile, desktop, and web
+- Subscription plans (Free and Premium) with different account limits
 
 ## Run Locally
 
@@ -57,3 +58,11 @@ Open: http://localhost:8080
 - Docker runs the web build only; it does not launch Android or iOS emulators.
 - The app needs internet access for Firebase and Tomy.
 - Some UI state is kept locally in memory or via client-side persistence where implemented.
+
+## Subscription System
+
+The app includes a subscription system with Free and Premium plans:
+- Free plan: Up to 3 accounts
+- Premium plan: Up to 10 accounts
+
+For detailed information, see [SUBSCRIPTION_GUIDE.md](SUBSCRIPTION_GUIDE.md)
