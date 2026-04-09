@@ -312,7 +312,7 @@ class _Step0MultiChoiceState extends State<_Step0MultiChoice> {
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
-                color: Colors.white.withValues(alpha: 0.85),
+                color: AppColors.label.withValues(alpha: 0.85),
               ),
             ),
           ),
@@ -454,7 +454,7 @@ class _Step1RevealState extends State<_Step1Reveal>
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white.withValues(alpha: 0.85),
+                      color: AppColors.label.withValues(alpha: 0.85),
                     ),
                   ),
                 ),
@@ -695,7 +695,7 @@ class _Step2RankState extends State<_Step2Rank> {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white.withValues(alpha: 0.85),
+                      color: AppColors.label.withValues(alpha: 0.85),
                     ),
                   ),
                 ),
