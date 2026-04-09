@@ -251,7 +251,7 @@ class _InsightsScreenState extends State<InsightsScreen>
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: AppColors.label,
                           height: 1.33,
                         ),
                       ),
@@ -806,7 +806,7 @@ class _ReorderableItem extends StatelessWidget {
                     child: Icon(
                       CupertinoIcons.minus,
                       size: 10,
-                      color: Colors.white,
+                      color: AppColors.label,
                     ),
                   ),
                 ),
@@ -1084,7 +1084,7 @@ class _AddWidgetRow extends StatelessWidget {
                           Icon(
                             CupertinoIcons.trash,
                             size: 14,
-                            color: Colors.white,
+                            color: AppColors.label,
                           ),
                           SizedBox(width: 4),
                           Text(
@@ -1092,7 +1092,7 @@ class _AddWidgetRow extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                              color: AppColors.label,
                             ),
                           ),
                         ],
@@ -1120,7 +1120,7 @@ class _AddWidgetRow extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: AppColors.label,
                           height: 1.38,
                         ),
                       ),

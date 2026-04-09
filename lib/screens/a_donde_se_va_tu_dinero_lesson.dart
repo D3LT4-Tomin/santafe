@@ -253,7 +253,7 @@ class _LessonHeader extends StatelessWidget {
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: AppColors.label,
             height: 1.2,
             letterSpacing: -0.5,
           ),
@@ -357,7 +357,9 @@ class _Step0MultiChoiceState extends State<_Step0MultiChoice> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: selected ? Colors.white : AppColors.secondaryLabel,
+                          color: selected
+                              ? AppColors.label
+                              : AppColors.secondaryLabel,
                         ),
                       ),
                     ],
@@ -520,7 +522,7 @@ class _Step1RevealState extends State<_Step1Reveal>
                                             item.label,
                                             style: TextStyle(
                                               fontSize: 11,
-                                              color: Colors.white.withValues(
+                                              color: AppColors.label.withValues(
                                                 alpha: 0.60,
                                               ),
                                               height: 1.3,
@@ -531,7 +533,7 @@ class _Step1RevealState extends State<_Step1Reveal>
                                             style: TextStyle(
                                               fontSize: 20,
                                               fontWeight: FontWeight.w700,
-                                              color: Colors.white,
+                                              color: AppColors.label,
                                               letterSpacing: -0.5,
                                             ),
                                           ),
@@ -793,7 +795,8 @@ class _Step2RankState extends State<_Step2Rank> {
                                                       item.icon,
                                                       color: isSelected
                                                           ? color
-                                                          : AppColors.tertiaryLabel,
+                                                          : AppColors
+                                                                .tertiaryLabel,
                                                       size: 18,
                                                     ),
                                             ),
@@ -813,7 +816,10 @@ class _Step2RankState extends State<_Step2Rank> {
                                                 fontWeight: FontWeight.w500,
                                                 color: isSelected
                                                     ? AppColors.label
-                                                    : AppColors.label.withValues(alpha: 0.6),
+                                                    : AppColors.label
+                                                          .withValues(
+                                                            alpha: 0.6,
+                                                          ),
                                                 height: 1.2,
                                               ),
                                             ),
@@ -958,7 +964,7 @@ class _Step4CompletionState extends State<_Step4Completion>
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: AppColors.label,
                     height: 1.2,
                     letterSpacing: -0.5,
                   ),
@@ -1011,7 +1017,7 @@ class _Step4CompletionState extends State<_Step4Completion>
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: AppColors.label,
                             height: 1.5,
                           ),
                         ),
@@ -1085,7 +1091,7 @@ class _CompletionBadge extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              color: Colors.white,
+              color: AppColors.label,
               height: 1.35,
             ),
           ),
@@ -1126,7 +1132,9 @@ class _BottomButton extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: enabled ? Colors.white : AppColors.label.withValues(alpha: 0.3),
+                color: enabled
+                    ? AppColors.label
+                    : AppColors.label.withValues(alpha: 0.3),
                 letterSpacing: -0.2,
               ),
             ),

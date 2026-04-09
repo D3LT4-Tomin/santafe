@@ -270,7 +270,7 @@ class _Step0IntroState extends State<_Step0Intro>
                       style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: AppColors.label,
                         height: 1.2,
                         letterSpacing: -0.5,
                       ),
@@ -312,7 +312,7 @@ class _Step0IntroState extends State<_Step0Intro>
                             children: [
                               Icon(
                                 CupertinoIcons.lightbulb_fill,
-                                color: Colors.white.withValues(alpha: 0.6),
+                                color: AppColors.label.withValues(alpha: 0.6),
                                 size: 18,
                               ),
                               const SizedBox(width: 8),
@@ -331,7 +331,7 @@ class _Step0IntroState extends State<_Step0Intro>
                             'La mayoría de las personas que ahorran exitosamente lo hacen ANTES de gastar, no después.',
                             style: TextStyle(
                               fontSize: 15,
-                              color: Colors.white,
+                              color: AppColors.label,
                               height: 1.5,
                             ),
                           ),
@@ -415,7 +415,7 @@ class _Step1BinaryChoiceState extends State<_Step1BinaryChoice> {
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: AppColors.label,
                       height: 1.2,
                       letterSpacing: -0.4,
                     ),
@@ -520,7 +520,7 @@ class _BinaryOption extends StatelessWidget {
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                   color: isSelected
-                      ? Colors.white
+                      ? AppColors.label
                       : AppColors.label.withValues(alpha: 0.6),
                   height: 1.3,
                 ),
@@ -533,7 +533,7 @@ class _BinaryOption extends StatelessWidget {
                 decoration: BoxDecoration(color: color, shape: BoxShape.circle),
                 child: const Icon(
                   CupertinoIcons.checkmark,
-                  color: Colors.white,
+                  color: AppColors.label,
                   size: 16,
                 ),
               ),
@@ -694,7 +694,7 @@ class _Step2RevealBinaryState extends State<_Step2RevealBinary>
                           'Págate primero a ti mismo.\nAhorra antes de pagar cuentas,\ncomprar o gastar.',
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.white,
+                            color: AppColors.label,
                             height: 1.5,
                           ),
                         ),
@@ -774,7 +774,7 @@ class _Step3SingleChoiceState extends State<_Step3SingleChoice> {
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: AppColors.label,
                       height: 1.3,
                     ),
                   ),
@@ -826,7 +826,7 @@ class _Step3SingleChoiceState extends State<_Step3SingleChoice> {
                                 child: isSelected
                                     ? const Icon(
                                         CupertinoIcons.checkmark,
-                                        color: Colors.white,
+                                        color: AppColors.label,
                                         size: 14,
                                       )
                                     : null,
@@ -965,7 +965,7 @@ class _Step4RevealWithPopUpState extends State<_Step4RevealWithPopUp>
                             widget.correct
                                 ? '\$1,000 × 10% = \$100 al mes'
                                 : 'La respuesta correcta es \$100',
-                            style: TextStyle(fontSize: 16, color: Colors.white),
+                            style: TextStyle(fontSize: 16, color: AppColors.label),
                           ),
                           if (widget.correct) ...[
                             const SizedBox(height: 8),
@@ -1045,7 +1045,7 @@ class _Step4RevealWithPopUpState extends State<_Step4RevealWithPopUp>
                               'Según datos de diferentes instituciones, se debe ahorrar entre el 10% y el 17% de nuestros ingresos mensuales.',
                               style: TextStyle(
                                 fontSize: 15,
-                                color: Colors.white,
+                                color: AppColors.label,
                                 height: 1.5,
                               ),
                             ),
@@ -1153,7 +1153,7 @@ class _Step5CompletionState extends State<_Step5Completion>
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        color: AppColors.label,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -1181,7 +1181,7 @@ class _Step5CompletionState extends State<_Step5Completion>
                           color: AppColors.label.withValues(alpha: 0.3),
                           fontSize: 16,
                         ),
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                        style: TextStyle(color: AppColors.label, fontSize: 16),
                         decoration: null,
                         padding: const EdgeInsets.all(16),
                         onSubmitted: (_) => _submitText(),
@@ -1242,7 +1242,7 @@ class _Step5CompletionState extends State<_Step5Completion>
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                            color: AppColors.label,
                             height: 1.2,
                           ),
                         ),
@@ -1301,7 +1301,7 @@ class _Step5CompletionState extends State<_Step5Completion>
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                              color: AppColors.label,
                               height: 1.4,
                             ),
                           ),
@@ -1442,7 +1442,7 @@ class _PointsBadge extends StatelessWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
-              color: Colors.white,
+              color: AppColors.label,
             ),
           ),
           Text(
@@ -1488,7 +1488,7 @@ class _BadgeUnlocked extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: AppColors.label,
                 ),
               ),
             ),
@@ -1532,7 +1532,7 @@ class _BottomButton extends StatelessWidget {
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: enabled
-                    ? Colors.white
+                    ? AppColors.label
                     : AppColors.label.withValues(alpha: 0.3),
                 letterSpacing: -0.2,
               ),

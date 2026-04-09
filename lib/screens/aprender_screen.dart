@@ -1392,7 +1392,7 @@ class _GenericLessonContentState extends State<_GenericLessonContent>
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      color: AppColors.label,
                       letterSpacing: -0.2,
                     ),
                   ),
