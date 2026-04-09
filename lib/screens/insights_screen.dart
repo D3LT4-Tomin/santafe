@@ -187,14 +187,10 @@ class _InsightsScreenState extends State<InsightsScreen>
                               return Column(
                                 children: [
                                   for (final config in configs) ...[
-                                    _SwipeableWidget(
-                                      widgetId: config.id,
+                                    _buildWidgetById(
+                                      config.id,
+                                      isReorderMode: false,
                                       controller: controller,
-                                      child: _buildWidgetById(
-                                        config.id,
-                                        isReorderMode: false,
-                                        controller: controller,
-                                      ),
                                     ),
                                     const SizedBox(height: 16),
                                   ],
@@ -759,79 +755,6 @@ class _InsightsScreenState extends State<InsightsScreen>
 }
 
 // ─── Swipeable widget to delete ───────────────────────────────────────────────
-
-class _SwipeableWidget extends StatefulWidget {
-  final InsightWidgetId widgetId;
-  final InsightsLayoutController controller;
-  final Widget child;
-
-  const _SwipeableWidget({
-    required this.widgetId,
-    required this.controller,
-    required this.child,
-  });
-
-  @override
-  State<_SwipeableWidget> createState() => _SwipeableWidgetState();
-}
-
-class _SwipeableWidgetState extends State<_SwipeableWidget> {
-  double _dragExtent = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    final isPinned = widget.controller.isPinned(widget.widgetId);
-
-    return GestureDetector(
-      onHorizontalDragUpdate: isPinned
-          ? null
-          : (details) {
-              setState(() {
-                _dragExtent += details.delta.dx;
-                _dragExtent = _dragExtent.clamp(-100.0, 0.0);
-              });
-            },
-      onHorizontalDragEnd: isPinned
-          ? null
-          : (details) {
-              if (_dragExtent < -60) {
-                widget.controller.remove(widget.widgetId);
-              }
-              setState(() {
-                _dragExtent = 0;
-              });
-            },
-      child: Stack(
-        children: [
-          // Delete indicator (behind) - only show when dragging left
-          if (!isPinned && _dragExtent < 0)
-            Positioned.fill(
-              child: Container(
-                alignment: Alignment.centerRight,
-                padding: const EdgeInsets.only(right: 20),
-                decoration: BoxDecoration(
-                  color: AppColors.systemRed.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Icon(
-                  CupertinoIcons.trash,
-                  color: AppColors.systemRed,
-                  size: 24,
-                ),
-              ),
-            ),
-          // The actual widget
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            transform: Matrix4.translationValues(_dragExtent, 0, 0),
-            child: widget.child,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 // ─── Reorderable item wrapper ─────────────────────────────────────────────────
 // Owns the drag handle (invisible — full widget is draggable) + delete badge.
 
@@ -1000,7 +923,7 @@ class _AddWidgetSheet extends StatelessWidget {
                   child: Row(
                     children: [
                       Text(
-                        'EN PANTALLA (swipe para eliminar)',
+                        'EN PANTALLA',
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
