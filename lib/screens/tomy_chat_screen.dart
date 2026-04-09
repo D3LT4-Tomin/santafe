@@ -77,7 +77,16 @@ class _TomyChatScreenState extends State<TomyChatScreen>
         final userId = context.read<AuthProvider>().user?.id ?? '';
         _tomyProvider = TomyProvider(userId: userId);
         await _tomyProvider!.loadHistory();
-        if (mounted) setState(() => _initialized = true);
+        if (mounted) {
+          setState(() => _initialized = true);
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (widget.scrollController.hasClients) {
+              widget.scrollController.jumpTo(
+                widget.scrollController.position.maxScrollExtent,
+              );
+            }
+          });
+        }
       });
     } else {
       // For regular screen mode, initialize after frame
@@ -90,7 +99,16 @@ class _TomyChatScreenState extends State<TomyChatScreen>
     final userId = context.read<AuthProvider>().user?.id ?? '';
     _tomyProvider = TomyProvider(userId: userId);
     await _tomyProvider!.loadHistory();
-    if (mounted) setState(() => _initialized = true);
+    if (mounted) {
+      setState(() => _initialized = true);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (widget.scrollController.hasClients) {
+          widget.scrollController.jumpTo(
+            widget.scrollController.position.maxScrollExtent,
+          );
+        }
+      });
+    }
   }
 
   @override
