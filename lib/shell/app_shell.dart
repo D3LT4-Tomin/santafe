@@ -250,13 +250,22 @@ class _AppShellState extends State<AppShell> {
               ),
             ],
 
-            // Only show FAB on home tab (index 0)
-            if (_selectedIndex == 0 && !_isInLesson && !_isChatMode)
-              Positioned(
-                right: 20,
-                bottom: MediaQuery.of(context).padding.bottom + 70,
+            // Only show FAB on home tab (index 0) with fade animation
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOutCubic,
+              right: _selectedIndex == 0 && !_isInLesson && !_isChatMode
+                  ? 20
+                  : -80,
+              bottom: MediaQuery.of(context).padding.bottom + 70,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 200),
+                opacity: _selectedIndex == 0 && !_isInLesson && !_isChatMode
+                    ? 1.0
+                    : 0.0,
                 child: FabButton(onTap: _showAddExpenseSheet),
               ),
+            ),
 
             if (!_isInLesson && !_isChatMode)
               Positioned(
@@ -296,6 +305,7 @@ class _AppShellState extends State<AppShell> {
       child: HeaderRow(
         searchBarOpacity: _searchBarOpacity,
         onSearchPressed: _showSearchChat,
+        currentTabIndex: _selectedIndex,
       ),
     );
   }

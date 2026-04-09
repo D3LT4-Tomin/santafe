@@ -91,8 +91,6 @@ class _UserAccountScreenState extends State<UserAccountScreen>
                   children: [
                     const _ProfileHeader(),
                     const SizedBox(height: 28),
-                    const _AchievementsSection(),
-                    const SizedBox(height: 28),
                     const _PlanCard(),
                     const SizedBox(height: 28),
                     _GlassSettingsRow(
