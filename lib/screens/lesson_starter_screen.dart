@@ -90,12 +90,12 @@ class _LessonStarterScreenState extends State<LessonStarterScreen>
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.08),
+                  color: AppColors.label.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
                   CupertinoIcons.xmark,
-                  color: Colors.white54,
+                  color: AppColors.tertiaryLabel,
                   size: 18,
                 ),
               ),
@@ -146,14 +146,14 @@ class _LessonStarterScreenState extends State<LessonStarterScreen>
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        color: AppColors.label,
                         letterSpacing: -0.2,
                       ),
                     ),
                     const SizedBox(width: 8),
                     const Icon(
                       CupertinoIcons.arrow_right,
-                      color: Colors.white,
+                      color: AppColors.label,
                       size: 18,
                     ),
                   ],
@@ -178,9 +178,9 @@ class _StarterCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 32),
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: AppColors.label.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+        border: Border.all(color: AppColors.label.withValues(alpha: 0.10)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -198,7 +198,9 @@ class _StarterCard extends StatelessWidget {
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+              border: Border.all(
+                color: AppColors.label.withValues(alpha: 0.15),
+              ),
             ),
             child: const Icon(
               CupertinoIcons.book_fill,
@@ -213,7 +215,7 @@ class _StarterCard extends StatelessWidget {
             style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w700,
-              color: Colors.white,
+              color: AppColors.label,
               height: 1.2,
               letterSpacing: -0.4,
             ),
@@ -259,7 +261,11 @@ class _StarterCard extends StatelessWidget {
           const Text(
             'Aprende conceptos clave para\nmejorar tus finanzas',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, color: Colors.white54, height: 1.4),
+            style: TextStyle(
+              fontSize: 14,
+              color: AppColors.tertiaryLabel,
+              height: 1.4,
+            ),
           ),
         ],
       ),
@@ -293,7 +299,7 @@ class _InfoChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = highlight ? AppColors.goldAccent : Colors.white54;
+    final color = highlight ? AppColors.goldAccent : AppColors.tertiaryLabel;
 
     return Row(
       mainAxisSize: MainAxisSize.min,

@@ -1237,12 +1237,12 @@ class _GenericLessonContentState extends State<_GenericLessonContent>
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.08),
+                  color: AppColors.label.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
                   CupertinoIcons.xmark,
-                  color: Colors.white54,
+                  color: AppColors.tertiaryLabel,
                   size: 18,
                 ),
               ),
@@ -1276,7 +1276,7 @@ class _GenericLessonContentState extends State<_GenericLessonContent>
                     style: const TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: AppColors.label,
                       height: 1.2,
                       letterSpacing: -0.4,
                     ),
@@ -1288,14 +1288,14 @@ class _GenericLessonContentState extends State<_GenericLessonContent>
                       Icon(
                         CupertinoIcons.clock,
                         size: 14,
-                        color: Colors.white.withValues(alpha: 0.5),
+                        color: AppColors.label.withValues(alpha: 0.5),
                       ),
                       const SizedBox(width: 6),
                       Text(
                         '${widget.minutes} min',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.white.withValues(alpha: 0.5),
+                          color: AppColors.label.withValues(alpha: 0.5),
                         ),
                       ),
                     ],
@@ -1305,10 +1305,10 @@ class _GenericLessonContentState extends State<_GenericLessonContent>
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.05),
+                      color: AppColors.label.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.10),
+                        color: AppColors.label.withValues(alpha: 0.10),
                       ),
                     ),
                     child: Column(
@@ -1319,7 +1319,7 @@ class _GenericLessonContentState extends State<_GenericLessonContent>
                           style: const TextStyle(
                             fontSize: 16,
                             height: 1.5,
-                            color: Colors.white,
+                            color: AppColors.label,
                           ),
                         ),
                       ],
@@ -1331,7 +1331,7 @@ class _GenericLessonContentState extends State<_GenericLessonContent>
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      color: AppColors.label,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -1361,7 +1361,7 @@ class _GenericLessonContentState extends State<_GenericLessonContent>
                               style: TextStyle(
                                 fontSize: 15,
                                 height: 1.4,
-                                color: Colors.white.withValues(alpha: 0.85),
+                                color: AppColors.label.withValues(alpha: 0.85),
                               ),
                             ),
                           ),
@@ -1386,10 +1386,10 @@ class _GenericLessonContentState extends State<_GenericLessonContent>
                   color: widget.color,
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Center(
+                child: Center(
                   child: Text(
                     'Completar lección',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
