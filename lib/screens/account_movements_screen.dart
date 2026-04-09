@@ -106,7 +106,7 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
           widget.accountName,
           style: const TextStyle(color: AppColors.label),
         ),
-        backgroundColor: AppColors.frostedBlue. withValues(alpha: 0.5),
+        backgroundColor: AppColors.frostedGreen.withValues(alpha: 0.5),
         border: null,
       ),
       child: Consumer<DataProvider>(
@@ -194,9 +194,9 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
             alignment: Alignment.topCenter,
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: AppColors.white05,
+                color: AppColors.cardBackground,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.white07),
+                border: Border.all(color: AppColors.black07),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,

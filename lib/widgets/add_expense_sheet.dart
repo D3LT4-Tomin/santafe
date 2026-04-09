@@ -158,14 +158,14 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Padding(
-                  padding: EdgeInsets.only(top: 8, bottom: 4),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8, bottom: 4),
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      color: Color(0x4D8E8E93),
+                      color: AppColors.secondaryLabel.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.all(Radius.circular(999)),
                     ),
-                    child: SizedBox(width: 36, height: 5),
+                    child: const SizedBox(width: 36, height: 5),
                   ),
                 ),
                 Padding(
@@ -181,7 +181,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                         onPressed: () => Navigator.pop(context),
                         child: const Text(
                           'Cancelar',
-                          style: TextStyle(color: AppColors.systemBlue),
+                          style: TextStyle(color: AppColors.systemGreen),
                         ),
                       ),
                       const Text(
@@ -200,7 +200,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                             : const Text(
                                 'Listo',
                                 style: TextStyle(
-                                  color: AppColors.systemBlue,
+                                  color: AppColors.systemGreen,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
@@ -225,12 +225,12 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                             decoration: BoxDecoration(
                               color: _isExpense
                                   ? AppColors.systemRed
-                                  : AppColors.white05,
+                                  : AppColors.cardBackground,
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
                                 color: _isExpense
                                     ? AppColors.systemRed
-                                    : AppColors.white10,
+                                    : AppColors.cardBorder,
                               ),
                             ),
                             child: Center(
@@ -259,12 +259,12 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                             decoration: BoxDecoration(
                               color: !_isExpense
                                   ? AppColors.systemGreen
-                                  : AppColors.white05,
+                                  : AppColors.cardBackground,
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
                                 color: !_isExpense
                                     ? AppColors.systemGreen
-                                    : AppColors.white10,
+                                    : AppColors.cardBorder,
                               ),
                             ),
                             child: Center(
@@ -346,9 +346,9 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                       vertical: 12,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.white05,
+                      color: AppColors.cardBackground,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.white10),
+                      border: Border.all(color: AppColors.cardBorder),
                     ),
                     child: Row(
                       children: [
@@ -394,9 +394,9 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                       vertical: 12,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.white05,
+                      color: AppColors.cardBackground,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.white10),
+                      border: Border.all(color: AppColors.cardBorder),
                     ),
                     child: Row(
                       children: [

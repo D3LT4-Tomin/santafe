@@ -140,23 +140,9 @@ class _CuentaScreenState extends State<CuentaScreen>
       height: topPadding + 66.0,
       child: Stack(
         children: [
-          const Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [AppColors.frostedBlue, Color(0x00070D1A)],
-                ),
-              ),
-            ),
-          ),
           Positioned.fill(
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                child: const ColoredBox(color: Colors.transparent),
-              ),
+            child: DecoratedBox(
+              decoration: const BoxDecoration(color: AppColors.frostedGreen),
             ),
           ),
         ],
@@ -196,9 +182,9 @@ class _NetWorthCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: AppColors.white05,
+              color: AppColors.cardBackground,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.white07),
+              border: Border.all(color: AppColors.black07),
             ),
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -237,7 +223,7 @@ class _NetWorthCard extends StatelessWidget {
                       _NetWorthPill(
                         label: 'BANCOS',
                         value: '\$${_formatCurrency(bankTotal)}',
-                        color: AppColors.systemBlue,
+                        color: AppColors.systemGreen,
                       ),
                       const SizedBox(width: 10),
                       _NetWorthPill(
@@ -340,7 +326,7 @@ class _SectionCard extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.badge,
-    this.badgeColor = AppColors.systemBlue,
+    this.badgeColor = AppColors.systemGreen,
     required this.onAdd,
     required this.children,
   });
@@ -351,9 +337,9 @@ class _SectionCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: AppColors.white05,
+          color: AppColors.cardBackground,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.white07),
+          border: Border.all(color: AppColors.black07),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -428,7 +414,7 @@ class _SectionCard extends StatelessWidget {
                     onPressed: onAdd,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        color: AppColors.systemBlue.withValues(alpha: 0.10),
+                        color: AppColors.systemGreen.withValues(alpha: 0.10),
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: const SizedBox(
@@ -436,7 +422,7 @@ class _SectionCard extends StatelessWidget {
                         height: 32,
                         child: Icon(
                           CupertinoIcons.add,
-                          color: AppColors.systemBlue,
+                          color: AppColors.systemGreen,
                           size: 16,
                         ),
                       ),
@@ -531,7 +517,7 @@ class _BankAccountsSection extends StatelessWidget {
           subtitle: '\$${_formatCurrency(totalBalance)}',
           badge:
               '${bankAccounts.length} ${bankAccounts.length == 1 ? 'cuenta' : 'cuentas'}',
-          badgeColor: AppColors.systemBlue,
+          badgeColor: AppColors.systemGreen,
           onAdd: () => Navigator.of(context).push(
             CupertinoPageRoute(builder: (_) => const AddBankAccountScreen()),
           ),
@@ -569,7 +555,7 @@ class _BankAccountRow extends StatelessWidget {
     final isCredit = account.bankSubtype == BankAccountSubtype.credit;
     final subtypeColor = isCredit
         ? AppColors.systemPurple
-        : AppColors.systemBlue;
+        : AppColors.systemGreen;
     final subtypeIcon = isCredit
         ? CupertinoIcons.creditcard
         : CupertinoIcons.creditcard_fill;

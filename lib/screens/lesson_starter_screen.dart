@@ -77,7 +77,7 @@ class _LessonStarterScreenState extends State<LessonStarterScreen>
     final topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF070D1A),
+      backgroundColor: AppColors.lessonBackground,
       body: Stack(
         children: [
           Positioned(
@@ -125,14 +125,14 @@ class _LessonStarterScreenState extends State<LessonStarterScreen>
                 height: 56,
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFF0A84FF), Color(0xFF5E5CE6)],
+                    colors: [AppColors.legacyBlue, AppColors.legacyBlueLight],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF0A84FF).withValues(alpha: 0.35),
+                      color: AppColors.legacyBlue.withValues(alpha: 0.35),
                       blurRadius: 20,
                       offset: const Offset(0, 8),
                     ),
@@ -191,7 +191,7 @@ class _StarterCard extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppColors.systemBlue.withValues(alpha: 0.2),
+                  AppColors.systemGreen.withValues(alpha: 0.2),
                   AppColors.systemPurple.withValues(alpha: 0.2),
                 ],
                 begin: Alignment.topLeft,
@@ -202,7 +202,7 @@ class _StarterCard extends StatelessWidget {
             ),
             child: const Icon(
               CupertinoIcons.book_fill,
-              color: AppColors.systemBlue,
+              color: AppColors.systemGreen,
               size: 36,
             ),
           ),
@@ -271,11 +271,11 @@ class _StarterCard extends StatelessWidget {
       case 'Gestión':
         return AppColors.systemIndigo;
       case 'Planeación':
-        return AppColors.systemBlue;
+        return AppColors.systemGreen;
       case 'Ahorro':
         return AppColors.systemGreen;
       default:
-        return AppColors.systemBlue;
+        return AppColors.systemGreen;
     }
   }
 }
@@ -293,7 +293,7 @@ class _InfoChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = highlight ? const Color(0xFFFFCC00) : Colors.white54;
+    final color = highlight ? AppColors.goldAccent : Colors.white54;
 
     return Row(
       mainAxisSize: MainAxisSize.min,

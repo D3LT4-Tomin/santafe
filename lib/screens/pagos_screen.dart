@@ -68,15 +68,15 @@ class _PagosScreenState extends State<PagosScreen>
                 children: [
                   DecoratedBox(
                     decoration: BoxDecoration(
-                      color: AppColors.white05,
+                      color: AppColors.cardBackground,
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: AppColors.white10),
+                      border: Border.all(color: AppColors.cardBorder),
                     ),
                     child: const Padding(
                       padding: EdgeInsets.all(20),
                       child: Icon(
                         CupertinoIcons.creditcard_fill,
-                        color: AppColors.systemBlue,
+                        color: AppColors.systemGreen,
                         size: 36,
                       ),
                     ),
@@ -128,16 +128,8 @@ class _PagosScreenState extends State<PagosScreen>
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   stops: [0.0, 1.0],
-                  colors: [AppColors.frostedBlue, Color(0x00070D1A)],
+                  colors: [AppColors.frostedGreen, AppColors.frostedGreen],
                 ),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                child: const ColoredBox(color: Colors.transparent),
               ),
             ),
           ),

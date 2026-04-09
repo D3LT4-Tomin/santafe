@@ -106,9 +106,9 @@ class _ChatOverlayState extends State<ChatOverlay>
                         width: 36,
                         height: 36,
                         decoration: BoxDecoration(
-                          color: AppColors.white05,
+                          color: AppColors.cardBackground,
                           shape: BoxShape.circle,
-                          border: Border.all(color: AppColors.white10),
+                          border: Border.all(color: AppColors.cardBorder),
                         ),
                         child: const Icon(
                           CupertinoIcons.back,
@@ -167,7 +167,7 @@ class _ChatOverlayState extends State<ChatOverlay>
                 decoration: BoxDecoration(
                   color: AppColors.systemBackground.withValues(alpha: 0.95),
                   border: const Border(
-                    top: BorderSide(color: AppColors.white07, width: 0.5),
+                    top: BorderSide(color: AppColors.black07, width: 0.5),
                   ),
                   boxShadow: [
                     BoxShadow(
@@ -200,9 +200,9 @@ class _ChatOverlayState extends State<ChatOverlay>
                         maxLines: 5,
                         textInputAction: TextInputAction.send,
                         decoration: BoxDecoration(
-                          color: AppColors.white05,
+                          color: AppColors.cardBackground,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: AppColors.white10),
+                          border: Border.all(color: AppColors.cardBorder),
                         ),
                         onSubmitted: (_) => _sendMessage(),
                       ),
@@ -217,11 +217,11 @@ class _ChatOverlayState extends State<ChatOverlay>
                           width: 44,
                           height: 44,
                           decoration: BoxDecoration(
-                            color: AppColors.systemBlue,
+                            color: AppColors.systemGreen,
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.systemBlue.withValues(
+                                color: AppColors.systemGreen.withValues(
                                   alpha: 0.3,
                                 ),
                                 blurRadius: 8,
@@ -275,7 +275,7 @@ class _ChatBubble extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: isUser
-                  ? AppColors.systemBlue
+                  ? AppColors.systemGreen
                   : AppColors.secondaryBackground,
               borderRadius: BorderRadius.circular(20).copyWith(
                 bottomRight: isUser
@@ -285,7 +285,7 @@ class _ChatBubble extends StatelessWidget {
                     ? const Radius.circular(4)
                     : const Radius.circular(20),
               ),
-              border: isUser ? null : Border.all(color: AppColors.white07),
+              border: isUser ? null : Border.all(color: AppColors.black07),
             ),
             child: Text(
               text,

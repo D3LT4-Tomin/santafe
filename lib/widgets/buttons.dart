@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
+import '../theme/app_theme.dart';
 
 // ─── Primary Button ───────────────────────────────────────────────────────────
 class PrimaryButton extends StatefulWidget {
-  final String   label;
+  final String label;
   final IconData icon;
   final VoidCallback onTap;
 
@@ -23,24 +24,30 @@ class _PrimaryButtonState extends State<PrimaryButton> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown:   (_) => setState(() => _pressed = true),
-      onTapUp:     (_) { setState(() => _pressed = false); widget.onTap(); },
-      onTapCancel: ()  => setState(() => _pressed = false),
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) {
+        setState(() => _pressed = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _pressed = false),
       child: AnimatedScale(
         scale: _pressed ? 0.97 : 1.0,
         duration: const Duration(milliseconds: 100),
         child: DecoratedBox(
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF0A84FF), Color(0xFF409CFF)],
+            gradient: LinearGradient(
+              colors: [
+                AppColors.primaryButtonGradientStart,
+                AppColors.primaryButtonGradientEnd,
+              ],
             ),
             borderRadius: BorderRadius.circular(14),
-            boxShadow: const [
+            boxShadow: [
               BoxShadow(
-                color: Color(0x590A84FF),
+                color: AppColors.primaryButtonShadow,
                 blurRadius: 16,
                 spreadRadius: 1,
-                offset: Offset(0, 4),
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -86,9 +93,12 @@ class _FabButtonState extends State<FabButton> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown:   (_) => setState(() => _pressed = true),
-      onTapUp:     (_) { setState(() => _pressed = false); widget.onTap(); },
-      onTapCancel: ()  => setState(() => _pressed = false),
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) {
+        setState(() => _pressed = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _pressed = false),
       child: AnimatedScale(
         scale: _pressed ? 0.92 : 1.0,
         duration: const Duration(milliseconds: 120),
@@ -97,18 +107,21 @@ class _FabButtonState extends State<FabButton> {
           width: 56,
           height: 56,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF0A84FF), Color(0xFF409CFF)],
+              colors: [
+                AppColors.primaryButtonGradientStart,
+                AppColors.primaryButtonGradientEnd,
+              ],
             ),
             shape: BoxShape.circle,
-            boxShadow: const [
+            boxShadow: [
               BoxShadow(
-                color: Color(0x330A84FF),
+                color: AppColors.primaryButtonShadowLight,
                 blurRadius: 12,
                 spreadRadius: 0,
-                offset: Offset(0, 4),
+                offset: const Offset(0, 4),
               ),
             ],
           ),

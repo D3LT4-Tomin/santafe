@@ -44,7 +44,7 @@ class _LessonShellState extends State<_LessonShell>
     _RankItem(
       label: 'Renta',
       icon: CupertinoIcons.house_fill,
-      color: AppColors.systemBlue,
+      color: AppColors.systemGreen,
     ),
     _RankItem(
       label: 'Cine',
@@ -116,7 +116,7 @@ class _LessonShellState extends State<_LessonShell>
     final top = MediaQuery.of(context).padding.top;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF070D1A),
+      backgroundColor: AppColors.lessonBackground,
       body: Column(
         children: [
           SizedBox(
@@ -145,15 +145,23 @@ class _LessonShellState extends State<_LessonShell>
                             animation: _progressAnim,
                             builder: (_, _) => LinearProgressIndicator(
                               value: _progressAnim.value,
-                              backgroundColor: Colors.white.withValues(alpha: 0.10),
-                              valueColor: const AlwaysStoppedAnimation(AppColors.systemBlue),
+                              backgroundColor: Colors.white.withValues(
+                                alpha: 0.10,
+                              ),
+                              valueColor: const AlwaysStoppedAnimation(
+                                AppColors.systemGreen,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                  const Icon(CupertinoIcons.bell, color: Colors.white38, size: 20),
+                  const Icon(
+                    CupertinoIcons.bell,
+                    color: Colors.white38,
+                    size: 20,
+                  ),
                 ],
               ),
             ),
@@ -194,9 +202,17 @@ class _LessonShellState extends State<_LessonShell>
       case 1:
         return _Step1Reveal(onNext: _advance);
       case 2:
-        return _Step2Rank(items: _rankItems, onNext: _advance, isSelecting: true);
+        return _Step2Rank(
+          items: _rankItems,
+          onNext: _advance,
+          isSelecting: true,
+        );
       case 3:
-        return _Step2Rank(items: _rankItems, onNext: _advance, isSelecting: false);
+        return _Step2Rank(
+          items: _rankItems,
+          onNext: _advance,
+          isSelecting: false,
+        );
       case 4:
         return _Step4Completion(onNext: _advance);
       default:
@@ -217,16 +233,16 @@ class _LessonHeader extends StatelessWidget {
           width: 56,
           height: 56,
           decoration: BoxDecoration(
-            color: AppColors.systemBlue.withValues(alpha: 0.15),
+            color: AppColors.systemGreen.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: AppColors.systemBlue.withValues(alpha: 0.35),
+              color: AppColors.systemGreen.withValues(alpha: 0.35),
               width: 1,
             ),
           ),
           child: const Icon(
             CupertinoIcons.money_dollar_circle_fill,
-            color: AppColors.systemBlue,
+            color: AppColors.systemGreen,
             size: 28,
           ),
         ),
@@ -272,7 +288,11 @@ class _Step0MultiChoiceState extends State<_Step0MultiChoice> {
   static const _choices = [
     _Choice('Comida', CupertinoIcons.cart_fill, AppColors.systemOrange),
     _Choice('Ocio', CupertinoIcons.gamecontroller_fill, AppColors.systemPurple),
-    _Choice('Servicios', CupertinoIcons.bolt_circle_fill, AppColors.systemBlue),
+    _Choice(
+      'Servicios',
+      CupertinoIcons.bolt_circle_fill,
+      AppColors.systemGreen,
+    ),
     _Choice('Transporte', CupertinoIcons.car_fill, AppColors.systemGreen),
   ];
 
@@ -374,10 +394,30 @@ class _Step1RevealState extends State<_Step1Reveal>
   late final AnimationController _ctrl;
 
   static const _items = [
-    _RevealItem('Comida', '\$120', AppColors.systemOrange, CupertinoIcons.cart_fill),
-    _RevealItem('Lista', '\$40', AppColors.systemBlue, CupertinoIcons.list_bullet),
-    _RevealItem('Servicios\nMúsica', '\$15', AppColors.systemPurple, CupertinoIcons.music_note),
-    _RevealItem('Transporte\nUber', '\$80', AppColors.systemGreen, CupertinoIcons.car_fill),
+    _RevealItem(
+      'Comida',
+      '\$120',
+      AppColors.systemOrange,
+      CupertinoIcons.cart_fill,
+    ),
+    _RevealItem(
+      'Lista',
+      '\$40',
+      AppColors.systemGreen,
+      CupertinoIcons.list_bullet,
+    ),
+    _RevealItem(
+      'Servicios\nMúsica',
+      '\$15',
+      AppColors.systemPurple,
+      CupertinoIcons.music_note,
+    ),
+    _RevealItem(
+      'Transporte\nUber',
+      '\$80',
+      AppColors.systemGreen,
+      CupertinoIcons.car_fill,
+    ),
   ];
 
   @override
@@ -435,7 +475,10 @@ class _Step1RevealState extends State<_Step1Reveal>
                     return AnimatedBuilder(
                       animation: _ctrl,
                       builder: (_, _) {
-                        final t = ((_ctrl.value - delay) / (1 - delay)).clamp(0.0, 1.0);
+                        final t = ((_ctrl.value - delay) / (1 - delay)).clamp(
+                          0.0,
+                          1.0,
+                        );
                         final curve = Curves.easeOutCubic.transform(t);
                         return Opacity(
                           opacity: curve,
@@ -459,18 +502,27 @@ class _Step1RevealState extends State<_Step1Reveal>
                                   ),
                                   padding: const EdgeInsets.all(14),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Icon(item.icon, color: item.color, size: 22),
+                                      Icon(
+                                        item.icon,
+                                        color: item.color,
+                                        size: 22,
+                                      ),
                                       Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             item.label,
                                             style: TextStyle(
                                               fontSize: 11,
-                                              color: Colors.white.withValues(alpha: 0.60),
+                                              color: Colors.white.withValues(
+                                                alpha: 0.60,
+                                              ),
                                               height: 1.3,
                                             ),
                                           ),
@@ -498,10 +550,14 @@ class _Step1RevealState extends State<_Step1Reveal>
                                       vertical: 3,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: AppColors.systemGreen.withValues(alpha: 0.20),
+                                      color: AppColors.systemGreen.withValues(
+                                        alpha: 0.20,
+                                      ),
                                       borderRadius: BorderRadius.circular(999),
                                       border: Border.all(
-                                        color: AppColors.systemGreen.withValues(alpha: 0.40),
+                                        color: AppColors.systemGreen.withValues(
+                                          alpha: 0.40,
+                                        ),
                                       ),
                                     ),
                                     child: const Text(
@@ -579,7 +635,7 @@ class _Step2RankState extends State<_Step2Rank> {
   static const _pointBadges = ['+2pt', '+1pt', '+2pt', '+1pt'];
   static const _revealColors = [
     AppColors.systemOrange,
-    AppColors.systemBlue,
+    AppColors.systemGreen,
     AppColors.systemPurple,
     AppColors.systemYellow,
   ];
@@ -650,18 +706,25 @@ class _Step2RankState extends State<_Step2Rank> {
                   builder: (context, constraints) {
                     final count = widget.items.length;
                     const gap = 8.0;
-                    final side = (constraints.maxWidth - gap * (count - 1)) / count;
+                    final side =
+                        (constraints.maxWidth - gap * (count - 1)) / count;
 
                     return Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: List.generate(count, (i) {
                         final item = widget.items[i];
                         final isSelected = item.selected;
-                        final color = widget.isSelecting ? item.color : _revealColors[i];
-                        final badge = !widget.isSelecting ? _pointBadges[i] : null;
+                        final color = widget.isSelecting
+                            ? item.color
+                            : _revealColors[i];
+                        final badge = !widget.isSelecting
+                            ? _pointBadges[i]
+                            : null;
 
                         return Padding(
-                          padding: EdgeInsets.only(right: i < count - 1 ? gap : 0),
+                          padding: EdgeInsets.only(
+                            right: i < count - 1 ? gap : 0,
+                          ),
                           child: GestureDetector(
                             onTap: widget.isSelecting ? () => _toggle(i) : null,
                             child: SizedBox(
@@ -672,53 +735,74 @@ class _Step2RankState extends State<_Step2Rank> {
                                   // Square card — fills the SizedBox
                                   Positioned.fill(
                                     child: AnimatedContainer(
-                                      duration: const Duration(milliseconds: 250),
+                                      duration: const Duration(
+                                        milliseconds: 250,
+                                      ),
                                       curve: Curves.easeOutCubic,
                                       decoration: BoxDecoration(
                                         color: isSelected
                                             ? color.withValues(alpha: 0.18)
-                                            : Colors.white.withValues(alpha: 0.06),
+                                            : Colors.white.withValues(
+                                                alpha: 0.06,
+                                              ),
                                         borderRadius: BorderRadius.circular(14),
                                         border: Border.all(
                                           color: isSelected
                                               ? color.withValues(alpha: 0.50)
-                                              : Colors.white.withValues(alpha: 0.10),
+                                              : Colors.white.withValues(
+                                                  alpha: 0.10,
+                                                ),
                                           width: isSelected ? 1.5 : 1,
                                         ),
                                       ),
                                       child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
                                           AnimatedContainer(
-                                            duration: const Duration(milliseconds: 200),
+                                            duration: const Duration(
+                                              milliseconds: 200,
+                                            ),
                                             width: 36,
                                             height: 36,
                                             decoration: BoxDecoration(
                                               color: isSelected
-                                                  ? color.withValues(alpha: 0.25)
-                                                  : Colors.white.withValues(alpha: 0.08),
-                                              borderRadius: BorderRadius.circular(10),
+                                                  ? color.withValues(
+                                                      alpha: 0.25,
+                                                    )
+                                                  : Colors.white.withValues(
+                                                      alpha: 0.08,
+                                                    ),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
                                             ),
                                             child: Center(
-                                              child: isSelected && item.rank != null
+                                              child:
+                                                  isSelected &&
+                                                      item.rank != null
                                                   ? Text(
                                                       '${item.rank}',
                                                       style: TextStyle(
                                                         fontSize: 16,
-                                                        fontWeight: FontWeight.w700,
+                                                        fontWeight:
+                                                            FontWeight.w700,
                                                         color: color,
                                                       ),
                                                     )
                                                   : Icon(
                                                       item.icon,
-                                                      color: isSelected ? color : Colors.white38,
+                                                      color: isSelected
+                                                          ? color
+                                                          : Colors.white38,
                                                       size: 18,
                                                     ),
                                             ),
                                           ),
                                           const SizedBox(height: 8),
                                           Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 4,
+                                            ),
                                             child: Text(
                                               item.label,
                                               textAlign: TextAlign.center,
@@ -727,7 +811,9 @@ class _Step2RankState extends State<_Step2Rank> {
                                               style: TextStyle(
                                                 fontSize: 10,
                                                 fontWeight: FontWeight.w500,
-                                                color: isSelected ? Colors.white : Colors.white60,
+                                                color: isSelected
+                                                    ? Colors.white
+                                                    : Colors.white60,
                                                 height: 1.2,
                                               ),
                                             ),
@@ -747,10 +833,14 @@ class _Step2RankState extends State<_Step2Rank> {
                                           vertical: 2,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: AppColors.systemGreen.withValues(alpha: 0.18),
-                                          borderRadius: BorderRadius.circular(999),
+                                          color: AppColors.systemGreen
+                                              .withValues(alpha: 0.18),
+                                          borderRadius: BorderRadius.circular(
+                                            999,
+                                          ),
                                           border: Border.all(
-                                            color: AppColors.systemGreen.withValues(alpha: 0.40),
+                                            color: AppColors.systemGreen
+                                                .withValues(alpha: 0.40),
                                           ),
                                         ),
                                         child: Text(
@@ -844,15 +934,17 @@ class _Step4CompletionState extends State<_Step4Completion>
                         width: 56,
                         height: 56,
                         decoration: BoxDecoration(
-                          color: AppColors.systemBlue.withValues(alpha: 0.15),
+                          color: AppColors.systemGreen.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: AppColors.systemBlue.withValues(alpha: 0.35),
+                            color: AppColors.systemGreen.withValues(
+                              alpha: 0.35,
+                            ),
                           ),
                         ),
                         child: const Icon(
                           CupertinoIcons.money_dollar_circle_fill,
-                          color: AppColors.systemBlue,
+                          color: AppColors.systemGreen,
                           size: 28,
                         ),
                       ),
@@ -883,7 +975,10 @@ class _Step4CompletionState extends State<_Step4Completion>
                 ),
                 const SizedBox(height: 36),
 
-                Container(height: 1, color: Colors.white.withValues(alpha: 0.08)),
+                Container(
+                  height: 1,
+                  color: Colors.white.withValues(alpha: 0.08),
+                ),
                 const SizedBox(height: 28),
 
                 FadeTransition(
@@ -894,7 +989,9 @@ class _Step4CompletionState extends State<_Step4Completion>
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.10),
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -931,7 +1028,7 @@ class _Step4CompletionState extends State<_Step4Completion>
                       Expanded(
                         child: _CompletionBadge(
                           icon: CupertinoIcons.star_fill,
-                          color: const Color(0xFFFFCC00),
+                          color: AppColors.goldAccent,
                           label: '10\npuntos',
                         ),
                       ),
@@ -1019,7 +1116,7 @@ class _BottomButton extends StatelessWidget {
           height: 54,
           decoration: BoxDecoration(
             color: enabled
-                ? AppColors.systemBlue
+                ? AppColors.systemGreen
                 : Colors.white.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(14),
           ),

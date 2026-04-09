@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 // Light-mode first. Primary brand: Dark Green #006341, Accent: Dark Red #af272f
 class AppColors {
   // ── Backgrounds ─────────────────────────────────────────────────────────────
-  // White canvas as primary surface (replaces HIG black)
+  // White canvas as primary surface
   static const systemBackground = Color(0xFFFFFFFF);
-  // Soft warm-gray card/sheet surface (replaces HIG #1C1C1E)
-  static const secondaryBackground = Color(0xFFF5F5F4);
-  // Light cool-gray for nested surfaces (replaces HIG #2C2C2E)
-  static const tertiaryBackground = Color(0xFFEAEBEB);
+  // Lighter warm-gray for card/sheet surfaces
+  static const secondaryBackground = Color(0xFFFAFAFA);
+  // Very light cool-gray for nested surfaces
+  static const tertiaryBackground = Color(0xFFF5F5F5);
 
   // ── Labels / Text ───────────────────────────────────────────────────────────
   // Near-black for primary text (replaces HIG white)
@@ -49,15 +49,14 @@ class AppColors {
   static const tertiaryFill = Color(0x1F53565A);
 
   // ── Frosted / Overlay Surfaces ───────────────────────────────────────────────
-  // Brand-green frosted base (replaces frostedBlue)
-  static const frostedGreen = Color(0xFF006341);
+  // Solid white for header and footer (100% opacity)
+  static const frostedGreen = Color(0xFFFFFFFF);
+  static const frostedGreen85 = Color(0xFFFFFFFF);
   // Semi-transparent overlays on white surfaces
   static const black05 = Color(0x0D000000);
   static const black07 = Color(0x12000000);
   static const black08 = Color(0x14000000);
   static const black10 = Color(0x1A000000);
-  // 85% opaque frosted green panel (replaces frostedBlue85)
-  static const frostedGreen85 = Color(0xD9006341);
 
   // ── Tip / Info Banners ───────────────────────────────────────────────────────
   // Green-tinted info banner bg (replaces blueTipBg)
@@ -101,6 +100,11 @@ class AppColors {
   static const white08 = Color(0x14FFFFFF);
   static const white05 = Color(0x0DFFFFFF);
 
+  // ── Card Surfaces (white theme) ──────────────────────────────────────────────────
+  static const cardBackground = Color(0xFFFFFFFF);
+  static const cardBorder = Color(0x1A000000); // subtle gray border
+  static const cardShadow = Color(0x0D000000);
+
   // ── Special Use Cases ───────────────────────────────────────────────────────────
   // For gradients and dark surfaces
   static const gradientStart = Color(0xFF0F2748);
@@ -120,10 +124,10 @@ class AppColors {
   static const disabledGray = Color(0xFF636366);
 
   // ── Shadows & Effects ────────────────────────────────────────────────────────────
-  static const primaryButtonGradientStart = Color(0xFF0A84FF);
-  static const primaryButtonGradientEnd = Color(0xFF409CFF);
-  static const primaryButtonShadow = Color(0x590A84FF);
-  static const primaryButtonShadowLight = Color(0x330A84FF);
+  static const primaryButtonGradientStart = Color(0xFF006341);
+  static const primaryButtonGradientEnd = Color(0xFF008751);
+  static const primaryButtonShadow = Color(0x4D006341);
+  static const primaryButtonShadowLight = Color(0x33006341);
 
   // ── Blob Colors (for animated backgrounds) ───────────────────────────────────────
   static const blobPurple = Color(0xFF2563EB);

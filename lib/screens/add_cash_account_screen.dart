@@ -139,9 +139,9 @@ class _AddCashAccountScreenState extends State<AddCashAccountScreen> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white05,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.white10),
+        border: Border.all(color: AppColors.cardBorder),
       ),
       child: Row(
         children: [

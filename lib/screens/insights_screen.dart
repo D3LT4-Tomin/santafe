@@ -231,11 +231,11 @@ class _InsightsScreenState extends State<InsightsScreen>
                   onPressed: controller.exitReorderMode,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      color: AppColors.systemBlue,
+                      color: AppColors.systemGreen,
                       borderRadius: BorderRadius.circular(999),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.systemBlue.withValues(alpha: 0.35),
+                          color: AppColors.systemGreen.withValues(alpha: 0.35),
                           blurRadius: 16,
                           spreadRadius: 1,
                         ),
@@ -327,7 +327,7 @@ class _InsightsScreenState extends State<InsightsScreen>
             return Material(
               elevation: elevation,
               color: Colors.transparent,
-              shadowColor: AppColors.systemBlue.withValues(alpha: 0.3),
+              shadowColor: AppColors.systemGreen.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(16),
               child: child,
             );
@@ -360,7 +360,7 @@ class _InsightsScreenState extends State<InsightsScreen>
     ),
     'Tarjeta Débito': _OriginData(
       CupertinoIcons.creditcard_fill,
-      AppColors.systemBlue,
+      AppColors.systemGreen,
     ),
     'Tarjeta Crédito': _OriginData(
       CupertinoIcons.creditcard,
@@ -410,7 +410,7 @@ class _InsightsScreenState extends State<InsightsScreen>
                       ? AppColors.systemGreen
                       : AppColors.systemRed,
                   trendText: '${expenseTrend.abs()}% vs mes ant.',
-                  glowColor: AppColors.systemBlue,
+                  glowColor: AppColors.systemGreen,
                 ),
               ),
               const SizedBox(width: 12),
@@ -446,9 +446,9 @@ class _InsightsScreenState extends State<InsightsScreen>
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: AppColors.white05,
+                color: AppColors.cardBackground,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.white07),
+                border: Border.all(color: AppColors.black07),
               ),
               child: const Padding(
                 padding: EdgeInsets.all(20),
@@ -482,9 +482,9 @@ class _InsightsScreenState extends State<InsightsScreen>
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: AppColors.white05,
+              color: AppColors.cardBackground,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.white07),
+              border: Border.all(color: AppColors.black07),
             ),
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -522,9 +522,9 @@ class _InsightsScreenState extends State<InsightsScreen>
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: AppColors.white05,
+          color: AppColors.cardBackground,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.white07),
+          border: Border.all(color: AppColors.black07),
         ),
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -537,10 +537,10 @@ class _InsightsScreenState extends State<InsightsScreen>
                   const SizedBox(width: 8),
                   DecoratedBox(
                     decoration: BoxDecoration(
-                      color: AppColors.blueTipBg,
+                      color: AppColors.greenTipBg,
                       borderRadius: BorderRadius.circular(999),
                       border: Border.all(
-                        color: AppColors.blueTipBorder,
+                        color: AppColors.greenTipBorder,
                         width: 0.5,
                       ),
                     ),
@@ -555,7 +555,7 @@ class _InsightsScreenState extends State<InsightsScreen>
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.5,
-                          color: AppColors.systemBlue,
+                          color: AppColors.systemGreen,
                           height: 1.4,
                         ),
                       ),
@@ -643,9 +643,9 @@ class _InsightsScreenState extends State<InsightsScreen>
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: AppColors.white05,
+          color: AppColors.cardBackground,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.white07),
+          border: Border.all(color: AppColors.black07),
         ),
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -658,10 +658,10 @@ class _InsightsScreenState extends State<InsightsScreen>
                   const SizedBox(width: 8),
                   DecoratedBox(
                     decoration: BoxDecoration(
-                      color: AppColors.blueTipBg,
+                      color: AppColors.greenTipBg,
                       borderRadius: BorderRadius.circular(999),
                       border: Border.all(
-                        color: AppColors.blueTipBorder,
+                        color: AppColors.greenTipBorder,
                         width: 0.5,
                       ),
                     ),
@@ -676,7 +676,7 @@ class _InsightsScreenState extends State<InsightsScreen>
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.5,
-                          color: AppColors.systemBlue,
+                          color: AppColors.systemGreen,
                           height: 1.4,
                         ),
                       ),
@@ -731,7 +731,7 @@ class _InsightsScreenState extends State<InsightsScreen>
                         ),
                         SizedBox(height: 12),
                         _LegendRow(
-                          color: AppColors.systemBlue,
+                          color: AppColors.systemGreen,
                           label: 'Inversiones',
                           percent: '20%',
                         ),
@@ -844,13 +844,13 @@ class _AddWidgetSheet extends StatelessWidget {
   };
 
   static Color _colorFor(InsightWidgetId id) => switch (id) {
-    InsightWidgetId.stats => AppColors.systemBlue,
+    InsightWidgetId.stats => AppColors.systemGreen,
     InsightWidgetId.savingsChart => AppColors.systemGreen,
     InsightWidgetId.categoriesGastos => AppColors.systemOrange,
     InsightWidgetId.categoriesIngresos => AppColors.systemGreen,
     InsightWidgetId.origin => AppColors.systemIndigo,
     InsightWidgetId.bank => AppColors.systemRed,
-    InsightWidgetId.predictions => AppColors.systemBlue,
+    InsightWidgetId.predictions => AppColors.systemGreen,
   };
 
   @override
@@ -861,7 +861,7 @@ class _AddWidgetSheet extends StatelessWidget {
 
         return Container(
           decoration: const BoxDecoration(
-            color: Color(0xFF1C1C1E),
+            color: AppColors.secondaryBackground,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           padding: EdgeInsets.only(
@@ -875,7 +875,7 @@ class _AddWidgetSheet extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: AppColors.white07,
+                    color: AppColors.black07,
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: const SizedBox(width: 36, height: 4),
@@ -906,7 +906,7 @@ class _AddWidgetSheet extends StatelessWidget {
                         'Cerrar',
                         style: TextStyle(
                           fontSize: 15,
-                          color: AppColors.systemBlue,
+                          color: AppColors.systemGreen,
                         ),
                       ),
                     ),
@@ -970,9 +970,9 @@ class _AddWidgetRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: AppColors.white05,
+          color: AppColors.cardBackground,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.white07),
+          border: Border.all(color: AppColors.black07),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -1008,7 +1008,7 @@ class _AddWidgetRow extends StatelessWidget {
                 minimumSize: Size(0, 0),
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: AppColors.systemBlue,
+                    color: AppColors.systemGreen,
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: const Padding(
@@ -1161,10 +1161,10 @@ class _ScalingButtonState extends State<_ScalingButton>
         onPressed: widget.onPressed,
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: AppColors.white05,
+            color: AppColors.cardBackground,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: AppColors.systemBlue.withValues(alpha: 0.25),
+              color: AppColors.systemGreen.withValues(alpha: 0.25),
             ),
           ),
           child: const Padding(
@@ -1175,7 +1175,7 @@ class _ScalingButtonState extends State<_ScalingButton>
                 Icon(
                   CupertinoIcons.add_circled,
                   size: 16,
-                  color: AppColors.systemBlue,
+                  color: AppColors.systemGreen,
                 ),
                 SizedBox(width: 8),
                 Text(
@@ -1183,7 +1183,7 @@ class _ScalingButtonState extends State<_ScalingButton>
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.systemBlue,
+                    color: AppColors.systemGreen,
                     height: 1.4,
                   ),
                 ),
@@ -1341,9 +1341,9 @@ class _PredictionsCardState extends State<_PredictionsCard>
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: AppColors.white05,
+          color: AppColors.cardBackground,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.white07),
+          border: Border.all(color: AppColors.black07),
         ),
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -1356,10 +1356,10 @@ class _PredictionsCardState extends State<_PredictionsCard>
                   const SizedBox(width: 8),
                   DecoratedBox(
                     decoration: BoxDecoration(
-                      color: AppColors.blueTipBg,
+                      color: AppColors.greenTipBg,
                       borderRadius: BorderRadius.circular(999),
                       border: Border.all(
-                        color: AppColors.blueTipBorder,
+                        color: AppColors.greenTipBorder,
                         width: 0.5,
                       ),
                     ),
@@ -1374,7 +1374,7 @@ class _PredictionsCardState extends State<_PredictionsCard>
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.5,
-                          color: AppColors.systemBlue,
+                          color: AppColors.systemGreen,
                           height: 1.4,
                         ),
                       ),
@@ -1428,7 +1428,7 @@ class _PredictionsCardState extends State<_PredictionsCard>
                           height: 5,
                           decoration: BoxDecoration(
                             color: active
-                                ? AppColors.systemBlue
+                                ? AppColors.systemGreen
                                 : AppColors.secondaryLabel.withValues(
                                     alpha: 0.3,
                                   ),
@@ -1482,10 +1482,10 @@ class _BlueSegmentedToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.systemBlue.withValues(alpha: 0.10),
+        color: AppColors.systemGreen.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(999),
         border: Border.all(
-          color: AppColors.systemBlue.withValues(alpha: 0.18),
+          color: AppColors.systemGreen.withValues(alpha: 0.18),
           width: 0.5,
         ),
       ),
@@ -1530,7 +1530,7 @@ class _BlueChip extends StatelessWidget {
           curve: Curves.easeOutCubic,
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            color: active ? AppColors.systemBlue : Colors.transparent,
+            color: active ? AppColors.systemGreen : Colors.transparent,
             borderRadius: BorderRadius.circular(999),
           ),
           child: Text(
@@ -1539,7 +1539,7 @@ class _BlueChip extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: active ? FontWeight.w600 : FontWeight.w400,
-              color: active ? Colors.white : AppColors.systemBlue,
+              color: active ? Colors.white : AppColors.systemGreen,
               height: 1.4,
             ),
           ),
@@ -1579,13 +1579,13 @@ class _MonthChip extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.systemBlue.withValues(alpha: 0.12)
+              ? AppColors.systemGreen.withValues(alpha: 0.12)
               : AppColors.tertiaryFill,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: isSelected
-                ? AppColors.systemBlue.withValues(alpha: 0.35)
-                : AppColors.white07,
+                ? AppColors.systemGreen.withValues(alpha: 0.35)
+                : AppColors.black07,
             width: isSelected ? 1 : 0.5,
           ),
         ),
@@ -1599,7 +1599,7 @@ class _MonthChip extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 11,
                   color: isSelected
-                      ? AppColors.systemBlue
+                      ? AppColors.systemGreen
                       : AppColors.secondaryLabel,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                   height: 1.3,
@@ -1611,7 +1611,7 @@ class _MonthChip extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: isSelected ? AppColors.systemBlue : AppColors.label,
+                  color: isSelected ? AppColors.systemGreen : AppColors.label,
                   height: 1.2,
                   letterSpacing: -0.3,
                 ),
@@ -1671,7 +1671,7 @@ class _SavingsDetails extends StatelessWidget {
             value: 0.225,
             minHeight: 6,
             backgroundColor: AppColors.tertiaryFill,
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.systemBlue),
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.systemGreen),
           ),
         ),
         const SizedBox(height: 14),
@@ -1741,7 +1741,7 @@ class _ExpensesDetails extends StatelessWidget {
             child: _CategoryRow(data: c),
           ),
         ),
-        const Divider(color: AppColors.white07, thickness: 0.5, height: 1),
+        const Divider(color: AppColors.black07, thickness: 0.5, height: 1),
         const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1868,9 +1868,9 @@ class _InsightBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.blueTipBg,
+        color: AppColors.greenTipBg,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.blueTipBorder, width: 0.5),
+        border: Border.all(color: AppColors.greenTipBorder, width: 0.5),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -1910,9 +1910,9 @@ class _StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.white05,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.white07),
+        border: Border.all(color: AppColors.black07),
         boxShadow: [
           BoxShadow(
             color: glowColor.withValues(alpha: 0.08),

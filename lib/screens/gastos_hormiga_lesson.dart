@@ -105,7 +105,7 @@ class _LessonShellState extends State<_LessonShell>
     final top = MediaQuery.of(context).padding.top;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF070D1A),
+      backgroundColor: AppColors.lessonBackground,
       body: Column(
         children: [
           SizedBox(
@@ -397,7 +397,7 @@ class _Step1MultiChoiceState extends State<_Step1MultiChoice> {
       1,
       'Renta',
       CupertinoIcons.house_fill,
-      AppColors.systemBlue,
+      AppColors.systemGreen,
       false,
     ),
     _MultiChoiceItem(
@@ -613,7 +613,7 @@ class _Step2RevealMultiState extends State<_Step2RevealMulti>
     _RevealItem(
       'Renta',
       CupertinoIcons.house_fill,
-      AppColors.systemBlue,
+      AppColors.systemGreen,
       false,
     ),
     _RevealItem(
@@ -1452,10 +1452,10 @@ class _PointsBadge extends StatelessWidget {
       width: 100,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFCC00).withValues(alpha: 0.15),
+        color: AppColors.goldAccent.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFFFCC00).withValues(alpha: 0.40),
+          color: AppColors.goldAccent.withValues(alpha: 0.40),
           width: 1.5,
         ),
       ),
@@ -1464,7 +1464,7 @@ class _PointsBadge extends StatelessWidget {
         children: [
           const Icon(
             CupertinoIcons.star_fill,
-            color: Color(0xFFFFCC00),
+            color: AppColors.goldAccent,
             size: 32,
           ),
           const SizedBox(height: 8),
@@ -1502,13 +1502,13 @@ class _BadgeUnlocked extends StatelessWidget {
       height: 120,
       child: CustomPaint(
         painter: _HexPainter(
-          fillColor: AppColors.systemBlue.withValues(alpha: 0.15),
-          borderColor: AppColors.systemBlue.withValues(alpha: 0.40),
+          fillColor: AppColors.systemGreen.withValues(alpha: 0.15),
+          borderColor: AppColors.systemGreen.withValues(alpha: 0.40),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: AppColors.systemBlue, size: 32),
+            Icon(icon, color: AppColors.systemGreen, size: 32),
             const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),

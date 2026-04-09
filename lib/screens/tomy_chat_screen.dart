@@ -164,18 +164,10 @@ class _TomyChatScreenState extends State<TomyChatScreen>
 
     return Stack(
       children: [
-        // Only show blurred background blobs if NOT in overlay mode
+        // Only show background blobs if NOT in overlay mode
         if (!widget.isOverlay)
           RepaintBoundary(
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: AnimatedBlobs(
-                  blob1Anim: _blob1Anim,
-                  blob2Anim: _blob2Anim,
-                ),
-              ),
-            ),
+            child: AnimatedBlobs(blob1Anim: _blob1Anim, blob2Anim: _blob2Anim),
           ),
         // Chat content with fade and slide animation
         Positioned.fill(
@@ -205,13 +197,13 @@ class _TomyChatScreenState extends State<TomyChatScreen>
                             width: 36,
                             height: 36,
                             decoration: BoxDecoration(
-                              color: AppColors.white05,
+                              color: AppColors.cardBackground,
                               shape: BoxShape.circle,
-                              border: Border.all(color: AppColors.white10),
+                              border: Border.all(color: AppColors.cardBorder),
                             ),
                             child: const Icon(
                               CupertinoIcons.back,
-                              color: AppColors.systemBlue,
+                              color: AppColors.systemGreen,
                               size: 20,
                             ),
                           ),
@@ -259,11 +251,11 @@ class _TomyChatScreenState extends State<TomyChatScreen>
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [Color(0xFF0A84FF), Color(0xFF409CFF)],
+                    colors: [AppColors.legacyBlue, AppColors.legacyBlueLight],
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.systemBlue.withValues(alpha: 0.25),
+                      color: AppColors.systemGreen.withValues(alpha: 0.25),
                       blurRadius: 20,
                       offset: const Offset(0, 6),
                     ),
@@ -334,7 +326,7 @@ class _TomyChatScreenState extends State<TomyChatScreen>
                 decoration: BoxDecoration(
                   color: AppColors.tertiaryBackground,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.white07),
+                  border: Border.all(color: AppColors.black07),
                 ),
                 child: CupertinoTextField(
                   controller: _textController,
@@ -373,13 +365,13 @@ class _TomyChatScreenState extends State<TomyChatScreen>
                 decoration: BoxDecoration(
                   color: isLoading
                       ? AppColors.tertiaryBackground
-                      : AppColors.systemBlue,
+                      : AppColors.systemGreen,
                   shape: BoxShape.circle,
                   boxShadow: isLoading
                       ? null
                       : [
                           BoxShadow(
-                            color: AppColors.systemBlue.withValues(alpha: 0.3),
+                            color: AppColors.systemGreen.withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -419,7 +411,7 @@ class _TomyChatScreenState extends State<TomyChatScreen>
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [Color(0xFF0A84FF), Color(0xFF409CFF)],
+                  colors: [AppColors.legacyBlue, AppColors.legacyBlueLight],
                 ),
               ),
               child: const Icon(
@@ -435,8 +427,8 @@ class _TomyChatScreenState extends State<TomyChatScreen>
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
                 color: isUser
-                    ? AppColors.systemBlue
-                    : AppColors.white05.withValues(
+                    ? AppColors.systemGreen
+                    : AppColors.cardBackground.withValues(
                         alpha: 0.6,
                       ), // Reduced opacity for assistant bubbles
                 borderRadius: BorderRadius.circular(16).copyWith(
@@ -447,7 +439,7 @@ class _TomyChatScreenState extends State<TomyChatScreen>
                       ? const Radius.circular(4)
                       : const Radius.circular(16),
                 ),
-                border: isUser ? null : Border.all(color: AppColors.white07),
+                border: isUser ? null : Border.all(color: AppColors.black07),
               ),
               child: Text(
                 message.content,
@@ -470,7 +462,7 @@ class _TomyChatScreenState extends State<TomyChatScreen>
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [Color(0xFF0A84FF), Color(0xFF409CFF)],
+                  colors: [AppColors.legacyBlue, AppColors.legacyBlueLight],
                 ),
               ),
               child: const Icon(
@@ -498,7 +490,7 @@ class _TomyChatScreenState extends State<TomyChatScreen>
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Color(0xFF0A84FF), Color(0xFF409CFF)],
+                colors: [AppColors.legacyBlue, AppColors.legacyBlueLight],
               ),
             ),
             child: const Icon(
@@ -511,11 +503,11 @@ class _TomyChatScreenState extends State<TomyChatScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: AppColors.white05.withValues(
+              color: AppColors.cardBackground.withValues(
                 alpha: 0.6,
               ), // Match assistant bubble opacity
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.white07),
+              border: Border.all(color: AppColors.black07),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,

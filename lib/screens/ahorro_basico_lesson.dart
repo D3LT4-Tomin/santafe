@@ -103,7 +103,7 @@ class _LessonShellState extends State<_LessonShell>
     final top = MediaQuery.of(context).padding.top;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF070D1A),
+      backgroundColor: AppColors.lessonBackground,
       body: Column(
         children: [
           SizedBox(
@@ -1001,10 +1001,12 @@ class _Step4RevealWithPopUpState extends State<_Step4RevealWithPopUp>
                         width: double.infinity,
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: AppColors.systemBlue.withValues(alpha: 0.12),
+                          color: AppColors.systemGreen.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: AppColors.systemBlue.withValues(alpha: 0.30),
+                            color: AppColors.systemGreen.withValues(
+                              alpha: 0.30,
+                            ),
                           ),
                         ),
                         child: Column(
@@ -1015,14 +1017,14 @@ class _Step4RevealWithPopUpState extends State<_Step4RevealWithPopUp>
                                 Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
-                                    color: AppColors.systemBlue.withValues(
+                                    color: AppColors.systemGreen.withValues(
                                       alpha: 0.20,
                                     ),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: const Icon(
                                     CupertinoIcons.chart_bar_fill,
-                                    color: AppColors.systemBlue,
+                                    color: AppColors.systemGreen,
                                     size: 20,
                                   ),
                                 ),
@@ -1032,7 +1034,7 @@ class _Step4RevealWithPopUpState extends State<_Step4RevealWithPopUp>
                                   style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,
-                                    color: AppColors.systemBlue,
+                                    color: AppColors.systemGreen,
                                   ),
                                 ),
                               ],
@@ -1416,10 +1418,10 @@ class _PointsBadge extends StatelessWidget {
       width: 100,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFCC00).withValues(alpha: 0.15),
+        color: AppColors.goldAccent.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFFFCC00).withValues(alpha: 0.40),
+          color: AppColors.goldAccent.withValues(alpha: 0.40),
           width: 1.5,
         ),
       ),
@@ -1428,7 +1430,7 @@ class _PointsBadge extends StatelessWidget {
         children: [
           const Icon(
             CupertinoIcons.star_fill,
-            color: Color(0xFFFFCC00),
+            color: AppColors.goldAccent,
             size: 32,
           ),
           const SizedBox(height: 8),
@@ -1466,13 +1468,13 @@ class _BadgeUnlocked extends StatelessWidget {
       height: 120,
       child: CustomPaint(
         painter: _HexPainter(
-          fillColor: AppColors.systemBlue.withValues(alpha: 0.15),
-          borderColor: AppColors.systemBlue.withValues(alpha: 0.40),
+          fillColor: AppColors.systemGreen.withValues(alpha: 0.15),
+          borderColor: AppColors.systemGreen.withValues(alpha: 0.40),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: AppColors.systemBlue, size: 32),
+            Icon(icon, color: AppColors.systemGreen, size: 32),
             const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),

@@ -97,7 +97,7 @@ class _UserAccountScreenState extends State<UserAccountScreen>
                     const SizedBox(height: 28),
                     _GlassSettingsRow(
                       icon: CupertinoIcons.gear_alt_fill,
-                      color: AppColors.systemBlue,
+                      color: AppColors.systemGreen,
                       label: 'Configuración',
                       trailing: const _TrailingChevron(),
                       onTap: () {
@@ -150,16 +150,13 @@ class _GlassCard extends StatelessWidget {
     final radius = borderRadius ?? BorderRadius.circular(16);
     return ClipRRect(
       borderRadius: radius,
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: sigmaX, sigmaY: sigmaY),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: AppColors.white05,
-            borderRadius: radius,
-            border: Border.all(color: AppColors.white07),
-          ),
-          child: child,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground,
+          borderRadius: radius,
+          border: Border.all(color: AppColors.cardBorder),
         ),
+        child: child,
       ),
     );
   }
@@ -201,7 +198,10 @@ class _ProfileHeader extends StatelessWidget {
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [Color(0xFF0A84FF), Color(0xFF409CFF)],
+                        colors: [
+                          AppColors.legacyBlue,
+                          AppColors.legacyBlueLight,
+                        ],
                       ),
                     ),
                     child: Center(
@@ -273,12 +273,12 @@ class _AchievementsSection extends StatelessWidget {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: AppColors.systemBlue.withValues(alpha: 0.15),
+                      color: AppColors.systemGreen.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
                       CupertinoIcons.star_fill,
-                      color: AppColors.systemBlue,
+                      color: AppColors.systemGreen,
                       size: 16,
                     ),
                   ),
@@ -416,13 +416,13 @@ class _HexBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconColor = earned ? AppColors.systemBlue : AppColors.tertiaryLabel;
+    final iconColor = earned ? AppColors.systemGreen : AppColors.tertiaryLabel;
     final bgColor = earned
-        ? AppColors.systemBlue.withValues(alpha: 0.12)
-        : AppColors.white05;
+        ? AppColors.systemGreen.withValues(alpha: 0.12)
+        : AppColors.cardBackground;
     final borderColor = earned
-        ? AppColors.systemBlue.withValues(alpha: 0.28)
-        : AppColors.white07;
+        ? AppColors.systemGreen.withValues(alpha: 0.28)
+        : AppColors.black07;
     final labelColor = earned ? AppColors.label : AppColors.tertiaryLabel;
 
     return Column(
@@ -665,8 +665,10 @@ class _GlassSettingsRow extends StatelessWidget {
                 onTap();
               },
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 13,
+                ),
                 child: Row(
                   children: [
                     Container(

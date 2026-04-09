@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -252,7 +250,8 @@ class _AppShellState extends State<AppShell> {
               ),
             ],
 
-            if (!_isInLesson && !_isChatMode)
+            // Only show FAB on home tab (index 0)
+            if (_selectedIndex == 0 && !_isInLesson && !_isChatMode)
               Positioned(
                 right: 20,
                 bottom: MediaQuery.of(context).padding.bottom + 70,
@@ -278,36 +277,10 @@ class _AppShellState extends State<AppShell> {
   }
 
   Widget _buildHeaderChrome(double topPadding) {
-    final chromeH = topPadding + 66.0;
-
     return SizedBox(
-      height: chromeH,
-      child: Stack(
-        children: [
-          const Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    AppColors.frostedBlue,
-                    AppColors.frostedBlue,
-                    Color(0x00070D1A),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                child: const ColoredBox(color: Colors.transparent),
-              ),
-            ),
-          ),
-        ],
+      height: topPadding + 66.0,
+      child: Container(
+        decoration: const BoxDecoration(color: AppColors.frostedGreen),
       ),
     );
   }

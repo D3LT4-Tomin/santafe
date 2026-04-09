@@ -10,6 +10,7 @@ import 'package:flutter/material.dart'
         ReorderableListView;
 import 'package:provider/provider.dart';
 
+import '../theme/app_theme.dart';
 import 'insights_layout_controller.dart';
 
 Future<void> showCustomizeSheet(BuildContext context) {
@@ -40,7 +41,7 @@ class _CustomizeSheet extends StatelessWidget {
       builder: (context, scrollController) {
         return Container(
           decoration: const BoxDecoration(
-            color: Color(0xFF1C1C1E),
+            color: AppColors.secondaryBackground,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Column(
@@ -52,7 +53,7 @@ class _CustomizeSheet extends StatelessWidget {
                   width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF48484A),
+                    color: AppColors.tertiaryLabel,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -81,20 +82,20 @@ class _CustomizeSheet extends StatelessWidget {
                         'Listo',
                         style: TextStyle(
                           fontSize: 17,
-                          color: Color(0xFF0A84FF),
+                          color: AppColors.legacyBlue,
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const Divider(color: Color(0xFF38383A), height: 1),
+              const Divider(color: AppColors.divider, height: 1),
               // Subtitle hint
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: Text(
                   'Arrastra para reordenar · Toca el interruptor para mostrar u ocultar',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF636366)),
+                  style: TextStyle(fontSize: 12, color: AppColors.disabledGray),
                 ),
               ),
               // List
@@ -149,7 +150,7 @@ class _CustomizeSheet extends StatelessWidget {
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2C2C2E),
+                        color: AppColors.tertiaryBackground,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Text(
@@ -157,7 +158,7 @@ class _CustomizeSheet extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 15,
-                          color: Color(0xFF0A84FF),
+                          color: AppColors.legacyBlue,
                         ),
                       ),
                     ),
@@ -185,7 +186,7 @@ class _WidgetListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFF1C1C1E),
+      color: AppColors.secondaryBackground,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -198,7 +199,7 @@ class _WidgetListItem extends StatelessWidget {
                   padding: EdgeInsets.only(right: 16),
                   child: Icon(
                     CupertinoIcons.line_horizontal_3,
-                    color: Color(0xFF636366),
+                    color: AppColors.disabledGray,
                     size: 20,
                   ),
                 ),
@@ -216,13 +217,13 @@ class _WidgetListItem extends StatelessWidget {
                 // Toggle
                 CupertinoSwitch(
                   value: config.visible,
-                  activeTrackColor: const Color(0xFF34C759),
+                  activeTrackColor: AppColors.legacyGreen,
                   onChanged: onToggle,
                 ),
               ],
             ),
           ),
-          const Divider(color: Color(0xFF38383A), height: 1, indent: 56),
+          const Divider(color: AppColors.divider, height: 1, indent: 56),
         ],
       ),
     );

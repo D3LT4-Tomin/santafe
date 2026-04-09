@@ -194,9 +194,9 @@ class _AddBankAccountScreenState extends State<AddBankAccountScreen> {
   Widget _buildAccountTypeSelector() {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white05,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.white10),
+        border: Border.all(color: AppColors.cardBorder),
       ),
       padding: const EdgeInsets.all(4),
       child: Row(
@@ -208,7 +208,7 @@ class _AddBankAccountScreenState extends State<AddBankAccountScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: _subtype == BankAccountSubtype.debit
-                      ? AppColors.systemBlue
+                      ? AppColors.systemGreen
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -289,9 +289,9 @@ class _AddBankAccountScreenState extends State<AddBankAccountScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: AppColors.white05,
+                color: AppColors.cardBackground,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.white10),
+                border: Border.all(color: AppColors.cardBorder),
               ),
               child: Row(
                 children: [
@@ -333,9 +333,9 @@ class _AddBankAccountScreenState extends State<AddBankAccountScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: AppColors.white05,
+                color: AppColors.cardBackground,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.white10),
+                border: Border.all(color: AppColors.cardBorder),
               ),
               child: Row(
                 children: [
@@ -496,7 +496,7 @@ class _AddBankAccountScreenState extends State<AddBankAccountScreen> {
               borderRadius: BorderRadius.circular(4),
               child: LinearProgressIndicator(
                 value: balance / limit,
-                backgroundColor: AppColors.white10,
+                backgroundColor: AppColors.cardBorder,
                 valueColor: AlwaysStoppedAnimation<Color>(
                   balance > limit * 0.8
                       ? AppColors.systemRed
@@ -520,9 +520,9 @@ class _AddBankAccountScreenState extends State<AddBankAccountScreen> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white05,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.white10),
+        border: Border.all(color: AppColors.cardBorder),
       ),
       child: Row(
         children: [
@@ -562,9 +562,9 @@ class _AddBankAccountScreenState extends State<AddBankAccountScreen> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white05,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.white10),
+        border: Border.all(color: AppColors.cardBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -576,7 +576,7 @@ class _AddBankAccountScreenState extends State<AddBankAccountScreen> {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: (iconColor ?? AppColors.systemBlue).withValues(
+                color: (iconColor ?? AppColors.systemGreen).withValues(
                   alpha: 0.8,
                 ),
                 letterSpacing: 0.3,

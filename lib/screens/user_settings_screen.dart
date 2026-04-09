@@ -97,7 +97,7 @@ class _UserSettingsScreenState extends State<UserSettingsScreen>
                       rows: [
                         _SettingsRow(
                           icon: CupertinoIcons.globe,
-                          color: AppColors.systemBlue,
+                          color: AppColors.systemGreen,
                           label: 'Moneda',
                           trailing: const _TrailingValue('MXN — Peso'),
                           onTap: () {},
@@ -135,7 +135,7 @@ class _UserSettingsScreenState extends State<UserSettingsScreen>
                       rows: [
                         _SettingsRow(
                           icon: CupertinoIcons.hand_raised_fill,
-                          color: AppColors.systemBlue,
+                          color: AppColors.systemGreen,
                           label: 'Face ID / Touch ID',
                           trailing: const _TrailingChevron(),
                           onTap: () {},
@@ -181,7 +181,7 @@ class _UserSettingsScreenState extends State<UserSettingsScreen>
                         ),
                         _ToggleRow(
                           icon: CupertinoIcons.chart_bar_fill,
-                          color: AppColors.systemBlue,
+                          color: AppColors.systemGreen,
                           label: 'Resumen semanal',
                           subtitle: 'Cada lunes por la mañana',
                           value: _notifResumen,
@@ -253,9 +253,9 @@ class _SettingsSection extends StatelessWidget {
           ),
           DecoratedBox(
             decoration: BoxDecoration(
-              color: AppColors.white05,
+              color: AppColors.cardBackground,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.white07),
+              border: Border.all(color: AppColors.black07),
             ),
             child: Column(children: rows),
           ),
@@ -419,7 +419,7 @@ class _ToggleRow extends StatelessWidget {
               const SizedBox(width: 8),
               CupertinoSwitch(
                 value: value,
-                activeTrackColor: AppColors.systemBlue,
+                activeTrackColor: AppColors.systemGreen,
                 onChanged: (v) {
                   HapticFeedback.selectionClick();
                   onChanged(v);
@@ -491,7 +491,9 @@ class _SignOutButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.systemRed.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.systemRed.withValues(alpha: 0.18)),
+            border: Border.all(
+              color: AppColors.systemRed.withValues(alpha: 0.18),
+            ),
           ),
           child: const SizedBox(
             width: double.infinity,

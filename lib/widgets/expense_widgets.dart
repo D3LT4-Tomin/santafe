@@ -206,7 +206,7 @@ class ShowMoreButton extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.systemBlue,
+                    color: AppColors.systemGreen,
                     letterSpacing: -0.08,
                     height: 1.38,
                   ),
@@ -220,7 +220,7 @@ class ShowMoreButton extends StatelessWidget {
                 child: const Icon(
                   CupertinoIcons.chevron_down,
                   size: 12,
-                  color: AppColors.systemBlue,
+                  color: AppColors.systemGreen,
                 ),
               ),
             ],
@@ -256,18 +256,18 @@ class FilterPill extends StatelessWidget {
         height: 32,
         padding: const EdgeInsets.symmetric(horizontal: 14),
         decoration: BoxDecoration(
-          color: selected ? AppColors.systemBlue : const Color(0x1AFFFFFF),
+          color: selected ? AppColors.systemGreen : AppColors.white10,
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
-            color: selected ? AppColors.systemBlue : const Color(0x1FFFFFFF),
+            color: selected ? AppColors.systemGreen : AppColors.white20,
             width: 0.5,
           ),
           boxShadow: selected
-              ? const [
+              ? [
                   BoxShadow(
-                    color: Color(0x400A84FF),
+                    color: AppColors.legacyBlue.withValues(alpha: 0.25),
                     blurRadius: 8,
-                    offset: Offset(0, 2),
+                    offset: const Offset(0, 2),
                   ),
                 ]
               : null,
@@ -383,17 +383,17 @@ class PillPager extends StatelessWidget {
                       height: _pillHeight,
                       width: _addBtnWidth,
                       decoration: BoxDecoration(
-                        color: const Color(0x1AFFFFFF),
+                        color: AppColors.white10,
                         borderRadius: BorderRadius.circular(999),
                         border: Border.all(
-                          color: const Color(0x1FFFFFFF),
+                          color: AppColors.white20,
                           width: 0.5,
                         ),
                       ),
                       child: const Icon(
                         CupertinoIcons.plus,
                         size: 14,
-                        color: AppColors.systemBlue,
+                        color: AppColors.systemGreen,
                       ),
                     ),
                   ),
@@ -413,8 +413,8 @@ class PillPager extends StatelessWidget {
                         height: 5,
                         decoration: BoxDecoration(
                           color: currentPage == i
-                              ? AppColors.systemBlue
-                              : const Color(0x3DFFFFFF),
+                              ? AppColors.systemGreen
+                              : AppColors.white25,
                           borderRadius: BorderRadius.circular(999),
                         ),
                       ),
@@ -520,8 +520,8 @@ class OriginPager extends StatelessWidget {
                         height: 5,
                         decoration: BoxDecoration(
                           color: currentPage == i
-                              ? AppColors.systemBlue
-                              : const Color(0x3DFFFFFF),
+                              ? AppColors.systemGreen
+                              : AppColors.white25,
                           borderRadius: BorderRadius.circular(999),
                         ),
                       ),
@@ -564,12 +564,12 @@ class OriginPill extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected
               ? AppColors.systemGreen.withValues(alpha: 0.2)
-              : const Color(0x1AFFFFFF),
+              : AppColors.white10,
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
             color: selected
                 ? AppColors.systemGreen.withValues(alpha: 0.5)
-                : const Color(0x1FFFFFFF),
+                : AppColors.white20,
             width: 0.5,
           ),
         ),

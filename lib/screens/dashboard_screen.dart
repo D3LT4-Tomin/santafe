@@ -208,9 +208,9 @@ class _DashboardScreenState extends State<DashboardScreen>
             alignment: Alignment.topCenter,
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: AppColors.white05,
+                color: AppColors.cardBackground,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.white07),
+                border: Border.all(color: AppColors.black07),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -236,7 +236,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.systemBlue,
+                                  color: AppColors.systemGreen,
                                 ),
                               ),
                             ),
@@ -283,7 +283,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               }),
               child: const Text(
                 'Limpiar filtros',
-                style: TextStyle(fontSize: 13, color: AppColors.systemBlue),
+                style: TextStyle(fontSize: 13, color: AppColors.systemGreen),
               ),
             ),
           ],

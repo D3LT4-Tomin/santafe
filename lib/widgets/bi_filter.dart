@@ -79,13 +79,18 @@ class _BiFilterState extends State<BiFilter> {
   }
 
   void _scrollToSelected(
-      ScrollController ctrl, List<String> items, String selected) {
+    ScrollController ctrl,
+    List<String> items,
+    String selected,
+  ) {
     final idx = items.indexOf(selected);
     if (idx < 0 || !ctrl.hasClients) return;
     // Rough estimate: pill width ≈ label chars * 8 + 32 padding
     const approxPillWidth = 80.0;
-    final target =
-        (idx * approxPillWidth - 24).clamp(0.0, ctrl.position.maxScrollExtent);
+    final target = (idx * approxPillWidth - 24).clamp(
+      0.0,
+      ctrl.position.maxScrollExtent,
+    );
     ctrl.animateTo(
       target,
       duration: const Duration(milliseconds: 320),
@@ -103,7 +108,7 @@ class _BiFilterState extends State<BiFilter> {
           items: widget.categories,
           selected: widget.selectedCategory,
           scrollController: _catScroll,
-          activeColor: AppColors.systemBlue,
+          activeColor: AppColors.systemGreen,
           onSelected: (val) {
             HapticFeedback.selectionClick();
             widget.onCategorySelected(val);
@@ -178,15 +183,17 @@ class _FilterRow extends StatelessWidget {
             physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 16),
             children: [
-              ...items.map((item) => Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: _Pill(
-                      label: item,
-                      isActive: selected == item,
-                      activeColor: activeColor,
-                      onTap: () => onSelected(item),
-                    ),
-                  )),
+              ...items.map(
+                (item) => Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: _Pill(
+                    label: item,
+                    isActive: selected == item,
+                    activeColor: activeColor,
+                    onTap: () => onSelected(item),
+                  ),
+                ),
+              ),
               ?trailingWidget,
             ],
           ),
@@ -222,12 +229,12 @@ class _Pill extends StatelessWidget {
         decoration: BoxDecoration(
           color: isActive
               ? activeColor.withValues(alpha: 0.15)
-              : AppColors.white05,
+              : AppColors.cardBackground,
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
             color: isActive
                 ? activeColor.withValues(alpha: 0.45)
-                : AppColors.white07,
+                : AppColors.black07,
             width: isActive ? 1.0 : 0.5,
           ),
         ),
@@ -258,14 +265,18 @@ class _AddPill extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         decoration: BoxDecoration(
-          color: AppColors.white05,
+          color: AppColors.cardBackground,
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: AppColors.white07, width: 0.5),
+          border: Border.all(color: AppColors.black07, width: 0.5),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: const [
-            Icon(CupertinoIcons.plus, size: 12, color: AppColors.secondaryLabel),
+            Icon(
+              CupertinoIcons.plus,
+              size: 12,
+              color: AppColors.secondaryLabel,
+            ),
             SizedBox(width: 4),
             Text(
               'Añadir',

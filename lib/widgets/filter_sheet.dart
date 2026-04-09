@@ -142,13 +142,13 @@ class FilterButton extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: hasFilters
-              ? AppColors.systemBlue.withValues(alpha: 0.12)
-              : AppColors.white05,
+              ? AppColors.systemGreen.withValues(alpha: 0.12)
+              : AppColors.cardBackground,
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
             color: hasFilters
-                ? AppColors.systemBlue.withValues(alpha: 0.35)
-                : AppColors.white07,
+                ? AppColors.systemGreen.withValues(alpha: 0.35)
+                : AppColors.black07,
             width: hasFilters ? 1.0 : 0.5,
           ),
         ),
@@ -163,7 +163,7 @@ class FilterButton extends StatelessWidget {
                     CupertinoIcons.slider_horizontal_3,
                     size: 14,
                     color: hasFilters
-                        ? AppColors.systemBlue
+                        ? AppColors.systemGreen
                         : AppColors.secondaryLabel,
                   ),
                   const SizedBox(width: 7),
@@ -175,7 +175,7 @@ class FilterButton extends StatelessWidget {
                           ? FontWeight.w600
                           : FontWeight.w400,
                       color: hasFilters
-                          ? AppColors.systemBlue
+                          ? AppColors.systemGreen
                           : AppColors.secondaryLabel,
                     ),
                   ),
@@ -187,7 +187,7 @@ class FilterButton extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.systemBlue.withValues(alpha: 0.18),
+                  color: AppColors.systemGreen.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
@@ -195,7 +195,7 @@ class FilterButton extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.systemBlue,
+                    color: AppColors.systemGreen,
                   ),
                 ),
               ),
@@ -348,7 +348,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                       'Limpiar',
                       style: TextStyle(
                         fontSize: 15,
-                        color: AppColors.systemBlue,
+                        color: AppColors.systemGreen,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -380,7 +380,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                           (cat) => _SelectChip(
                             label: cat,
                             isSelected: _cats.contains(cat),
-                            activeColor: AppColors.systemBlue,
+                            activeColor: AppColors.systemGreen,
                             onTap: () => _toggleCat(cat),
                           ),
                         )
@@ -441,9 +441,9 @@ class _FilterSheetState extends State<_FilterSheet> {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.white05,
+                          color: AppColors.cardBackground,
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: AppColors.white07),
+                          border: Border.all(color: AppColors.black07),
                         ),
                         child: Row(
                           children: [
@@ -483,7 +483,7 @@ class _FilterSheetState extends State<_FilterSheet> {
               child: Container(
                 height: 52,
                 decoration: BoxDecoration(
-                  color: AppColors.systemBlue,
+                  color: AppColors.systemGreen,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Center(
@@ -506,7 +506,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.systemBlue,
+                              color: AppColors.systemGreen,
                             ),
                           ),
                         ),
@@ -517,7 +517,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.systemBlue,
+                          color: AppColors.systemGreen,
                           letterSpacing: -0.2,
                         ),
                       ),
@@ -560,10 +560,10 @@ class _SectionLabel extends StatelessWidget {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
             decoration: BoxDecoration(
-              color: AppColors.systemBlue.withValues(alpha: 0.15),
+              color: AppColors.systemGreen.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(999),
               border: Border.all(
-                color: AppColors.systemBlue.withValues(alpha: 0.35),
+                color: AppColors.systemGreen.withValues(alpha: 0.35),
                 width: 0.5,
               ),
             ),
@@ -572,7 +572,7 @@ class _SectionLabel extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
-                color: AppColors.systemBlue,
+                color: AppColors.systemGreen,
               ),
             ),
           ),
@@ -608,12 +608,12 @@ class _SelectChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? activeColor.withValues(alpha: 0.14)
-              : AppColors.white05,
+              : AppColors.cardBackground,
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
             color: isSelected
                 ? activeColor.withValues(alpha: 0.45)
-                : AppColors.white07,
+                : AppColors.black07,
             width: isSelected ? 1.0 : 0.5,
           ),
         ),
@@ -671,12 +671,12 @@ class DateFilterButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: hasDateFilters
               ? AppColors.systemOrange.withValues(alpha: 0.12)
-              : AppColors.white05,
+              : AppColors.cardBackground,
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
             color: hasDateFilters
                 ? AppColors.systemOrange.withValues(alpha: 0.35)
-                : AppColors.white07,
+                : AppColors.black07,
             width: hasDateFilters ? 1.0 : 0.5,
           ),
         ),
@@ -873,7 +873,7 @@ class _DateFilterSheetState extends State<DateFilterSheet> {
                       'Limpiar',
                       style: TextStyle(
                         fontSize: 15,
-                        color: AppColors.systemBlue,
+                        color: AppColors.systemGreen,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

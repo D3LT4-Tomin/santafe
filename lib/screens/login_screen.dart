@@ -58,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const Icon(
                     CupertinoIcons.money_dollar_circle_fill,
                     size: 80,
-                    color: AppColors.systemBlue,
+                    color: AppColors.systemGreen,
                   ),
                   const SizedBox(height: 24),
                   const Text(
@@ -162,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           : '¿No tienes cuenta? Regístrate',
                       style: const TextStyle(
                         fontSize: 15,
-                        color: AppColors.systemBlue,
+                        color: AppColors.systemGreen,
                       ),
                     ),
                   ),
@@ -204,9 +204,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white05,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.white10),
+        border: Border.all(color: AppColors.cardBorder),
       ),
       child: Row(
         children: [

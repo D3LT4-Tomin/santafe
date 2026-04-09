@@ -361,7 +361,7 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
                 value: _formatTime(_timeRemaining),
                 color: _timeRemaining <= 10
                     ? AppColors.systemRed
-                    : AppColors.systemBlue,
+                    : AppColors.systemGreen,
               ),
               // Progress counter – same style as dashboard section labels
               Text(
@@ -388,8 +388,8 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 6,
-              backgroundColor: AppColors.white07,
-              valueColor: const AlwaysStoppedAnimation(AppColors.systemBlue),
+              backgroundColor: AppColors.black07,
+              valueColor: const AlwaysStoppedAnimation(AppColors.systemGreen),
             ),
           ),
         ],
@@ -407,9 +407,9 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: AppColors.white05,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.white07),
+        border: Border.all(color: AppColors.black07),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -444,7 +444,7 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
               icon: CupertinoIcons.house_fill,
               title: 'NECESIDADES',
               subtitle: 'Esenciales',
-              color: AppColors.systemBlue,
+              color: AppColors.systemGreen,
             ),
           ),
           const SizedBox(width: 12),
@@ -471,9 +471,9 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         // Dashboard surface: white05 fill + white07 border
-        color: AppColors.white05,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.white07),
+        border: Border.all(color: AppColors.black07),
       ),
       child: Row(
         children: [
@@ -527,7 +527,7 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
       decoration: BoxDecoration(
         color: AppColors.tertiaryBackground,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.white07),
+        border: Border.all(color: AppColors.black07),
         // Softer shadow – consistent with other elevated surfaces in the app
         boxShadow: [
           BoxShadow(
@@ -547,9 +547,9 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppColors.white10,
+                  color: AppColors.cardBorder,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppColors.white07),
+                  border: Border.all(color: AppColors.black07),
                 ),
                 child: Icon(
                   _getCategoryIcon(item.category),
@@ -605,7 +605,7 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
           Expanded(
             child: CupertinoButton(
               padding: const EdgeInsets.symmetric(vertical: 16),
-              color: AppColors.systemBlue,
+              color: AppColors.systemGreen,
               borderRadius: BorderRadius.circular(14),
               onPressed: () => _answer(true),
               child: const Row(
@@ -676,7 +676,7 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: passed
-                      ? [AppColors.systemGreen, AppColors.systemBlue]
+                      ? [AppColors.systemGreen, AppColors.systemGreen]
                       : [AppColors.systemOrange, AppColors.systemRed],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -727,9 +727,9 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               decoration: BoxDecoration(
-                color: AppColors.white05,
+                color: AppColors.cardBackground,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.white07),
+                border: Border.all(color: AppColors.black07),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -756,7 +756,7 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
             // Primary CTA
             CupertinoButton(
               padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 14),
-              color: AppColors.systemBlue,
+              color: AppColors.systemGreen,
               borderRadius: BorderRadius.circular(14),
               onPressed: _restartGame,
               child: const Text(

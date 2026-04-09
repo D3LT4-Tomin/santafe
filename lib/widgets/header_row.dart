@@ -45,7 +45,7 @@ class HeaderRow extends StatelessWidget {
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.fromBorderSide(
-                    BorderSide(color: Color(0x2EFFFFFF), width: 1.5),
+                    BorderSide(color: AppColors.white20, width: 1.5),
                   ),
                 ),
                 child: ClipOval(
@@ -69,7 +69,7 @@ class HeaderRow extends StatelessWidget {
                 width: maxSearchW,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: const Color(0x1AFFFFFF),
+                  color: AppColors.white10,
                   borderRadius: BorderRadius.circular(18.0),
                   border: Border.all(
                     color: Color.fromRGBO(255, 255, 255, 0.14),
@@ -144,7 +144,7 @@ class NavButton extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            Icon(icon, color: AppColors.systemBlue, size: 22),
+            Icon(icon, color: AppColors.systemGreen, size: 22),
             if (badgeCount != null && badgeCount! > 0)
               const Positioned(
                 top: 8,

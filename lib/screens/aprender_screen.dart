@@ -157,9 +157,9 @@ class _ActivityCardState extends State<_ActivityCard>
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: AppColors.white05,
+              color: AppColors.cardBackground,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.white07),
+              border: Border.all(color: AppColors.black07),
             ),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
@@ -287,7 +287,7 @@ class _RingPainter extends CustomPainter {
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 7
-        ..color = AppColors.white07,
+        ..color = AppColors.black07,
     );
 
     if (progress > 0) {
@@ -300,7 +300,7 @@ class _RingPainter extends CustomPainter {
           ..style = PaintingStyle.stroke
           ..strokeWidth = 7
           ..strokeCap = StrokeCap.round
-          ..color = AppColors.systemBlue,
+          ..color = AppColors.systemGreen,
       );
     }
   }
@@ -328,9 +328,9 @@ class _WeekStrip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: AppColors.white05,
+              color: AppColors.cardBackground,
               borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: AppColors.white07),
+              border: Border.all(color: AppColors.black07),
             ),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -348,24 +348,24 @@ class _WeekStrip extends StatelessWidget {
 
                   if (isDone) {
                     if (isToday) {
-                      bg = AppColors.systemBlue;
+                      bg = AppColors.systemGreen;
                       fg = Colors.white;
                     } else {
                       bg = Colors.transparent;
-                      fg = AppColors.systemBlue;
+                      fg = AppColors.systemGreen;
                       border = Border.all(
-                        color: AppColors.systemBlue,
+                        color: AppColors.systemGreen,
                         width: 2,
                       );
                     }
                   } else if (isToday) {
-                    bg = AppColors.systemBlue;
+                    bg = AppColors.systemGreen;
                     fg = Colors.white;
                   } else if (isPast) {
-                    bg = AppColors.white05;
+                    bg = AppColors.cardBackground;
                     fg = AppColors.tertiaryLabel;
                   } else {
-                    bg = AppColors.white05;
+                    bg = AppColors.cardBackground;
                     fg = AppColors.tertiaryLabel;
                   }
 
@@ -623,7 +623,7 @@ class _ModulesSectionData {
           title: '¿A dónde se va\ntu dinero?',
           minutes: 5,
           icon: CupertinoIcons.money_dollar_circle_fill,
-          color: AppColors.systemBlue,
+          color: AppColors.systemGreen,
           recommended: true,
           orderInCategory: 0,
           lessonScreen: const DondeSeVanLesson(),
@@ -775,7 +775,7 @@ class _ModulesSectionData {
           title: 'Intro a\nplaneación',
           minutes: 5,
           icon: CupertinoIcons.lightbulb_fill,
-          color: AppColors.systemBlue,
+          color: AppColors.systemGreen,
           orderInCategory: 4,
           description: 'Introducción a la planificación financiera personal.',
           tips: [
@@ -789,7 +789,7 @@ class _ModulesSectionData {
           title: 'Planificación\nanual',
           minutes: 12,
           icon: CupertinoIcons.calendar,
-          color: AppColors.systemBlue,
+          color: AppColors.systemGreen,
           orderInCategory: 5,
           description: 'Planifica tus finanzas para todo el año.',
           tips: [
@@ -936,20 +936,20 @@ class _ModuleCard extends StatelessWidget {
     if (locked) {
       iconColor = AppColors.tertiaryLabel;
       textColor = AppColors.tertiaryLabel;
-      borderColor = AppColors.white07;
-      bgColor = AppColors.white05;
-      iconBgColor = AppColors.white07;
+      borderColor = AppColors.black07;
+      bgColor = AppColors.cardBackground;
+      iconBgColor = AppColors.black07;
     } else if (isCurrent) {
-      iconColor = AppColors.systemBlue;
+      iconColor = AppColors.systemGreen;
       textColor = AppColors.label;
-      borderColor = AppColors.systemBlue.withValues(alpha: 0.55);
-      bgColor = AppColors.systemBlue.withValues(alpha: 0.08);
-      iconBgColor = AppColors.systemBlue.withValues(alpha: 0.15);
+      borderColor = AppColors.systemGreen.withValues(alpha: 0.55);
+      bgColor = AppColors.systemGreen.withValues(alpha: 0.08);
+      iconBgColor = AppColors.systemGreen.withValues(alpha: 0.15);
     } else if (completed) {
       iconColor = data.color.withValues(alpha: 0.5);
       textColor = AppColors.secondaryLabel;
-      borderColor = AppColors.white07;
-      bgColor = AppColors.white05;
+      borderColor = AppColors.black07;
+      bgColor = AppColors.cardBackground;
       iconBgColor = data.color.withValues(alpha: 0.08);
     } else {
       iconColor = data.color;
@@ -1145,7 +1145,7 @@ class _ModuleCard extends StatelessWidget {
                   width: 7,
                   height: 7,
                   decoration: const BoxDecoration(
-                    color: AppColors.systemBlue,
+                    color: AppColors.systemGreen,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -1222,7 +1222,7 @@ class _GenericLessonContentState extends State<_GenericLessonContent>
     final topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF070D1A),
+      backgroundColor: AppColors.lessonBackground,
       body: Stack(
         children: [
           Positioned(
@@ -1499,13 +1499,13 @@ class _HexBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconColor = earned ? AppColors.systemBlue : AppColors.tertiaryLabel;
+    final iconColor = earned ? AppColors.systemGreen : AppColors.tertiaryLabel;
     final bgColor = earned
-        ? AppColors.systemBlue.withValues(alpha: 0.12)
-        : AppColors.white05;
+        ? AppColors.systemGreen.withValues(alpha: 0.12)
+        : AppColors.cardBackground;
     final borderColor = earned
-        ? AppColors.systemBlue.withValues(alpha: 0.28)
-        : AppColors.white07;
+        ? AppColors.systemGreen.withValues(alpha: 0.28)
+        : AppColors.black07;
     final labelColor = earned ? AppColors.label : AppColors.tertiaryLabel;
 
     return Column(

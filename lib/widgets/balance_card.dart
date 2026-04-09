@@ -44,12 +44,12 @@ class _BalanceCardState extends State<BalanceCard> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: AppColors.white05,
+              color: AppColors.cardBackground,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.white10),
+              border: Border.all(color: AppColors.cardBorder),
               boxShadow: const [
                 BoxShadow(
-                  color: Color(0x4D000000),
+                  color: AppColors.cardShadow,
                   blurRadius: 30,
                   spreadRadius: 5,
                 ),

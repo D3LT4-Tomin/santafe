@@ -3,20 +3,160 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../screens/insights_screen.dart';
 
-// ─── Tip Card ─────────────────────────────────────────────────────────────────
+// ─── Savings Goal Card ────────────────────────────────────────────────────────
+class SavingsGoalCard extends StatelessWidget {
+  const SavingsGoalCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground,
+          borderRadius: const BorderRadius.all(Radius.circular(16)),
+          border: Border.all(color: AppColors.cardBorder, width: 0.5),
+          boxShadow: const [
+            BoxShadow(
+              color: AppColors.cardShadow,
+              blurRadius: 20,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: AppColors.legacyGreen.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    child: SizedBox(
+                      width: 36,
+                      height: 36,
+                      child: Icon(
+                        CupertinoIcons.flag_fill,
+                        color: AppColors.systemGreen,
+                        size: 18,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'META DE AHORRO',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.6,
+                            color: AppColors.systemGreen,
+                            height: 1.2,
+                          ),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          'Viaje a Japón 🇯🇵',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: -0.3,
+                            color: AppColors.label,
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      const Text(
+                        r'$12,450 / $25,000',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.label,
+                          height: 1.2,
+                        ),
+                      ),
+                      Text(
+                        '49% completado',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.secondaryLabel,
+                          height: 1.2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Stack(
+                children: [
+                  Container(
+                    height: 8,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: AppColors.cardBorder,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  FractionallySizedBox(
+                    widthFactor: 0.49,
+                    child: Container(
+                      height: 8,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [
+                            AppColors.systemGreen,
+                            AppColors.legacyGreen,
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(4),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.systemGreen.withValues(alpha: 0.3),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Tip Card (replaced by SavingsGoalCard)
 class TipCard extends StatelessWidget {
   const TipCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
+    return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: AppColors.blueTipBg,
+          color: AppColors.greenTipBg,
           borderRadius: BorderRadius.all(Radius.circular(16)),
           border: Border.fromBorderSide(
-            BorderSide(color: AppColors.blueTipBorder, width: 0.5),
+            BorderSide(color: AppColors.greenTipBorder, width: 0.5),
           ),
         ),
         child: Padding(
@@ -26,7 +166,7 @@ class TipCard extends StatelessWidget {
             children: [
               DecoratedBox(
                 decoration: BoxDecoration(
-                  color: Color(0x330A84FF),
+                  color: AppColors.legacyBlue.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
                 child: SizedBox(
@@ -34,7 +174,7 @@ class TipCard extends StatelessWidget {
                   height: 36,
                   child: Icon(
                     CupertinoIcons.lightbulb_fill,
-                    color: AppColors.systemBlue,
+                    color: AppColors.systemGreen,
                     size: 18,
                   ),
                 ),
@@ -50,7 +190,7 @@ class TipCard extends StatelessWidget {
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                         letterSpacing: -0.08,
-                        color: AppColors.systemBlue,
+                        color: AppColors.systemGreen,
                         height: 1.38,
                       ),
                     ),
@@ -93,15 +233,15 @@ class BankPromoCard extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF0F2748), Color(0xFF0A1A35)],
+            colors: [AppColors.gradientStart, AppColors.gradientEnd],
           ),
-          border: Border.all(color: const Color(0x33FFFFFF), width: 0.5),
+          border: Border.all(color: AppColors.white30, width: 0.5),
           boxShadow: const [
             BoxShadow(
-              color: Color(0x4D000000),
+              color: AppColors.cardBackground,
               blurRadius: 24,
               spreadRadius: 2,
             ),
@@ -117,9 +257,9 @@ class BankPromoCard extends StatelessWidget {
                 child: Container(
                   width: 130,
                   height: 130,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Color(0x1A0A84FF),
+                    color: AppColors.legacyBlue.withValues(alpha: 0.1),
                   ),
                 ),
               ),
@@ -129,9 +269,9 @@ class BankPromoCard extends StatelessWidget {
                 child: Container(
                   width: 100,
                   height: 100,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Color(0x120A84FF),
+                    color: AppColors.legacyBlue.withValues(alpha: 0.07),
                   ),
                 ),
               ),
@@ -142,10 +282,10 @@ class BankPromoCard extends StatelessWidget {
                   children: [
                     DecoratedBox(
                       decoration: BoxDecoration(
-                        color: const Color(0x330A84FF),
+                        color: AppColors.legacyBlue.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(999),
                         border: Border.all(
-                          color: const Color(0x4D0A84FF),
+                          color: AppColors.legacyBlue.withValues(alpha: 0.3),
                           width: 0.5,
                         ),
                       ),
@@ -160,7 +300,7 @@ class BankPromoCard extends StatelessWidget {
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 0.6,
-                            color: AppColors.systemBlue,
+                            color: AppColors.systemGreen,
                             height: 1.4,
                           ),
                         ),
@@ -184,7 +324,7 @@ class BankPromoCard extends StatelessWidget {
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
                         letterSpacing: -0.1,
-                        color: Color(0xB3FFFFFF),
+                        color: AppColors.white70,
                         height: 1.5,
                       ),
                     ),
@@ -193,19 +333,24 @@ class BankPromoCard extends StatelessWidget {
                       children: [
                         DecoratedBox(
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF0A84FF), Color(0xFF409CFF)],
+                            gradient: LinearGradient(
+                              colors: [
+                                AppColors.legacyBlue,
+                                AppColors.legacyBlueLight,
+                              ],
                             ),
                             borderRadius: BorderRadius.circular(999),
-                            boxShadow: const [
+                            boxShadow: [
                               BoxShadow(
-                                color: Color(0x400A84FF),
+                                color: AppColors.legacyBlue.withValues(
+                                  alpha: 0.25,
+                                ),
                                 blurRadius: 10,
                                 offset: Offset(0, 3),
                               ),
                             ],
                           ),
-                          child: const Padding(
+                          child: Padding(
                             padding: EdgeInsets.symmetric(
                               horizontal: 18,
                               vertical: 10,
@@ -250,7 +395,7 @@ class BankPromoCard extends StatelessWidget {
                               'rendimiento anual',
                               style: TextStyle(
                                 fontSize: 11,
-                                color: Color(0x80FFFFFF),
+                                color: AppColors.white50,
                                 letterSpacing: -0.1,
                                 height: 1.3,
                               ),
@@ -292,9 +437,9 @@ class WeeklySummaryCard extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 16),
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: AppColors.white05,
-            borderRadius: BorderRadius.all(Radius.circular(16)),
-            border: Border.fromBorderSide(BorderSide(color: AppColors.white07)),
+            color: AppColors.cardBackground,
+            borderRadius: const BorderRadius.all(Radius.circular(16)),
+            border: Border.all(color: AppColors.cardBorder, width: 0.5),
           ),
           child: Padding(
             padding: EdgeInsets.all(20),

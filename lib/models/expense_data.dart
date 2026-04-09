@@ -128,7 +128,7 @@ const kAllExpenses = [
   ),
   ExpenseData(
     CupertinoIcons.airplane,
-    AppColors.systemBlue,
+    AppColors.systemGreen,
     'Aeroméxico — MTY→CDMX',
     'Viaje · Sáb',
     '-\$1,850.00',
@@ -248,7 +248,7 @@ const kAllExpenses = [
   ),
   ExpenseData(
     CupertinoIcons.money_dollar_circle_fill,
-    AppColors.systemBlue,
+    AppColors.systemGreen,
     'Dividendos CFE',
     'Inversión · 10 días',
     '+\$850.00',
@@ -323,7 +323,7 @@ const kAdditionalExpenses = [
   ),
   ExpenseData(
     CupertinoIcons.phone_fill,
-    AppColors.systemBlue,
+    AppColors.systemGreen,
     'Telcel Recarga',
     'Servicios · 10:00',
     '-\$100.00',
@@ -343,7 +343,7 @@ const kAdditionalExpenses = [
   ),
   ExpenseData(
     CupertinoIcons.airplane,
-    AppColors.systemBlue,
+    AppColors.systemGreen,
     'Volaris - Vuelo',
     'Viaje · Hace 7 días',
     '-\$1,200.00',

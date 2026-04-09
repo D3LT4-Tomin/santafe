@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 class SavingsProjectionData {
@@ -23,7 +24,10 @@ class SavingsProjectionData {
 // ─── Card ─────────────────────────────────────────────────────────────────────
 class SavingsProjectionCard extends StatefulWidget {
   final SavingsProjectionData data;
-  const SavingsProjectionCard({super.key, this.data = const SavingsProjectionData()});
+  const SavingsProjectionCard({
+    super.key,
+    this.data = const SavingsProjectionData(),
+  });
 
   @override
   State<SavingsProjectionCard> createState() => _SavingsProjectionCardState();
@@ -61,9 +65,9 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
     final d = widget.data;
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: const Color(0x0DFFFFFF),
+        color: AppColors.white05,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0x12FFFFFF)),
+        border: Border.all(color: AppColors.white.withValues(alpha: 0.07)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -83,7 +87,11 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
             // Big number
             const Text(
               'A los 65 años podrías tener',
-              style: TextStyle(fontSize: 13, color: Color(0xFF8E8E93), height: 1.4),
+              style: TextStyle(
+                fontSize: 13,
+                color: AppColors.secondaryLabel,
+                height: 1.4,
+              ),
             ),
             const SizedBox(height: 4),
             Row(
@@ -94,7 +102,7 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
                   style: const TextStyle(
                     fontSize: 34,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFFFFFFFF),
+                    color: AppColors.white,
                     letterSpacing: -1,
                     height: 1.1,
                   ),
@@ -106,9 +114,9 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
                     width: 22,
                     height: 22,
                     decoration: BoxDecoration(
-                      color: const Color(0x1AFFFFFF),
+                      color: AppColors.white10,
                       shape: BoxShape.circle,
-                      border: Border.all(color: const Color(0x30FFFFFF)),
+                      border: Border.all(color: AppColors.white20),
                     ),
                     child: const Center(
                       child: Text(
@@ -116,7 +124,7 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFFAAAAAA),
+                          color: AppColors.secondaryLabel,
                         ),
                       ),
                     ),
@@ -135,7 +143,10 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
                     children: [
                       const Text(
                         'Rango esperado',
-                        style: TextStyle(fontSize: 12, color: Color(0xFF8E8E93)),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.secondaryLabel,
+                        ),
                       ),
                       const SizedBox(height: 3),
                       Text(
@@ -143,7 +154,7 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFFFFFFFF),
+                          color: AppColors.white,
                           letterSpacing: -0.3,
                         ),
                       ),
@@ -156,7 +167,10 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
                     children: [
                       const Text(
                         'Hoy llevas',
-                        style: TextStyle(fontSize: 12, color: Color(0xFF8E8E93)),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.secondaryLabel,
+                        ),
                       ),
                       const SizedBox(height: 3),
                       Text(
@@ -164,7 +178,7 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFFFFFFFF),
+                          color: AppColors.white,
                           letterSpacing: -0.3,
                         ),
                       ),
@@ -200,10 +214,20 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('A tus 20',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF8E8E93))),
-                  Text('A tus 65',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF8E8E93))),
+                  Text(
+                    'A tus 20',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.secondaryLabel,
+                    ),
+                  ),
+                  Text(
+                    'A tus 65',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.secondaryLabel,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -224,7 +248,7 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF1C1C1E),
+        backgroundColor: AppColors.secondaryBackground,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: const Text(
           '¿Cómo se calcula?',
@@ -232,14 +256,18 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
         ),
         content: const Text(
           'Basado en tu ahorro actual de \$450/mes con un retorno anual estimado del 7%, compuesto mensualmente desde los 20 hasta los 65 años.',
-          style: TextStyle(color: Color(0xFF8E8E93), fontSize: 14, height: 1.5),
+          style: TextStyle(
+            color: AppColors.secondaryLabel,
+            fontSize: 14,
+            height: 1.5,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text(
               'Entendido',
-              style: TextStyle(color: Color(0xFF0A84FF)),
+              style: TextStyle(color: AppColors.legacyBlue),
             ),
           ),
         ],
@@ -310,22 +338,42 @@ class _SavingsChartPainter extends CustomPainter {
     final bandPath = Path();
     bandPath.moveTo(highPts.first.dx, highPts.first.dy);
     for (int i = 1; i < highPts.length; i++) {
-      final cp1 = Offset((highPts[i - 1].dx + highPts[i].dx) / 2, highPts[i - 1].dy);
-      final cp2 = Offset((highPts[i - 1].dx + highPts[i].dx) / 2, highPts[i].dy);
-      bandPath.cubicTo(cp1.dx, cp1.dy, cp2.dx, cp2.dy, highPts[i].dx, highPts[i].dy);
+      final cp1 = Offset(
+        (highPts[i - 1].dx + highPts[i].dx) / 2,
+        highPts[i - 1].dy,
+      );
+      final cp2 = Offset(
+        (highPts[i - 1].dx + highPts[i].dx) / 2,
+        highPts[i].dy,
+      );
+      bandPath.cubicTo(
+        cp1.dx,
+        cp1.dy,
+        cp2.dx,
+        cp2.dy,
+        highPts[i].dx,
+        highPts[i].dy,
+      );
     }
     for (int i = lowPts.length - 1; i >= 0; i--) {
       final prev = i < lowPts.length - 1 ? lowPts[i + 1] : lowPts[i];
       final cp1 = Offset((prev.dx + lowPts[i].dx) / 2, prev.dy);
       final cp2 = Offset((prev.dx + lowPts[i].dx) / 2, lowPts[i].dy);
-      bandPath.cubicTo(cp1.dx, cp1.dy, cp2.dx, cp2.dy, lowPts[i].dx, lowPts[i].dy);
+      bandPath.cubicTo(
+        cp1.dx,
+        cp1.dy,
+        cp2.dx,
+        cp2.dy,
+        lowPts[i].dx,
+        lowPts[i].dy,
+      );
     }
     bandPath.close();
 
     canvas.drawPath(
       bandPath,
       Paint()
-        ..color = const Color(0xFF0A84FF).withValues(alpha: 0.15)
+        ..color = AppColors.legacyBlue.withValues(alpha: 0.15)
         ..style = PaintingStyle.fill,
     );
 
@@ -333,14 +381,27 @@ class _SavingsChartPainter extends CustomPainter {
     final linePath = Path();
     linePath.moveTo(mainPts.first.dx, mainPts.first.dy);
     for (int i = 1; i < mainPts.length; i++) {
-      final cp1 = Offset((mainPts[i - 1].dx + mainPts[i].dx) / 2, mainPts[i - 1].dy);
-      final cp2 = Offset((mainPts[i - 1].dx + mainPts[i].dx) / 2, mainPts[i].dy);
-      linePath.cubicTo(cp1.dx, cp1.dy, cp2.dx, cp2.dy, mainPts[i].dx, mainPts[i].dy);
+      final cp1 = Offset(
+        (mainPts[i - 1].dx + mainPts[i].dx) / 2,
+        mainPts[i - 1].dy,
+      );
+      final cp2 = Offset(
+        (mainPts[i - 1].dx + mainPts[i].dx) / 2,
+        mainPts[i].dy,
+      );
+      linePath.cubicTo(
+        cp1.dx,
+        cp1.dy,
+        cp2.dx,
+        cp2.dy,
+        mainPts[i].dx,
+        mainPts[i].dy,
+      );
     }
     canvas.drawPath(
       linePath,
       Paint()
-        ..color = const Color(0xFF1D5FB8)
+        ..color = AppColors.systemGreen
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2.5
         ..strokeCap = StrokeCap.round,
@@ -366,7 +427,7 @@ class _SectionLabel extends StatelessWidget {
         fontSize: 12,
         fontWeight: FontWeight.w600,
         letterSpacing: 0.6,
-        color: Color(0xFF8E8E93),
+        color: AppColors.secondaryLabel,
         height: 1.33,
       ),
     );
@@ -378,9 +439,12 @@ class _SmartBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: const Color(0x1A0A84FF),
+        color: AppColors.legacyBlue.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: const Color(0x330A84FF), width: 0.5),
+        border: Border.all(
+          color: AppColors.legacyBlue.withValues(alpha: 0.2),
+          width: 0.5,
+        ),
       ),
       child: const Padding(
         padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -390,7 +454,7 @@ class _SmartBadge extends StatelessWidget {
             fontSize: 10,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.5,
-            color: Color(0xFF0A84FF),
+            color: AppColors.legacyBlue,
             height: 1.4,
           ),
         ),
@@ -407,9 +471,12 @@ class _InsightBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: const Color(0x0F0A84FF),
+        color: AppColors.legacyBlue.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0x260A84FF), width: 0.5),
+        border: Border.all(
+          color: AppColors.legacyBlue.withValues(alpha: 0.15),
+          width: 0.5,
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -417,7 +484,7 @@ class _InsightBox extends StatelessWidget {
           text,
           style: const TextStyle(
             fontSize: 12,
-            color: Color(0xFF8E8E93),
+            color: AppColors.secondaryLabel,
             height: 1.55,
           ),
         ),

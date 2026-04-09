@@ -126,10 +126,10 @@ class _AddInvestmentScreenState extends State<AddInvestmentScreen> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.systemGreen. withValues(alpha: 0.1),
+                color: AppColors.systemGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: AppColors.systemGreen. withValues(alpha: 0.2),
+                  color: AppColors.systemGreen.withValues(alpha: 0.2),
                 ),
               ),
               child: Column(
@@ -137,7 +137,7 @@ class _AddInvestmentScreenState extends State<AddInvestmentScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppColors.systemGreen. withValues(alpha: 0.15),
+                      color: AppColors.systemGreen.withValues(alpha: 0.15),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -219,17 +219,17 @@ class _AddInvestmentScreenState extends State<AddInvestmentScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.systemBlue. withValues(alpha: 0.08),
+                color: AppColors.systemGreen.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: AppColors.systemBlue. withValues(alpha: 0.15),
+                  color: AppColors.systemGreen.withValues(alpha: 0.15),
                 ),
               ),
               child: const Row(
                 children: [
                   Icon(
                     CupertinoIcons.info_circle,
-                    color: AppColors.systemBlue,
+                    color: AppColors.systemGreen,
                     size: 20,
                   ),
                   SizedBox(width: 12),
@@ -266,9 +266,9 @@ class _AddInvestmentScreenState extends State<AddInvestmentScreen> {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: AppColors.white05,
+            color: AppColors.cardBackground,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.white10),
+            border: Border.all(color: AppColors.cardBorder),
           ),
           child: Row(
             children: [

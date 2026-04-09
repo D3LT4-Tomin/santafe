@@ -17,8 +17,8 @@ void main() async {
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
-      statusBarBrightness: Brightness.dark,
-      statusBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.dark,
     ),
   );
   runApp(const FinanzasApp());
@@ -40,10 +40,12 @@ class FinanzasApp extends StatelessWidget {
         title: 'SantaFe',
         debugShowCheckedModeBanner: false,
         theme: CupertinoThemeData(
-          brightness: Brightness.dark,
-          primaryColor: AppColors.systemBlue,
+          brightness: Brightness.light,
+          primaryColor: AppColors.systemGreen,
           scaffoldBackgroundColor: AppColors.systemBackground,
-          textTheme: CupertinoTextThemeData(primaryColor: AppColors.systemBlue),
+          textTheme: CupertinoTextThemeData(
+            primaryColor: AppColors.systemGreen,
+          ),
         ),
         home: AuthWrapper(),
       ),
