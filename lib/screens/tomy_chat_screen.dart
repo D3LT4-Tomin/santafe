@@ -164,10 +164,10 @@ class _TomyChatScreenState extends State<TomyChatScreen>
 
     return Stack(
       children: [
-        // Only show background blobs if NOT in overlay mode
+        // Solid gray background
         if (!widget.isOverlay)
-          RepaintBoundary(
-            child: AnimatedBlobs(blob1Anim: _blob1Anim, blob2Anim: _blob2Anim),
+          Positioned.fill(
+            child: Container(color: AppColors.secondaryBackground),
           ),
         // Chat content with fade and slide animation
         Positioned.fill(
@@ -428,9 +428,7 @@ class _TomyChatScreenState extends State<TomyChatScreen>
               decoration: BoxDecoration(
                 color: isUser
                     ? AppColors.systemGreen
-                    : AppColors.cardBackground.withValues(
-                        alpha: 0.6,
-                      ), // Reduced opacity for assistant bubbles
+                    : AppColors.cardBackground,
                 borderRadius: BorderRadius.circular(16).copyWith(
                   bottomRight: isUser
                       ? const Radius.circular(4)

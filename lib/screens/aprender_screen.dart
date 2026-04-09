@@ -1513,14 +1513,16 @@ class _HexBadge extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(
+        Container(
           width: 76,
           height: 76,
-          child: CustomPaint(
-            painter: _HexPainter(fillColor: bgColor, borderColor: borderColor),
-            child: Center(
-              child: Icon(badgeInfo.icon, color: iconColor, size: 26),
-            ),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: bgColor,
+            border: Border.all(color: borderColor, width: 1.5),
+          ),
+          child: Center(
+            child: Icon(badgeInfo.icon, color: iconColor, size: 26),
           ),
         ),
         const SizedBox(height: 6),

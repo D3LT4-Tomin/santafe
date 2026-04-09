@@ -109,8 +109,8 @@ class AppColors {
   // For gradients and dark surfaces
   static const gradientStart = Color(0xFF0F2748);
   static const gradientEnd = Color(0xFF0A1A35);
-  // Lesson screen backgrounds (dark)
-  static const lessonBackground = Color(0xFF070D1A);
+  // Lesson screen backgrounds (light gray like rest of app)
+  static const lessonBackground = secondaryBackground;
   // Achievement/score highlight
   static const goldAccent = Color(0xFFFFCC00);
   // Legacy brand blue (for gradients)
