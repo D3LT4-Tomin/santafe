@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/services.dart';
 
 import '../theme/app_theme.dart';
@@ -496,7 +497,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                           decoration: const BoxDecoration(
                             border: Border(
                               right: BorderSide(
-                                color: AppColors.label,
+                                color: Colors.white,
                                 width: 0.3,
                               ),
                             ),
@@ -506,7 +507,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.systemGreen,
+                              color: Colors.white,
                             ),
                           ),
                         ),
@@ -517,7 +518,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.systemGreen,
+                          color: Colors.white,
                           letterSpacing: -0.2,
                         ),
                       ),
@@ -957,7 +958,7 @@ class _DateFilterSheetState extends State<DateFilterSheet> {
                           decoration: const BoxDecoration(
                             border: Border(
                               right: BorderSide(
-                                color: AppColors.label,
+                                color: Colors.white,
                                 width: 0.3,
                               ),
                             ),
@@ -967,7 +968,7 @@ class _DateFilterSheetState extends State<DateFilterSheet> {
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.systemOrange,
+                              color: Colors.white,
                             ),
                           ),
                         ),
@@ -978,7 +979,7 @@ class _DateFilterSheetState extends State<DateFilterSheet> {
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.systemOrange,
+                          color: Colors.white,
                           letterSpacing: -0.2,
                         ),
                       ),
