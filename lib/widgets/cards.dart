@@ -116,20 +116,8 @@ class SavingsGoalCard extends StatelessWidget {
                     child: Container(
                       height: 8,
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [
-                            AppColors.systemGreen,
-                            AppColors.legacyGreen,
-                          ],
-                        ),
+                        color: AppColors.systemGreen,
                         borderRadius: BorderRadius.circular(4),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.systemGreen.withValues(alpha: 0.3),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
                       ),
                     ),
                   ),
