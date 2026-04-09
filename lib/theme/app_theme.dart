@@ -129,6 +129,10 @@ class AppColors {
   static const primaryButtonShadow = Color(0x4D006341);
   static const primaryButtonShadowLight = Color(0x33006341);
 
+  // ── Chat Border Animation ───────────────────────────────────────────────────────
+  static const chatBorderColor = Color(0xFF006341);
+  static const chatBorderGlow = Color(0x33006341);
+
   // ── Blob Colors (for animated backgrounds) ───────────────────────────────────────
   static const blobPurple = Color(0xFF2563EB);
   static const blobGreen = Color(0xFF581C87);
