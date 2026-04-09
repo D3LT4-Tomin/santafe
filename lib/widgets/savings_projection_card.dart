@@ -2,31 +2,19 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
-class SavingsProjectionData {
-  final double projectedAmount;
-  final double rangeMin;
-  final double rangeMax;
+// ─── Card ─────────────────────────────────────────────────────────────────────
+class SavingsProjectionCard extends StatefulWidget {
+  final double monthlySavings;
   final double currentSavings;
   final int currentAge;
   final int targetAge;
 
-  const SavingsProjectionData({
-    this.projectedAmount = 563338,
-    this.rangeMin = 525000,
-    this.rangeMax = 600000,
-    this.currentSavings = 144,
-    this.currentAge = 20,
-    this.targetAge = 65,
-  });
-}
-
-// ─── Card ─────────────────────────────────────────────────────────────────────
-class SavingsProjectionCard extends StatefulWidget {
-  final SavingsProjectionData data;
   const SavingsProjectionCard({
     super.key,
-    this.data = const SavingsProjectionData(),
+    this.monthlySavings = 0,
+    this.currentSavings = 0,
+    this.currentAge = 22,
+    this.targetAge = 65,
   });
 
   @override
@@ -37,6 +25,24 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
     with SingleTickerProviderStateMixin {
   late AnimationController _chartController;
   late Animation<double> _chartAnim;
+
+  double get _projectedAmount {
+    final years = widget.targetAge - widget.currentAge;
+    final monthlyRate = 0.07 / 12;
+    final months = years * 12;
+
+    if (widget.monthlySavings <= 0) return 0;
+
+    final futureValue =
+        widget.currentSavings * math.pow(1 + monthlyRate, months) +
+        widget.monthlySavings *
+            ((math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
+
+    return futureValue;
+  }
+
+  double get _rangeMin => _projectedAmount * 0.93;
+  double get _rangeMax => _projectedAmount * 1.09;
 
   @override
   void initState() {
@@ -62,7 +68,6 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
 
   @override
   Widget build(BuildContext context) {
-    final d = widget.data;
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
@@ -74,7 +79,6 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Header — Expanded title prevents pill overflow on wiggle ──────
             Row(
               children: [
                 const Expanded(child: _SectionLabel('PROYECCIÓN DE AHORRO')),
@@ -84,12 +88,11 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
             ),
             const SizedBox(height: 16),
 
-            // Big number
             const Text(
               'A los 65 años podrías tener',
               style: TextStyle(
                 fontSize: 13,
-                color: AppColors.secondaryLabel,
+                color: Color(0xFF8E8E93),
                 height: 1.4,
               ),
             ),
@@ -98,7 +101,7 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  '\$${_formatAmount(d.projectedAmount)}',
+                  '\$${_formatAmount(_projectedAmount)}',
                   style: const TextStyle(
                     fontSize: 34,
                     fontWeight: FontWeight.w700,
@@ -136,7 +139,6 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
             ),
             const SizedBox(height: 16),
 
-            // Range + current row
             Row(
               children: [
                 Expanded(
@@ -152,7 +154,7 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        '\$${_formatK(d.rangeMin)} – \$${_formatK(d.rangeMax)}',
+                        '\$${_formatK(_rangeMin)} – \$${_formatK(_rangeMax)}',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -176,7 +178,7 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        '\$${d.currentSavings.toStringAsFixed(0)}',
+                        '\$${widget.currentSavings.toStringAsFixed(0)}',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -191,7 +193,6 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
             ),
             const SizedBox(height: 20),
 
-            // ── Chart — SizedBox with no width constraint → fills card ────────
             SizedBox(
               height: 150,
               width: double.infinity,
@@ -200,34 +201,33 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
                 builder: (_, _) => CustomPaint(
                   painter: _SavingsChartPainter(
                     progress: _chartAnim.value,
-                    currentAge: d.currentAge,
-                    targetAge: d.targetAge,
-                    currentSavings: d.currentSavings,
-                    projected: d.projectedAmount,
+                    currentAge: widget.currentAge,
+                    targetAge: widget.targetAge,
+                    currentSavings: widget.currentSavings,
+                    projected: _projectedAmount,
                   ),
                   size: Size.infinite,
                 ),
               ),
             ),
 
-            // Age labels
-            const Padding(
-              padding: EdgeInsets.only(top: 6),
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'A tus 20',
-                    style: TextStyle(
+                    'A tus ${widget.currentAge}',
+                    style: const TextStyle(
                       fontSize: 12,
-                      color: AppColors.secondaryLabel,
+                      color: Color(0xFF8E8E93),
                     ),
                   ),
                   Text(
-                    'A tus 65',
-                    style: TextStyle(
+                    'A los ${widget.targetAge}',
+                    style: const TextStyle(
                       fontSize: 12,
-                      color: AppColors.secondaryLabel,
+                      color: Color(0xFF8E8E93),
                     ),
                   ),
                 ],
@@ -235,10 +235,10 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
             ),
             const SizedBox(height: 14),
 
-            // Insight
             _InsightBox(
-              text:
-                  'Ahorrando \$450/mes con un retorno anual del 7%, alcanzarías \$563K a los 65. Cada año que empieces antes puede añadir ~\$40K.',
+              text: widget.monthlySavings > 0
+                  ? 'Ahorrando \$${widget.monthlySavings.toStringAsFixed(0)}/mes con un retorno del 7%, alcanzarías \$${_formatAmount(_projectedAmount)} a los ${widget.targetAge}.'
+                  : 'Registra tus transacciones de ahorro para ver tu proyección.',
             ),
           ],
         ),
@@ -256,10 +256,10 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
           '¿Cómo se calcula?',
           style: TextStyle(color: Colors.white, fontSize: 16),
         ),
-        content: const Text(
-          'Basado en tu ahorro actual de \$450/mes con un retorno anual estimado del 7%, compuesto mensualmente desde los 20 hasta los 65 años.',
-          style: TextStyle(
-            color: AppColors.secondaryLabel,
+        content: Text(
+          'Basado en tu ahorro actual de \$${widget.monthlySavings.toStringAsFixed(0)}/mes con un retorno anual estimado del 7%, compuesto mensualmente desde los ${widget.currentAge} hasta los ${widget.targetAge} años.',
+          style: const TextStyle(
+            color: Color(0xFF8E8E93),
             fontSize: 14,
             height: 1.5,
           ),

@@ -2,8 +2,6 @@ import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart'
     show
-        Switch,
-        Switcher,
         LinearProgressIndicator,
         Divider,
         Colors,
@@ -19,6 +17,7 @@ import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
 import '../providers/auth_provider.dart' as auth;
 import '../providers/data_provider.dart';
+import '../models/forecast_model.dart';
 import '../widgets/animated_blobs.dart';
 import '../widgets/cards.dart';
 import '../widgets/savings_projection_card.dart';
@@ -278,9 +277,17 @@ class _InsightsScreenState extends State<InsightsScreen>
       case InsightWidgetId.stats:
         child = _buildStatsGrid();
       case InsightWidgetId.savingsChart:
-        child = const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          child: SavingsProjectionCard(),
+        child = Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Consumer<DataProvider>(
+            builder: (context, data, _) {
+              return SavingsProjectionCard(
+                monthlySavings: data.monthlySavingsRate,
+                currentSavings: data.totalSavedAmount,
+                currentAge: 22,
+              );
+            },
+          ),
         );
       case InsightWidgetId.categoriesGastos:
         child = _buildGastosCard();
@@ -386,8 +393,8 @@ class _InsightsScreenState extends State<InsightsScreen>
   Widget _buildStatsGrid() {
     return Consumer<DataProvider>(
       builder: (context, data, _) {
-        final expenses = data.currentMonthExpenses;
-        final savings = data.currentMonthSavings;
+        final expenses = data.recentMonthExpenses;
+        final savings = data.recentMonthSavings;
         final expenseTrend = data.expenseTrendPercent;
         final savingsTrend = data.savingsTrendPercent;
 
@@ -439,7 +446,7 @@ class _InsightsScreenState extends State<InsightsScreen>
   Widget _buildOriginCard() {
     return Consumer<DataProvider>(
       builder: (context, data, _) {
-        final expensesByOrigin = data.expensesByOrigin;
+        final expensesByOrigin = data.expensesByOriginRecent;
 
         if (expensesByOrigin.isEmpty) {
           return Padding(
@@ -458,7 +465,7 @@ class _InsightsScreenState extends State<InsightsScreen>
                     _SectionLabel('ORIGEN DE GASTOS'),
                     SizedBox(height: 16),
                     Text(
-                      'Sin gastos este mes',
+                      'Sin gastos registrados',
                       style: TextStyle(
                         fontSize: 14,
                         color: AppColors.secondaryLabel,
@@ -518,238 +525,322 @@ class _InsightsScreenState extends State<InsightsScreen>
   }
 
   Widget _buildGastosCard() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.cardBackground,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.black07),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Expanded(child: _SectionLabel('CATEGORÍAS GASTOS')),
-                  const SizedBox(width: 8),
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: AppColors.greenTipBg,
-                      borderRadius: BorderRadius.circular(999),
-                      border: Border.all(
-                        color: AppColors.greenTipBorder,
-                        width: 0.5,
-                      ),
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      child: Text(
-                        'SMART INSIGHTS',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.5,
-                          color: AppColors.systemGreen,
-                          height: 1.4,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+    return Consumer<DataProvider>(
+      builder: (context, data, _) {
+        final expensesByCategory = data.expensesByCategoryRecent;
+        final total = expensesByCategory.values.fold(0.0, (a, b) => a + b);
+
+        if (expensesByCategory.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: AppColors.white05,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.cardBorder),
               ),
-              const SizedBox(height: 20),
-              Row(
+              child: const Padding(
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _SectionLabel('CATEGORÍAS GASTOS'),
+                    SizedBox(height: 16),
+                    Text(
+                      'Sin gastos registrados',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.secondaryLabel,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+
+        final sortedCategories = expensesByCategory.entries.toList()
+          ..sort((a, b) => b.value.compareTo(a.value));
+        final topCategories = sortedCategories.take(4).toList();
+
+        final colors = [
+          AppColors.systemOrange,
+          AppColors.systemIndigo,
+          AppColors.systemRed,
+          AppColors.systemGreen,
+        ];
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.cardBackground,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.black07),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    width: 120,
-                    height: 120,
-                    child: AnimatedBuilder(
-                      animation: _donutAnim,
-                      builder: (_, _) => CustomPaint(
-                        painter: _DonutPainter(progress: _donutAnim.value),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Total',
-                                style: AppTextStyles.caption1.copyWith(
-                                  fontSize: 10,
-                                ),
-                              ),
-                              const Text(
-                                '100%',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.label,
-                                  height: 1.2,
-                                ),
-                              ),
-                            ],
+                  Row(
+                    children: [
+                      const Expanded(child: _SectionLabel('CATEGORÍAS GASTOS')),
+                      const SizedBox(width: 8),
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: AppColors.greenTipBg,
+                          borderRadius: BorderRadius.circular(999),
+                          border: Border.all(
+                            color: AppColors.greenTipBorder,
+                            width: 0.5,
+                          ),
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          child: Text(
+                            'SMART INSIGHTS',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
+                              color: AppColors.systemGreen,
+                              height: 1.4,
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                  const SizedBox(width: 24),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _LegendRow(
-                          color: AppColors.systemOrange,
-                          label: 'Comida',
-                          percent: '40%',
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 120,
+                        height: 120,
+                        child: AnimatedBuilder(
+                          animation: _donutAnim,
+                          builder: (_, _) => CustomPaint(
+                            painter: _DynamicDonutPainter(
+                              progress: _donutAnim.value,
+                              data: expensesByCategory,
+                              colors: colors,
+                            ),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Total',
+                                    style: AppTextStyles.caption1.copyWith(
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                  Text(
+                                    '\$${(total / 1000).toStringAsFixed(1)}k',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.label,
+                                      height: 1.2,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
-                        SizedBox(height: 12),
-                        _LegendRow(
-                          color: AppColors.systemIndigo,
-                          label: 'Ocio',
-                          percent: '30%',
+                      ),
+                      const SizedBox(width: 24),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            for (int i = 0; i < topCategories.length; i++) ...[
+                              if (i > 0) const SizedBox(height: 12),
+                              _LegendRow(
+                                color: colors[i % colors.length],
+                                label: topCategories[i].key,
+                                percent:
+                                    '${((topCategories[i].value / total) * 100).toStringAsFixed(0)}%',
+                              ),
+                            ],
+                          ],
                         ),
-                        SizedBox(height: 12),
-                        _LegendRow(
-                          color: AppColors.systemRed,
-                          label: 'Transporte',
-                          percent: '18%',
-                        ),
-                        SizedBox(height: 12),
-                        _LegendRow(
-                          color: AppColors.systemGreen,
-                          label: 'Otros',
-                          percent: '12%',
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
   Widget _buildIngresosCard() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.cardBackground,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.black07),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Expanded(child: _SectionLabel('CATEGORÍAS INGRESOS')),
-                  const SizedBox(width: 8),
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: AppColors.greenTipBg,
-                      borderRadius: BorderRadius.circular(999),
-                      border: Border.all(
-                        color: AppColors.greenTipBorder,
-                        width: 0.5,
-                      ),
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      child: Text(
-                        'SMART INSIGHTS',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.5,
-                          color: AppColors.systemGreen,
-                          height: 1.4,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+    return Consumer<DataProvider>(
+      builder: (context, data, _) {
+        final incomeByCategory = data.incomeByCategoryRecent;
+        final total = incomeByCategory.values.fold(0.0, (a, b) => a + b);
+
+        if (incomeByCategory.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: AppColors.white05,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.cardBorder),
               ),
-              const SizedBox(height: 20),
-              Row(
+              child: const Padding(
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _SectionLabel('CATEGORÍAS INGRESOS'),
+                    SizedBox(height: 16),
+                    Text(
+                      'Sin ingresos registrados',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.secondaryLabel,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+
+        final sortedCategories = incomeByCategory.entries.toList()
+          ..sort((a, b) => b.value.compareTo(a.value));
+        final topCategories = sortedCategories.take(4).toList();
+
+        final colors = [
+          AppColors.systemGreen,
+          AppColors.systemLightGreen,
+          AppColors.systemTeal,
+          AppColors.systemPurple,
+        ];
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.white05,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.cardBorder),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    width: 120,
-                    height: 120,
-                    child: AnimatedBuilder(
-                      animation: _donutAnim,
-                      builder: (_, _) => CustomPaint(
-                        painter: _DonutPainter(progress: _donutAnim.value),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Total',
-                                style: AppTextStyles.caption1.copyWith(
-                                  fontSize: 10,
-                                ),
-                              ),
-                              const Text(
-                                '100%',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.label,
-                                  height: 1.2,
-                                ),
-                              ),
-                            ],
+                  Row(
+                    children: [
+                      const Expanded(
+                        child: _SectionLabel('CATEGORÍAS INGRESOS'),
+                      ),
+                      const SizedBox(width: 8),
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: AppColors.greenTipBg,
+                          borderRadius: BorderRadius.circular(999),
+                          border: Border.all(
+                            color: AppColors.greenTipBorder,
+                            width: 0.5,
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          child: Text(
+                            'SMART INSIGHTS',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
+                              color: AppColors.systemGreen,
+                              height: 1.4,
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                  const SizedBox(width: 24),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _LegendRow(
-                          color: AppColors.systemGreen,
-                          label: 'Salario',
-                          percent: '70%',
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 120,
+                        height: 120,
+                        child: AnimatedBuilder(
+                          animation: _donutAnim,
+                          builder: (_, _) => CustomPaint(
+                            painter: _DynamicDonutPainter(
+                              progress: _donutAnim.value,
+                              data: incomeByCategory,
+                              colors: colors,
+                            ),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Total',
+                                    style: AppTextStyles.caption1.copyWith(
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                  Text(
+                                    '\$${(total / 1000).toStringAsFixed(1)}k',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.label,
+                                      height: 1.2,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
-                        SizedBox(height: 12),
-                        _LegendRow(
-                          color: AppColors.systemGreen,
-                          label: 'Inversiones',
-                          percent: '20%',
+                      ),
+                      const SizedBox(width: 24),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            for (int i = 0; i < topCategories.length; i++) ...[
+                              if (i > 0) const SizedBox(height: 12),
+                              _LegendRow(
+                                color: colors[i % colors.length],
+                                label: topCategories[i].key,
+                                percent:
+                                    '${((topCategories[i].value / total) * 100).toStringAsFixed(0)}%',
+                              ),
+                            ],
+                          ],
                         ),
-                        SizedBox(height: 12),
-                        _LegendRow(
-                          color: AppColors.systemPurple,
-                          label: 'Otros',
-                          percent: '10%',
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
@@ -1322,82 +1413,6 @@ class _PredictionsCardState extends State<_PredictionsCard>
   );
   int _currentMonth = 1;
 
-  static const _savingsMonths = [
-    _MonthData(
-      label: 'Mar',
-      amount: '\$390',
-      pct: 'Pasado',
-      positive: true,
-      isNeutral: true,
-    ),
-    _MonthData(
-      label: 'Abr',
-      amount: '\$520',
-      pct: '+15%',
-      positive: true,
-      isNeutral: false,
-    ),
-    _MonthData(
-      label: 'May',
-      amount: '\$610',
-      pct: '+17%',
-      positive: true,
-      isNeutral: false,
-    ),
-    _MonthData(
-      label: 'Jun',
-      amount: '\$680',
-      pct: '+11%',
-      positive: true,
-      isNeutral: false,
-    ),
-    _MonthData(
-      label: 'Jul',
-      amount: '\$720',
-      pct: '+6%',
-      positive: true,
-      isNeutral: false,
-    ),
-  ];
-
-  static const _expensesMonths = [
-    _MonthData(
-      label: 'Mar',
-      amount: '\$1,250',
-      pct: 'Pasado',
-      positive: true,
-      isNeutral: true,
-    ),
-    _MonthData(
-      label: 'Abr',
-      amount: '\$1,305',
-      pct: '+4%',
-      positive: false,
-      isNeutral: false,
-    ),
-    _MonthData(
-      label: 'May',
-      amount: '\$1,280',
-      pct: '-2%',
-      positive: true,
-      isNeutral: false,
-    ),
-    _MonthData(
-      label: 'Jun',
-      amount: '\$1,340',
-      pct: '+5%',
-      positive: false,
-      isNeutral: false,
-    ),
-    _MonthData(
-      label: 'Jul',
-      amount: '\$1,295',
-      pct: '-3%',
-      positive: true,
-      isNeutral: false,
-    ),
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -1434,143 +1449,185 @@ class _PredictionsCardState extends State<_PredictionsCard>
     );
   }
 
-  List<_MonthData> get _months =>
-      _mode == _PredictionMode.savings ? _savingsMonths : _expensesMonths;
+  List<MonthlyData> _getMonths(DataProvider data) {
+    if (_mode == _PredictionMode.savings) {
+      return data.savingsHistory;
+    }
+    return data.expensesHistory;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.cardBackground,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.black07),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+    return Consumer<DataProvider>(
+      builder: (context, data, _) {
+        final months = _getMonths(data);
+        final hasData = months.isNotEmpty;
+        final maxIndex = hasData ? months.length - 1 : 0;
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.cardBackground,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.black07),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Expanded(child: _SectionLabel('PRONOSTICO AI')),
-                  const SizedBox(width: 8),
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: AppColors.greenTipBg,
-                      borderRadius: BorderRadius.circular(999),
-                      border: Border.all(
-                        color: AppColors.greenTipBorder,
-                        width: 0.5,
-                      ),
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      child: Text(
-                        'SMART INSIGHTS',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.5,
-                          color: AppColors.systemGreen,
-                          height: 1.4,
+                  Row(
+                    children: [
+                      const Expanded(child: _SectionLabel('PRONOSTICO AI')),
+                      const SizedBox(width: 8),
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: AppColors.greenTipBg,
+                          borderRadius: BorderRadius.circular(999),
+                          border: Border.all(
+                            color: AppColors.greenTipBorder,
+                            width: 0.5,
+                          ),
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          child: Text(
+                            'SMART INSIGHTS',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
+                              color: AppColors.systemGreen,
+                              height: 1.4,
+                            ),
+                          ),
                         ),
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  _BlueSegmentedToggle(selected: _mode, onChanged: _switchMode),
+                  const SizedBox(height: 20),
+                  FadeTransition(
+                    opacity: _crossfadeAnim,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: 90,
+                          child: hasData
+                              ? PageView.builder(
+                                  controller: _pageController,
+                                  onPageChanged: (i) =>
+                                      setState(() => _currentMonth = i),
+                                  itemCount: months.length,
+                                  itemBuilder: (context, i) {
+                                    final isSelected = i == _currentMonth;
+                                    final m = months[i];
+                                    return AnimatedScale(
+                                      scale: isSelected ? 1.0 : 0.88,
+                                      duration: const Duration(
+                                        milliseconds: 280,
+                                      ),
+                                      curve: Curves.easeOutCubic,
+                                      child: AnimatedOpacity(
+                                        opacity: isSelected ? 1.0 : 0.45,
+                                        duration: const Duration(
+                                          milliseconds: 250,
+                                        ),
+                                        curve: Curves.easeOut,
+                                        child: _MonthChip(
+                                          label: m.monthLabel,
+                                          amount: m.amount,
+                                          pct: m.pctChange,
+                                          isNeutral:
+                                              !m.isPredicted &&
+                                              m.pctChange == null,
+                                          isSelected: isSelected,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                )
+                              : const Center(
+                                  child: Text(
+                                    'Sin datos suficientes',
+                                    style: TextStyle(
+                                      color: AppColors.secondaryLabel,
+                                    ),
+                                  ),
+                                ),
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(hasData ? months.length : 1, (
+                            i,
+                          ) {
+                            final active = i == _currentMonth;
+                            return AnimatedContainer(
+                              duration: const Duration(milliseconds: 250),
+                              curve: Curves.easeOutCubic,
+                              margin: const EdgeInsets.symmetric(horizontal: 3),
+                              width: active ? 16 : 5,
+                              height: 5,
+                              decoration: BoxDecoration(
+                                color: active
+                                    ? AppColors.systemGreen
+                                    : AppColors.secondaryLabel.withValues(
+                                        alpha: 0.3,
+                                      ),
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                            );
+                          }),
+                        ),
+                        const SizedBox(height: 20),
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 280),
+                          switchInCurve: Curves.easeOutCubic,
+                          switchOutCurve: Curves.easeInCubic,
+                          transitionBuilder: (child, anim) => FadeTransition(
+                            opacity: anim,
+                            child: SlideTransition(
+                              position: Tween<Offset>(
+                                begin: const Offset(0, 0.04),
+                                end: Offset.zero,
+                              ).animate(anim),
+                              child: child,
+                            ),
+                          ),
+                          child: _mode == _PredictionMode.savings
+                              ? _SavingsDetails(
+                                  key: ValueKey('savings_$_currentMonth'),
+                                  selectedMonth: _currentMonth.clamp(
+                                    0,
+                                    maxIndex,
+                                  ),
+                                  history: months,
+                                )
+                              : _ExpensesDetails(
+                                  key: ValueKey('expenses_$_currentMonth'),
+                                  selectedMonth: _currentMonth.clamp(
+                                    0,
+                                    maxIndex,
+                                  ),
+                                  history: months,
+                                ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              _BlueSegmentedToggle(selected: _mode, onChanged: _switchMode),
-              const SizedBox(height: 20),
-              FadeTransition(
-                opacity: _crossfadeAnim,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: 90,
-                      child: PageView.builder(
-                        controller: _pageController,
-                        onPageChanged: (i) => setState(() => _currentMonth = i),
-                        itemCount: _months.length,
-                        itemBuilder: (context, i) {
-                          final isSelected = i == _currentMonth;
-                          return AnimatedScale(
-                            scale: isSelected ? 1.0 : 0.88,
-                            duration: const Duration(milliseconds: 280),
-                            curve: Curves.easeOutCubic,
-                            child: AnimatedOpacity(
-                              opacity: isSelected ? 1.0 : 0.45,
-                              duration: const Duration(milliseconds: 250),
-                              curve: Curves.easeOut,
-                              child: _MonthChip(
-                                data: _months[i],
-                                isSelected: isSelected,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(_months.length, (i) {
-                        final active = i == _currentMonth;
-                        return AnimatedContainer(
-                          duration: const Duration(milliseconds: 250),
-                          curve: Curves.easeOutCubic,
-                          margin: const EdgeInsets.symmetric(horizontal: 3),
-                          width: active ? 16 : 5,
-                          height: 5,
-                          decoration: BoxDecoration(
-                            color: active
-                                ? AppColors.systemGreen
-                                : AppColors.secondaryLabel.withValues(
-                                    alpha: 0.3,
-                                  ),
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                        );
-                      }),
-                    ),
-                    const SizedBox(height: 20),
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 280),
-                      switchInCurve: Curves.easeOutCubic,
-                      switchOutCurve: Curves.easeInCubic,
-                      transitionBuilder: (child, anim) => FadeTransition(
-                        opacity: anim,
-                        child: SlideTransition(
-                          position: Tween<Offset>(
-                            begin: const Offset(0, 0.04),
-                            end: Offset.zero,
-                          ).animate(anim),
-                          child: child,
-                        ),
-                      ),
-                      child: _mode == _PredictionMode.savings
-                          ? _SavingsDetails(
-                              key: ValueKey('savings_$_currentMonth'),
-                              selectedMonth: _currentMonth,
-                            )
-                          : _ExpensesDetails(
-                              key: ValueKey('expenses_$_currentMonth'),
-                              selectedMonth: _currentMonth,
-                            ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
@@ -1651,31 +1708,34 @@ class _BlueChip extends StatelessWidget {
   }
 }
 
-class _MonthData {
+class _MonthChip extends StatelessWidget {
   final String label;
-  final String amount;
-  final String pct;
-  final bool positive;
+  final double amount;
+  final double? pct;
   final bool isNeutral;
-  const _MonthData({
+  final bool isSelected;
+  const _MonthChip({
     required this.label,
     required this.amount,
     required this.pct,
-    required this.positive,
     required this.isNeutral,
+    required this.isSelected,
   });
-}
-
-class _MonthChip extends StatelessWidget {
-  final _MonthData data;
-  final bool isSelected;
-  const _MonthChip({required this.data, required this.isSelected});
 
   @override
   Widget build(BuildContext context) {
-    final pctColor = data.isNeutral
+    final pctColor = isNeutral
         ? AppColors.secondaryLabel
-        : (data.positive ? AppColors.systemGreen : AppColors.systemRed);
+        : (amount >= 0 ? AppColors.systemGreen : AppColors.systemRed);
+    final pctText = isNeutral
+        ? 'Pasado'
+        : (pct != null
+              ? '${pct! >= 0 ? '+' : ''}${pct!.toStringAsFixed(0)}%'
+              : '');
+    final amountText = amount >= 0
+        ? '\$${amount.toStringAsFixed(0)}'
+        : '-\$${amount.abs().toStringAsFixed(0)}';
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: DecoratedBox(
@@ -1697,7 +1757,7 @@ class _MonthChip extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                data.label,
+                label,
                 style: TextStyle(
                   fontSize: 11,
                   color: isSelected
@@ -1709,7 +1769,7 @@ class _MonthChip extends StatelessWidget {
               ),
               const SizedBox(height: 5),
               Text(
-                data.amount,
+                amountText,
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
@@ -1720,7 +1780,7 @@ class _MonthChip extends StatelessWidget {
               ),
               const SizedBox(height: 3),
               Text(
-                data.pct,
+                pctText,
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
@@ -1738,29 +1798,39 @@ class _MonthChip extends StatelessWidget {
 
 class _SavingsDetails extends StatelessWidget {
   final int selectedMonth;
-  const _SavingsDetails({super.key, required this.selectedMonth});
-
-  static const _insights = [
-    'Mes anterior. Ahorraste \$390, un buen punto de partida.',
-    'A este ritmo alcanzarás tu meta en 8 meses. Ahorrando \$50 más/mes podrías lograrlo en 6.',
-    'Proyección positiva. Mayo podría ser tu mejor mes del trimestre.',
-    'Ahorro consistente. Considera incrementar \$30 más este mes.',
-    'Tendencia sólida. Julio marca el ritmo más alto del semestre.',
-  ];
+  final List<MonthlyData> history;
+  const _SavingsDetails({
+    super.key,
+    required this.selectedMonth,
+    required this.history,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final currentData = history.isNotEmpty && selectedMonth < history.length
+        ? history[selectedMonth]
+        : null;
+    final amount = currentData?.amount ?? 0;
+    final isPositive = amount >= 0;
+
+    final insight = currentData?.isPredicted == true
+        ? 'Proyección basada en tu patrón de ahorro. Considera ${isPositive ? 'mantener' : 'mejorar'} este ritmo.'
+        : 'Historial real de tu ahorro.';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Meta: Viaje 2024', style: AppTextStyles.caption1),
             Text(
-              '\$2,000.00',
+              currentData?.isPredicted == true ? 'Próximo mes' : 'Este mes',
+              style: AppTextStyles.caption1,
+            ),
+            Text(
+              '\$${amount.abs().toStringAsFixed(0)}',
               style: AppTextStyles.caption1.copyWith(
-                color: AppColors.secondaryLabel,
+                color: isPositive ? AppColors.systemGreen : AppColors.systemRed,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -1769,17 +1839,17 @@ class _SavingsDetails extends StatelessWidget {
         const SizedBox(height: 8),
         ClipRRect(
           borderRadius: BorderRadius.circular(999),
-          child: const LinearProgressIndicator(
-            value: 0.225,
+          child: LinearProgressIndicator(
+            value: (amount.abs() / 1000).clamp(0.0, 1.0),
             minHeight: 6,
             backgroundColor: AppColors.tertiaryFill,
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.systemGreen),
+            valueColor: AlwaysStoppedAnimation<Color>(
+              isPositive ? AppColors.systemGreen : AppColors.systemRed,
+            ),
           ),
         ),
         const SizedBox(height: 14),
-        _InsightBox(
-          text: _insights[selectedMonth.clamp(0, _insights.length - 1)],
-        ),
+        _InsightBox(text: insight),
       ],
     );
   }
@@ -1787,115 +1857,132 @@ class _SavingsDetails extends StatelessWidget {
 
 class _ExpensesDetails extends StatelessWidget {
   final int selectedMonth;
-  const _ExpensesDetails({super.key, required this.selectedMonth});
-
-  static const _categories = [
-    _CategoryData(
-      color: AppColors.systemOrange,
-      label: 'Comida',
-      amount: '\$520',
-      progress: 0.70,
-      delta: '+8%',
-      positive: false,
-    ),
-    _CategoryData(
-      color: AppColors.systemIndigo,
-      label: 'Ocio',
-      amount: '\$390',
-      progress: 0.50,
-      delta: '-5%',
-      positive: true,
-    ),
-    _CategoryData(
-      color: AppColors.systemRed,
-      label: 'Transporte',
-      amount: '\$240',
-      progress: 0.30,
-      delta: '+3%',
-      positive: false,
-    ),
-    _CategoryData(
-      color: AppColors.systemGreen,
-      label: 'Otros',
-      amount: '\$155',
-      progress: 0.18,
-      delta: '-2%',
-      positive: true,
-    ),
-  ];
-
-  static const _insights = [
-    'Mes anterior. Total gastado: \$1,250. Base de comparación.',
-    'Se proyecta +4% en gastos totales. La categoría Comida es la de mayor riesgo.',
-    'Leve mejora respecto a Abril. Ocio y Otros muestran tendencia positiva.',
-    'Atención: Junio proyecta +5%. Revisar gastos de Comida y Transporte.',
-    'Rebote a la baja en Julio. Buen control en categorías variables.',
-  ];
+  final List<MonthlyData> history;
+  const _ExpensesDetails({
+    super.key,
+    required this.selectedMonth,
+    required this.history,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ..._categories.map(
-          (c) => Padding(
-            padding: const EdgeInsets.only(bottom: 14),
-            child: _CategoryRow(data: c),
-          ),
-        ),
-        const Divider(color: AppColors.black07, thickness: 0.5, height: 1),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Total proyectado', style: AppTextStyles.caption1),
-            const Text(
-              '\$1,305',
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                color: AppColors.label,
-                letterSpacing: -0.41,
-                height: 1.29,
+    final currentData = history.isNotEmpty && selectedMonth < history.length
+        ? history[selectedMonth]
+        : null;
+    final amount = currentData?.amount ?? 0;
+    final isPredicted = currentData?.isPredicted ?? false;
+    final pct = currentData?.pctChange;
+
+    final insight = isPredicted
+        ? 'Proyección de gastos para el próximo mes basada en tu historial.'
+        : (pct != null
+              ? '${pct >= 0 ? 'Incremento' : 'Reducción'} del ${pct.abs().toStringAsFixed(0)}% respecto al mes anterior.'
+              : 'Historial de gastos del mes.');
+
+    return Consumer<DataProvider>(
+      builder: (context, data, _) {
+        final expensesByCategory = data.expensesByCategoryRecent;
+        final total = expensesByCategory.values.fold(0.0, (a, b) => a + b);
+
+        if (expensesByCategory.isEmpty) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                isPredicted ? 'Total proyectado' : 'Total este mes',
+                style: AppTextStyles.caption1,
               ),
+              const SizedBox(height: 8),
+              Text(
+                '\$${amount.abs().toStringAsFixed(0)}',
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.label,
+                ),
+              ),
+              const SizedBox(height: 14),
+              _InsightBox(text: insight),
+            ],
+          );
+        }
+
+        final sortedCategories = expensesByCategory.entries.toList()
+          ..sort((a, b) => b.value.compareTo(a.value));
+        final topCategories = sortedCategories.take(4).toList();
+        final colors = [
+          AppColors.systemOrange,
+          AppColors.systemIndigo,
+          AppColors.systemRed,
+          AppColors.systemGreen,
+        ];
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ...topCategories.asMap().entries.map((entry) {
+              final i = entry.key;
+              final cat = entry.value;
+              final pct = total > 0 ? (cat.value / total) : 0.0;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 14),
+                child: _CategoryRow(
+                  label: cat.key,
+                  amount: '\$${cat.value.toStringAsFixed(0)}',
+                  progress: pct,
+                  delta: '${(pct * 100).toStringAsFixed(0)}%',
+                  color: colors[i % colors.length],
+                ),
+              );
+            }),
+            const Divider(color: AppColors.black07, thickness: 0.5, height: 1),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  isPredicted ? 'Total proyectado' : 'Total este mes',
+                  style: AppTextStyles.caption1,
+                ),
+                Text(
+                  '\$${amount.abs().toStringAsFixed(0)}',
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.label,
+                    letterSpacing: -0.41,
+                    height: 1.29,
+                  ),
+                ),
+              ],
             ),
+            const SizedBox(height: 14),
+            _InsightBox(text: insight),
           ],
-        ),
-        const SizedBox(height: 14),
-        _InsightBox(
-          text: _insights[selectedMonth.clamp(0, _insights.length - 1)],
-        ),
-      ],
+        );
+      },
     );
   }
 }
 
-class _CategoryData {
-  final Color color;
+class _CategoryRow extends StatelessWidget {
   final String label;
   final String amount;
   final double progress;
   final String delta;
+  final Color color;
   final bool positive;
-  const _CategoryData({
-    required this.color,
+  const _CategoryRow({
     required this.label,
     required this.amount,
     required this.progress,
     required this.delta,
-    required this.positive,
+    required this.color,
+    this.positive = false,
   });
-}
-
-class _CategoryRow extends StatelessWidget {
-  final _CategoryData data;
-  const _CategoryRow({required this.data});
 
   @override
   Widget build(BuildContext context) {
-    final deltaColor = data.positive
-        ? AppColors.systemGreen
-        : AppColors.systemRed;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1904,15 +1991,12 @@ class _CategoryRow extends StatelessWidget {
             Container(
               width: 8,
               height: 8,
-              decoration: BoxDecoration(
-                color: data.color,
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
             ),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                data.label,
+                label,
                 style: const TextStyle(
                   fontSize: 13,
                   color: AppColors.label,
@@ -1922,7 +2006,7 @@ class _CategoryRow extends StatelessWidget {
               ),
             ),
             Text(
-              data.amount,
+              amount,
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -1935,12 +2019,12 @@ class _CategoryRow extends StatelessWidget {
             SizedBox(
               width: 36,
               child: Text(
-                data.delta,
+                delta,
                 textAlign: TextAlign.right,
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
-                  color: deltaColor,
+                  color: AppColors.secondaryLabel,
                   height: 1.38,
                 ),
               ),
@@ -1951,10 +2035,10 @@ class _CategoryRow extends StatelessWidget {
         ClipRRect(
           borderRadius: BorderRadius.circular(999),
           child: LinearProgressIndicator(
-            value: data.progress,
+            value: progress,
             minHeight: 5,
             backgroundColor: AppColors.tertiaryFill,
-            valueColor: AlwaysStoppedAnimation<Color>(data.color),
+            valueColor: AlwaysStoppedAnimation<Color>(color),
           ),
         ),
       ],
@@ -2241,23 +2325,24 @@ class _LegendRow extends StatelessWidget {
   }
 }
 
-class _DonutPainter extends CustomPainter {
+class _DynamicDonutPainter extends CustomPainter {
   final double progress;
-
-  static const _segments = [
-    (0.40, AppColors.systemOrange),
-    (0.30, AppColors.systemIndigo),
-    (0.18, AppColors.systemRed),
-    (0.12, AppColors.systemGreen),
-  ];
+  final Map<String, double> data;
+  final List<Color> colors;
 
   static const _strokeWidth = 10.0;
-  static const _gap = 0.025;
+  static const _gap = 0.02;
 
-  const _DonutPainter({required this.progress});
+  _DynamicDonutPainter({
+    required this.progress,
+    required this.data,
+    required this.colors,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
+    if (data.isEmpty) return;
+
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.shortestSide - _strokeWidth) / 2;
     final rect = Rect.fromCircle(center: center, radius: radius);
@@ -2273,9 +2358,18 @@ class _DonutPainter extends CustomPainter {
         ..color = AppColors.tertiaryFill,
     );
 
+    final total = data.values.fold(0.0, (a, b) => a + b);
+    if (total == 0) return;
+
+    final sortedEntries = data.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
     double startAngle = -math.pi / 2;
-    for (final (fraction, color) in _segments) {
+    for (int i = 0; i < sortedEntries.length; i++) {
+      final fraction = sortedEntries[i].value / total;
+      final color = i < colors.length ? colors[i] : AppColors.secondaryLabel;
       final sweep = (fraction * math.pi * 2 - _gap).clamp(0.0, math.pi * 2);
+
       canvas.drawArc(
         rect,
         startAngle,
@@ -2291,5 +2385,6 @@ class _DonutPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_DonutPainter old) => old.progress != progress;
+  bool shouldRepaint(_DynamicDonutPainter old) =>
+      old.progress != progress || old.data != data;
 }

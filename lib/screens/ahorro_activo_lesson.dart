@@ -698,7 +698,7 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
                 passed
                     ? CupertinoIcons.checkmark_seal_fill
                     : CupertinoIcons.exclamationmark_triangle_fill,
-                color: CupertinoColors.white,
+                color: AppColors.white,
                 size: 48,
               ),
             ),

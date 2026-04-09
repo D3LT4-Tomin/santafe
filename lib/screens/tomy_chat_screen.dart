@@ -282,7 +282,7 @@ class _TomyChatScreenState extends State<TomyChatScreen>
                 child: const Icon(
                   CupertinoIcons.chat_bubble_2_fill,
                   size: 36,
-                  color: CupertinoColors.white,
+                  color: AppColors.white,
                 ),
               ),
               const SizedBox(height: 24),
@@ -399,7 +399,7 @@ class _TomyChatScreenState extends State<TomyChatScreen>
                   CupertinoIcons.arrow_up,
                   color: isLoading
                       ? AppColors.tertiaryLabel
-                      : CupertinoColors.white,
+                      : AppColors.white,
                   size: 20,
                 ),
               ),
@@ -434,7 +434,7 @@ class _TomyChatScreenState extends State<TomyChatScreen>
               ),
               child: const Icon(
                 CupertinoIcons.person_fill,
-                color: CupertinoColors.white,
+                color: AppColors.white,
                 size: 16,
               ),
             ),
@@ -461,7 +461,7 @@ class _TomyChatScreenState extends State<TomyChatScreen>
                 message.content,
                 style: TextStyle(
                   fontSize: 15,
-                  color: isUser ? CupertinoColors.white : AppColors.label,
+                  color: isUser ? AppColors.white : AppColors.label,
                   height: 1.3,
                   letterSpacing: -0.24,
                 ),
@@ -483,7 +483,7 @@ class _TomyChatScreenState extends State<TomyChatScreen>
               ),
               child: const Icon(
                 CupertinoIcons.person_fill,
-                color: CupertinoColors.white,
+                color: AppColors.white,
                 size: 16,
               ),
             ),
@@ -511,7 +511,7 @@ class _TomyChatScreenState extends State<TomyChatScreen>
             ),
             child: const Icon(
               CupertinoIcons.person_fill,
-              color: CupertinoColors.white,
+              color: AppColors.white,
               size: 16,
             ),
           ),

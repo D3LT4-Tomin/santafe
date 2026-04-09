@@ -38,12 +38,12 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBOlxCuHHqx3uTDlUCDN1R1FiOBZVxTJRg',
-    appId: '1:956244832711:web:f0ecf27747d901773b69e2',
-    messagingSenderId: '956244832711',
-    projectId: 'tomin-1',
-    authDomain: 'tomin-1.firebaseapp.com',
-    storageBucket: 'tomin-1.firebasestorage.app',
+  apiKey: "AIzaSyBOlxCuHHqx3uTDlUCDN1R1FiOBZVxTJRg",
+  authDomain: "tomin-1.firebaseapp.com",
+  projectId: "tomin-1",
+  storageBucket: "tomin-1.firebasestorage.app",
+  messagingSenderId: "956244832711",
+  appId: "1:956244832711:web:b436e0b173eb89dc3b69e2"
   );
 
   static const FirebaseOptions android = FirebaseOptions(
@@ -56,20 +56,20 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDSbsXnWn0kWRY-pBXLWYlpuysLB3zZTyw',
-    appId: '1:956244832711:ios:b389aeb77ad9cc3c3b69e2',
+    appId: '1:956244832711:ios:01201e302a03dcc33b69e2',
     messagingSenderId: '956244832711',
     projectId: 'tomin-1',
     storageBucket: 'tomin-1.firebasestorage.app',
-    iosBundleId: 'com.d3tl4.santafe',
+    iosBundleId: 'com.d3tl4.tomin',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyDSbsXnWn0kWRY-pBXLWYlpuysLB3zZTyw',
-    appId: '1:956244832711:ios:b389aeb77ad9cc3c3b69e2',
+    appId: '1:956244832711:ios:01201e302a03dcc33b69e2',
     messagingSenderId: '956244832711',
     projectId: 'tomin-1',
     storageBucket: 'tomin-1.firebasestorage.app',
-    iosBundleId: 'com.d3tl4.santafe',
+    iosBundleId: 'com.d3tl4.tomin',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(

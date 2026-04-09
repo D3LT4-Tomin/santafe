@@ -6,6 +6,8 @@ import '../theme/app_theme.dart';
 import '../widgets/animated_blobs.dart';
 import '../providers/auth_provider.dart';
 import '../providers/data_provider.dart';
+import '../providers/subscription_provider.dart';
+import 'subscription_screen.dart';
 
 class UserSettingsScreen extends StatefulWidget {
   final ScrollController? scrollController;
@@ -58,6 +60,10 @@ class _UserSettingsScreenState extends State<UserSettingsScreen>
       curve: const Cubic(0.34, 1.56, 0.64, 1.0),
     );
     _appearController.forward();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<SubscriptionProvider>(context, listen: false).loadPlan();
+    });
   }
 
   @override
@@ -76,6 +82,30 @@ class _UserSettingsScreenState extends State<UserSettingsScreen>
       children: [
         // Solid gray background
         Positioned.fill(child: Container(color: AppColors.secondaryBackground)),
+
+        // Botón de regreso
+        Positioned(
+          top: topPadding + 12,
+          left: 16,
+          child: CupertinoButton(
+            padding: EdgeInsets.zero,
+            onPressed: () => Navigator.of(context).pop(),
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: AppColors.systemGreen.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                CupertinoIcons.back,
+                size: 20,
+                color: AppColors.systemGreen,
+              ),
+            ),
+          ),
+        ),
+
         Positioned.fill(
           child: SingleChildScrollView(
             controller: widget.scrollController ?? ScrollController(),
@@ -90,6 +120,25 @@ class _UserSettingsScreenState extends State<UserSettingsScreen>
                 ).animate(_appearAnim),
                 child: Column(
                   children: [
+                    // ── Plan de suscripción ──────────────────────────────
+                    Consumer<SubscriptionProvider>(
+                      builder: (context, subscriptionProvider, child) {
+                        return _SubscriptionCard(
+                          isPremium: subscriptionProvider.isPremium,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                builder: (context) =>
+                                    const SubscriptionScreen(),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 28),
+
                     // ── Configuración general ─────────────────────────
                     _SettingsSection(
                       title: 'CONFIGURACIÓN',
@@ -465,6 +514,78 @@ class _TrailingValue extends StatelessWidget {
           color: AppColors.tertiaryLabel,
         ),
       ],
+    );
+  }
+}
+
+// ─── Subscription Card ─────────────────────────────────────────────────────────
+class _SubscriptionCard extends StatelessWidget {
+  final bool isPremium;
+  final VoidCallback onTap;
+
+  const _SubscriptionCard({required this.isPremium, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: CupertinoButton(
+        padding: EdgeInsets.zero,
+        onPressed: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: isPremium
+                ? AppColors.systemGreen
+                : AppColors.tertiaryBackground,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color:
+                    (isPremium
+                            ? AppColors.systemGreen
+                            : AppColors.tertiaryLabel)
+                        .withValues(alpha: 0.15),
+                blurRadius: 15,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    isPremium ? CupertinoIcons.star_fill : CupertinoIcons.star,
+                    color: isPremium
+                        ? AppColors.white
+                        : AppColors.tertiaryLabel,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    isPremium ? 'Plan Premium' : 'Plan Básico',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: isPremium ? AppColors.white : AppColors.label,
+                    ),
+                  ),
+                ],
+              ),
+              Icon(
+                CupertinoIcons.chevron_right,
+                color: isPremium ? AppColors.white : AppColors.tertiaryLabel,
+                size: 20,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
