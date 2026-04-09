@@ -4,9 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/transaction_service.dart';
 import '../services/account_service.dart';
 import '../services/firebase_service.dart';
+import '../services/predict_service.dart';
 import '../models/transaction_model.dart';
 import '../models/account_model.dart';
 import '../models/expense_data.dart';
+import '../models/forecast_model.dart';
 import 'package:flutter/cupertino.dart';
 
 class DataProvider extends ChangeNotifier {
@@ -19,11 +21,52 @@ class DataProvider extends ChangeNotifier {
   StreamSubscription? _accountsSub;
   bool _transactionsLoaded = false;
   bool _accountsLoaded = false;
+  UserForecast? _forecast;
 
   List<TransactionModel> get transactions => _transactions;
   List<AccountModel> get accounts => _accounts;
   bool get isLoading => _isLoading;
   String? get error => _error;
+  UserForecast? get forecast => _forecast;
+
+  List<MonthlyData> get expensesHistory {
+    return PredictService.buildExpensesHistory(_transactions, _forecast, 5);
+  }
+
+  List<MonthlyData> get savingsHistory {
+    return PredictService.buildSavingsHistory(_transactions, _forecast, 5);
+  }
+
+  double get monthlySavingsRate {
+    if (_transactions.isEmpty) return 0;
+    final Map<String, double> monthlySavings = {};
+    final Map<String, int> monthIndexes = {};
+
+    for (final t in _transactions) {
+      if (t.category == 'Ahorro' && t.tipo == 'egreso') {
+        final key =
+            '${t.createdAt.year}-${t.createdAt.month.toString().padLeft(2, '0')}';
+        monthlySavings[key] = (monthlySavings[key] ?? 0) + t.amount.abs();
+        monthIndexes[key] = t.createdAt.year * 12 + t.createdAt.month;
+      }
+    }
+
+    if (monthlySavings.isEmpty) return 0;
+    return monthlySavings.values.reduce((a, b) => a + b) /
+        monthlySavings.length;
+  }
+
+  double get totalSavedAmount {
+    return _transactions
+        .where((t) => t.category == 'Ahorro' && t.tipo == 'egreso')
+        .fold(0.0, (total, t) => total + t.amount.abs());
+  }
+
+  Future<void> loadForecast() async {
+    if (_transactions.isEmpty) return;
+    _forecast = await PredictService.getForecast(_transactions);
+    notifyListeners();
+  }
 
   double get totalBalance {
     if (_accounts.isEmpty) return 0;
@@ -70,6 +113,75 @@ class DataProvider extends ChangeNotifier {
     }).toList();
   }
 
+  int? get _mostRecentMonthYear {
+    if (_transactions.isEmpty) return null;
+    int year = 0;
+    int month = 0;
+    bool initialized = false;
+
+    for (final t in _transactions) {
+      if (!initialized ||
+          t.createdAt.year > year ||
+          (t.createdAt.year == year && t.createdAt.month > month)) {
+        year = t.createdAt.year;
+        month = t.createdAt.month;
+        initialized = true;
+      }
+    }
+    return initialized ? year : null;
+  }
+
+  int? get _mostRecentMonth {
+    if (_transactions.isEmpty) return null;
+    int year = 0;
+    int month = 0;
+    bool initialized = false;
+
+    for (final t in _transactions) {
+      if (!initialized ||
+          t.createdAt.year > year ||
+          (t.createdAt.year == year && t.createdAt.month > month)) {
+        year = t.createdAt.year;
+        month = t.createdAt.month;
+        initialized = true;
+      }
+    }
+    return initialized ? month : null;
+  }
+
+  List<TransactionModel> get _mostRecentMonthTransactions {
+    final year = _mostRecentMonthYear;
+    final month = _mostRecentMonth;
+    if (year == null || month == null) {
+      return [];
+    }
+    return _transactions.where((t) {
+      return t.createdAt.year == year && t.createdAt.month == month;
+    }).toList();
+  }
+
+  Map<String, double> get expensesByCategoryRecent {
+    final Map<String, double> result = {};
+    for (final t in _mostRecentMonthTransactions.where(
+      (t) => t.tipo == 'egreso' && t.category != 'Ahorro',
+    )) {
+      final category = t.category.isNotEmpty ? t.category : 'Otro';
+      result[category] = (result[category] ?? 0) + t.amount.abs();
+    }
+    return result;
+  }
+
+  Map<String, double> get incomeByCategoryRecent {
+    final Map<String, double> result = {};
+    for (final t in _mostRecentMonthTransactions.where(
+      (t) => t.tipo == 'ingreso',
+    )) {
+      final category = t.category.isNotEmpty ? t.category : 'Otro';
+      result[category] = (result[category] ?? 0) + t.amount.abs();
+    }
+    return result;
+  }
+
   double get currentMonthExpenses {
     return _currentMonthTransactions
         .where((t) => t.tipo == 'egreso')
@@ -102,15 +214,35 @@ class DataProvider extends ChangeNotifier {
     return previousMonthIncome - previousMonthExpenses;
   }
 
+  // ── Recent month stats (based on most recent transactions) ────────────────────
+
+  double get recentMonthExpenses {
+    return _mostRecentMonthTransactions
+        .where((t) => t.tipo == 'egreso' && t.category != 'Ahorro')
+        .fold(0.0, (total, t) => total + t.amount.abs());
+  }
+
+  double get recentMonthIncome {
+    return _mostRecentMonthTransactions
+        .where((t) => t.tipo == 'ingreso')
+        .fold(0.0, (total, t) => total + t.amount.abs());
+  }
+
+  double get recentMonthSavings {
+    return _mostRecentMonthTransactions
+        .where((t) => t.tipo == 'egreso' && t.category == 'Ahorro')
+        .fold(0.0, (total, t) => total + t.amount.abs());
+  }
+
   int get expenseTrendPercent {
     if (previousMonthExpenses == 0) return 0;
-    final diff = currentMonthExpenses - previousMonthExpenses;
+    final diff = recentMonthExpenses - previousMonthExpenses;
     return ((diff / previousMonthExpenses) * 100).round();
   }
 
   int get savingsTrendPercent {
     if (previousMonthSavings == 0) return 0;
-    final diff = currentMonthSavings - previousMonthSavings;
+    final diff = recentMonthSavings - previousMonthSavings;
     return ((diff / previousMonthSavings.abs()) * 100).round();
   }
 
@@ -120,6 +252,17 @@ class DataProvider extends ChangeNotifier {
     final Map<String, double> result = {};
     for (final t in _currentMonthTransactions.where(
       (t) => t.tipo == 'egreso',
+    )) {
+      final origin = t.origin.isNotEmpty ? t.origin : 'Otro';
+      result[origin] = (result[origin] ?? 0) + t.amount.abs();
+    }
+    return result;
+  }
+
+  Map<String, double> get expensesByOriginRecent {
+    final Map<String, double> result = {};
+    for (final t in _mostRecentMonthTransactions.where(
+      (t) => t.tipo == 'egreso' && t.category != 'Ahorro',
     )) {
       final origin = t.origin.isNotEmpty ? t.origin : 'Otro';
       result[origin] = (result[origin] ?? 0) + t.amount.abs();
@@ -178,6 +321,7 @@ class DataProvider extends ChangeNotifier {
             .toList();
         _transactionsLoaded = true;
         _checkAllLoaded();
+        loadForecast();
         notifyListeners();
       },
       onError: (error) {
@@ -413,11 +557,6 @@ class DataProvider extends ChangeNotifier {
   Future<void> addTransaction(TransactionModel transaction) async {
     final userId = FirebaseService.currentUserId;
     if (userId == null) return;
-
-    final transactionRef = await TransactionService.addTransaction(
-      userId,
-      transaction,
-    );
 
     if (transaction.accountId != null) {
       await _updateAccountBalance(userId, transaction.accountId!, transaction);
