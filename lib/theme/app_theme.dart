@@ -1,35 +1,93 @@
 import 'package:flutter/material.dart';
 
-// ─── HIG Color System ────────────────────────────────────────────────────────
+// ─── Banco Azteca Color System ───────────────────────────────────────────────
+// Adapted from HIG structure to Banco Azteca brand identity.
+// Light-mode first. Primary brand: Dark Green #006341, Accent: Dark Red #af272f
 class AppColors {
-  static const systemBackground = Color(0xFF000000);
-  static const secondaryBackground = Color(0xFF1C1C1E);
-  static const tertiaryBackground = Color(0xFF2C2C2E);
-  static const label = Color(0xFFFFFFFF);
-  static const secondaryLabel = Color(0xFF8E8E93);
-  static const tertiaryLabel = Color(0xFF48484A);
-  static const systemBlue = Color(0xFF0A84FF);
-  static const systemGreen = Color(0xFF30D158);
-  static const systemRed = Color(0xFFFF453A);
-  static const systemOrange = Color(0xFFFF9F0A);
-  static const systemTeal = Color(0xFF64D2FF);
-  static const systemIndigo = Color(0xFF5E5CE6);
-  static const systemPurple = Color(0xFFBF5AF2);
-  static const systemYellow = Color(0xFFFFD60A);
-  static const separator = Color(0xFF38383A);
-  static const tertiaryFill = Color(0x1F767680);
-  static const frostedBlue = Color(0xFF070D1A);
+  // ── Backgrounds ─────────────────────────────────────────────────────────────
+  // White canvas as primary surface (replaces HIG black)
+  static const systemBackground        = Color(0xFFFFFFFF);
+  // Soft warm-gray card/sheet surface (replaces HIG #1C1C1E)
+  static const secondaryBackground     = Color(0xFFF5F5F4);
+  // Light cool-gray for nested surfaces (replaces HIG #2C2C2E)
+  static const tertiaryBackground      = Color(0xFFEAEBEB);
 
-  static const white05 = Color(0x0DFFFFFF);
-  static const white07 = Color(0x12FFFFFF);
-  static const white08 = Color(0x14FFFFFF);
-  static const white10 = Color(0x1AFFFFFF);
-  static const frostedBlue85 = Color(0xD9070D1A);
-  static const blueTipBg = Color(0x1F0A84FF);
-  static const blueTipBorder = Color(0x330A84FF);
+  // ── Labels / Text ───────────────────────────────────────────────────────────
+  // Near-black for primary text (replaces HIG white)
+  static const label                   = Color(0xFF1A1A1A);
+  // Logo Gray light — secondary text (replaces HIG #8E8E93)
+  static const secondaryLabel          = Color(0xFF75787B);
+  // Logo Gray dark — disabled/hint text (replaces HIG #48484A)
+  static const tertiaryLabel           = Color(0xFF53565A);
+
+  // ── Brand Primary ───────────────────────────────────────────────────────────
+  // Dark Green — primary action, CTAs, active states (replaces systemBlue)
+  static const systemGreen             = Color(0xFF006341);
+  // Light Green — success states, badges, confirmations (replaces systemGreen)
+  static const systemLightGreen        = Color(0xFF43B02A);
+
+  // ── Brand Accent ────────────────────────────────────────────────────────────
+  // Dark Red — secondary actions, highlights (replaces systemRed)
+  static const systemRed               = Color(0xFFAF272F);
+  // Bright Red — errors, urgent alerts (replaces systemOrange)
+  static const systemOrange            = Color(0xFFE63422);
+
+  // ── Extended Brand Colors ────────────────────────────────────────────────────
+  // Teal — positive balance, fintech accent (replaces systemTeal)
+  static const systemTeal              = Color(0xFF009D7E);
+  // Deep Forest Green — dark variant for pressed/hover states
+  static const systemIndigo            = Color(0xFF144733);
+  // Warm Orange — highlights, promo tags (replaces systemPurple)
+  static const systemPurple            = Color(0xFFF99D25);
+  // Warm Orange-Red — warnings (replaces systemYellow)
+  static const systemYellow            = Color(0xFFF05327);
+
+  // ── Chrome & Dividers ────────────────────────────────────────────────────────
+  // Light cool-gray separator (replaces dark HIG separator)
+  static const separator               = Color(0xFFD0D2D3);
+  // Very light tint for subtle fills (replaces HIG tertiaryFill)
+  static const tertiaryFill            = Color(0x1F53565A);
+
+  // ── Frosted / Overlay Surfaces ───────────────────────────────────────────────
+  // Brand-green frosted base (replaces frostedBlue)
+  static const frostedGreen            = Color(0xFF006341);
+  // Semi-transparent overlays on white surfaces
+  static const black05                 = Color(0x0D000000);
+  static const black07                 = Color(0x12000000);
+  static const black08                 = Color(0x14000000);
+  static const black10                 = Color(0x1A000000);
+  // 85% opaque frosted green panel (replaces frostedBlue85)
+  static const frostedGreen85          = Color(0xD9006341);
+
+  // ── Tip / Info Banners ───────────────────────────────────────────────────────
+  // Green-tinted info banner bg (replaces blueTipBg)
+  static const greenTipBg             = Color(0x1F006341);
+  // Green-tinted info banner border (replaces blueTipBorder)
+  static const greenTipBorder         = Color(0x33006341);
+
+  // ── Tint Ramp (for cards, chips, backgrounds) ────────────────────────────────
+  // Warm reds
+  static const warmRed100             = Color(0xFF80251580); // #80251580 approx
+  static const warmRed75             = Color(0xBF802515);
+  static const warmRed50             = Color(0x80802515);
+  static const warmRed25             = Color(0x40802515);
+
+  // Cool greens
+  static const coolGreen100          = Color(0xFF006241);
+  static const coolGreen75           = Color(0xBF006241);
+  static const coolGreen50           = Color(0x80006241);
+  static const coolGreen25           = Color(0x40006241);
+
+  // Neutrals
+  static const neutral100            = Color(0xFF55565A);
+  static const neutral75             = Color(0xBF55565A);
+  static const neutral50             = Color(0x8055565A);
+  static const neutral25             = Color(0x4055565A);
 }
 
-// ─── HIG Typography Scale ────────────────────────────────────────────────────
+// ─── Typography Scale ────────────────────────────────────────────────────────
+// Same HIG scale; colors updated to Banco Azteca tokens.
+// Font: system default. Swap fontFamily to 'YourBrandFont' if licensed.
 class AppTextStyles {
   static const title2 = TextStyle(
     fontSize: 22,
@@ -71,6 +129,48 @@ class AppTextStyles {
     fontWeight: FontWeight.w400,
     letterSpacing: 0.0,
     color: AppColors.secondaryLabel,
+    height: 1.33,
+  );
+
+  // ── Brand-specific variants ──────────────────────────────────────────────────
+  // Use for primary CTA labels on green backgrounds
+  static const ctaLabel = TextStyle(
+    fontSize: 17,
+    fontWeight: FontWeight.w600,
+    letterSpacing: -0.41,
+    color: Color(0xFFFFFFFF),
+    height: 1.29,
+  );
+  // Use for amount/balance displays
+  static const balanceLarge = TextStyle(
+    fontSize: 34,
+    fontWeight: FontWeight.w700,
+    letterSpacing: 0.37,
+    color: AppColors.label,
+    height: 1.21,
+  );
+  // Use for currency labels or unit suffixes next to amounts
+  static const balanceUnit = TextStyle(
+    fontSize: 17,
+    fontWeight: FontWeight.w400,
+    letterSpacing: -0.41,
+    color: AppColors.secondaryLabel,
+    height: 1.29,
+  );
+  // Use for status chips: success
+  static const statusSuccess = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.w600,
+    letterSpacing: 0.0,
+    color: AppColors.systemLightGreen,
+    height: 1.33,
+  );
+  // Use for status chips: error/alert
+  static const statusError = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.w600,
+    letterSpacing: 0.0,
+    color: AppColors.systemRed,
     height: 1.33,
   );
 }
