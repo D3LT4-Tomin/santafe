@@ -100,7 +100,7 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      backgroundColor: AppColors.systemBackground,
+      backgroundColor: AppColors.secondaryBackground,
       navigationBar: CupertinoNavigationBar(
         middle: Text(
           widget.accountName,
@@ -113,33 +113,21 @@ class _AccountMovementsScreenState extends State<AccountMovementsScreen>
         builder: (context, dataProvider, _) {
           final filtered = _getFilteredTransactions(dataProvider.transactions);
 
-          return Stack(
-            children: [
-              RepaintBoundary(
-                child: AnimatedBlobs(
-                  blob1Anim: _blob1Anim,
-                  blob2Anim: _blob2Anim,
+          return SafeArea(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.only(top: 20, bottom: 120),
+              child: FadeTransition(
+                opacity: _appearAnim,
+                child: SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(0, 0.04),
+                    end: Offset.zero,
+                  ).animate(_appearAnim),
+                  child: _buildMovementsPanel(filtered),
                 ),
               ),
-              Positioned.fill(
-                child: SafeArea(
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.only(top: 20, bottom: 120),
-                    child: FadeTransition(
-                      opacity: _appearAnim,
-                      child: SlideTransition(
-                        position: Tween<Offset>(
-                          begin: const Offset(0, 0.04),
-                          end: Offset.zero,
-                        ).animate(_appearAnim),
-                        child: _buildMovementsPanel(filtered),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           );
         },
       ),
