@@ -7,8 +7,10 @@ import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
 import '../providers/auth_provider.dart';
 import '../providers/learning_provider.dart';
+import '../providers/subscription_provider.dart';
 import '../widgets/animated_blobs.dart';
 import 'user_settings_screen.dart';
+import 'subscription_screen.dart';
 
 class UserAccountScreen extends StatefulWidget {
   final ScrollController? scrollController;
@@ -56,6 +58,10 @@ class _UserAccountScreenState extends State<UserAccountScreen>
       curve: const Cubic(0.34, 1.56, 0.64, 1.0),
     );
     _appearController.forward();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<SubscriptionProvider>(context, listen: false).loadPlan();
+    });
   }
 
   @override
@@ -75,6 +81,30 @@ class _UserAccountScreenState extends State<UserAccountScreen>
         RepaintBoundary(
           child: AnimatedBlobs(blob1Anim: _blob1Anim, blob2Anim: _blob2Anim),
         ),
+
+        // Botón de regreso
+        Positioned(
+          top: topPadding + 12,
+          left: 16,
+          child: CupertinoButton(
+            padding: EdgeInsets.zero,
+            onPressed: () => Navigator.of(context).pop(),
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: AppColors.systemGreen.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                CupertinoIcons.back,
+                size: 20,
+                color: AppColors.systemGreen,
+              ),
+            ),
+          ),
+        ),
+
         Positioned.fill(
           child: SingleChildScrollView(
             controller: widget.scrollController ?? ScrollController(),
@@ -193,16 +223,9 @@ class _ProfileHeader extends StatelessWidget {
                   Container(
                     width: 56,
                     height: 56,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          AppColors.legacyBlue,
-                          AppColors.legacyBlueLight,
-                        ],
-                      ),
+                      color: AppColors.systemGreen,
                     ),
                     child: Center(
                       child: Text(
@@ -210,7 +233,7 @@ class _ProfileHeader extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
-                          color: CupertinoColors.white,
+                          color: AppColors.white,
                           letterSpacing: -0.5,
                         ),
                       ),
@@ -503,89 +526,146 @@ class _PlanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: _GlassCard(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: AppColors.systemPurple.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(8),
+    return Consumer<SubscriptionProvider>(
+      builder: (context, provider, child) {
+        final isPremium = provider.isPremium;
+        final limits = provider.limits;
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: GestureDetector(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              Navigator.of(context).push(
+                CupertinoPageRoute(
+                  builder: (context) => const SubscriptionScreen(),
+                ),
+              );
+            },
+            child: _GlassCard(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: isPremium
+                                ? AppColors.systemGreen
+                                : AppColors.tertiaryBackground,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            isPremium
+                                ? CupertinoIcons.star_fill
+                                : CupertinoIcons.star,
+                            color: isPremium
+                                ? AppColors.white
+                                : AppColors.tertiaryLabel,
+                            size: 16,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            isPremium ? 'Plan Premium' : 'Plan Básico',
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.label,
+                              letterSpacing: -0.41,
+                              height: 1.29,
+                            ),
+                          ),
+                        ),
+                        const Icon(
+                          CupertinoIcons.chevron_right,
+                          size: 16,
+                          color: AppColors.tertiaryLabel,
+                        ),
+                      ],
                     ),
-                    child: const Icon(
-                      CupertinoIcons.sparkles,
-                      color: AppColors.systemPurple,
-                      size: 16,
+                    const SizedBox(height: 12),
+                    Text(
+                      isPremium
+                          ? 'Acceso completo a todas las funciones'
+                          : 'Funciones básicas disponibles',
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: AppColors.secondaryLabel,
+                        height: 1.33,
+                        letterSpacing: -0.24,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  const Text(
-                    'Plan gratuito',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.label,
-                      letterSpacing: -0.41,
-                      height: 1.29,
+                    const SizedBox(height: 16),
+                    const ColoredBox(
+                      color: AppColors.separator,
+                      child: SizedBox(height: 0.5, width: double.infinity),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'Cuentas básicas y seguimiento de gastos',
-                style: TextStyle(
-                  fontSize: 15,
-                  color: AppColors.secondaryLabel,
-                  height: 1.33,
-                  letterSpacing: -0.24,
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        _Feature(
+                          icon: CupertinoIcons.checkmark_circle_fill,
+                          label: isPremium
+                              ? 'Cuentas ilimitadas'
+                              : 'Hasta ${limits.maxAccounts} cuentas',
+                        ),
+                        const SizedBox(width: 16),
+                        _Feature(
+                          icon: CupertinoIcons.checkmark_circle_fill,
+                          label: 'Resumen semanal',
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        _Feature(
+                          icon: CupertinoIcons.checkmark_circle_fill,
+                          label: 'Metas de ahorro',
+                        ),
+                        const SizedBox(width: 16),
+                        _Feature(
+                          icon: CupertinoIcons.checkmark_circle_fill,
+                          label: isPremium
+                              ? 'Soporte prioritario'
+                              : 'Categorías básicas',
+                        ),
+                      ],
+                    ),
+                    if (!isPremium) ...[
+                      const SizedBox(height: 16),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          color: AppColors.systemGreen,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'Mejorar a Premium',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
-              const ColoredBox(
-                color: AppColors.separator,
-                child: SizedBox(height: 0.5, width: double.infinity),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  _Feature(
-                    icon: CupertinoIcons.checkmark_circle_fill,
-                    label: 'Hasta 3 cuentas',
-                  ),
-                  const SizedBox(width: 16),
-                  _Feature(
-                    icon: CupertinoIcons.checkmark_circle_fill,
-                    label: 'Resumen semanal',
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  _Feature(
-                    icon: CupertinoIcons.checkmark_circle_fill,
-                    label: 'Categorías básicas',
-                  ),
-                  const SizedBox(width: 16),
-                  _Feature(
-                    icon: CupertinoIcons.checkmark_circle_fill,
-                    label: 'Metas de ahorro',
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
@@ -600,7 +680,7 @@ class _Feature extends StatelessWidget {
     return Expanded(
       child: Row(
         children: [
-          Icon(icon, color: AppColors.systemPurple, size: 14),
+          Icon(icon, color: AppColors.systemLightGreen, size: 14),
           const SizedBox(width: 6),
           Flexible(
             child: Text(

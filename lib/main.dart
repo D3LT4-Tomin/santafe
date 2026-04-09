@@ -7,6 +7,7 @@ import 'firebase_options.dart';
 import 'providers/auth_provider.dart' as app;
 import 'providers/data_provider.dart';
 import 'providers/learning_provider.dart';
+import 'providers/subscription_provider.dart';
 import 'widgets/insights_layout_controller.dart';
 import 'screens/auth_wrapper.dart';
 import 'theme/app_theme.dart';
@@ -34,6 +35,7 @@ class FinanzasApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => app.AuthProvider()),
         ChangeNotifierProvider(create: (_) => DataProvider()),
         ChangeNotifierProvider(create: (_) => LearningProvider()),
+        ChangeNotifierProvider(create: (_) => SubscriptionProvider()),
         ChangeNotifierProvider(create: (_) => InsightsLayoutController()),
       ],
       child: const CupertinoApp(
@@ -43,9 +45,6 @@ class FinanzasApp extends StatelessWidget {
           brightness: Brightness.light,
           primaryColor: AppColors.systemGreen,
           scaffoldBackgroundColor: AppColors.systemBackground,
-          textTheme: CupertinoTextThemeData(
-            primaryColor: AppColors.systemGreen,
-          ),
         ),
         home: AuthWrapper(),
       ),

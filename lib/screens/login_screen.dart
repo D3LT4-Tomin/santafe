@@ -138,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     borderRadius: BorderRadius.circular(12),
                     child: authProvider.isLoading
                         ? const CupertinoActivityIndicator(
-                            color: CupertinoColors.white,
+                            color: AppColors.white,
                           )
                         : Text(
                             _isSignUp ? 'Crear cuenta' : 'Iniciar sesión',
