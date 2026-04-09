@@ -72,9 +72,8 @@ class _UserAccountScreenState extends State<UserAccountScreen>
 
     return Stack(
       children: [
-        RepaintBoundary(
-          child: AnimatedBlobs(blob1Anim: _blob1Anim, blob2Anim: _blob2Anim),
-        ),
+        // Solid background like dashboard
+        Positioned.fill(child: Container(color: AppColors.secondaryBackground)),
         Positioned.fill(
           child: SingleChildScrollView(
             controller: widget.scrollController ?? ScrollController(),
@@ -119,6 +118,58 @@ class _UserAccountScreenState extends State<UserAccountScreen>
                   ],
                 ),
               ),
+            ),
+          ),
+        ),
+        // Header chrome (white frosted bar)
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: IgnorePointer(
+            child: SizedBox(
+              height: topPadding + 66.0,
+              child: DecoratedBox(
+                decoration: const BoxDecoration(color: AppColors.frostedGreen),
+              ),
+            ),
+          ),
+        ),
+        // Header row with back button
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: topPadding + 10,
+              bottom: 20,
+              left: 8,
+              right: 16,
+            ),
+            child: Row(
+              children: [
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Icon(
+                    CupertinoIcons.chevron_left,
+                    color: AppColors.label,
+                    size: 28,
+                  ),
+                ),
+                const Expanded(
+                  child: Text(
+                    'Mi cuenta',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.label,
+                      letterSpacing: -0.41,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
