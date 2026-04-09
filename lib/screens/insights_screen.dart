@@ -187,10 +187,14 @@ class _InsightsScreenState extends State<InsightsScreen>
                               return Column(
                                 children: [
                                   for (final config in configs) ...[
-                                    _buildWidgetById(
-                                      config.id,
-                                      isReorderMode: false,
+                                    _SwipeableWidget(
+                                      widgetId: config.id,
                                       controller: controller,
+                                      child: _buildWidgetById(
+                                        config.id,
+                                        isReorderMode: false,
+                                        controller: controller,
+                                      ),
                                     ),
                                     const SizedBox(height: 16),
                                   ],
@@ -754,6 +758,82 @@ class _InsightsScreenState extends State<InsightsScreen>
   }
 }
 
+// ─── Swipeable widget to delete ───────────────────────────────────────────────
+
+class _SwipeableWidget extends StatefulWidget {
+  final InsightWidgetId widgetId;
+  final InsightsLayoutController controller;
+  final Widget child;
+
+  const _SwipeableWidget({
+    required this.widgetId,
+    required this.controller,
+    required this.child,
+  });
+
+  @override
+  State<_SwipeableWidget> createState() => _SwipeableWidgetState();
+}
+
+class _SwipeableWidgetState extends State<_SwipeableWidget> {
+  double _dragExtent = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final isPinned = widget.controller.isPinned(widget.widgetId);
+
+    return GestureDetector(
+      onHorizontalDragUpdate: isPinned
+          ? null
+          : (details) {
+              setState(() {
+                _dragExtent += details.delta.dx;
+                _dragExtent = _dragExtent.clamp(-100.0, 0.0);
+              });
+            },
+      onHorizontalDragEnd: isPinned
+          ? null
+          : (details) {
+              if (_dragExtent < -60) {
+                widget.controller.remove(widget.widgetId);
+              }
+              setState(() {
+                _dragExtent = 0;
+              });
+            },
+      child: Stack(
+        children: [
+          // Delete indicator (behind)
+          if (!isPinned)
+            Positioned.fill(
+              child: Container(
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.only(right: 20),
+                decoration: BoxDecoration(
+                  color: AppColors.systemRed.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Icon(
+                  CupertinoIcons.trash,
+                  color: AppColors.systemRed.withValues(
+                    alpha: _dragExtent.abs() / 100,
+                  ),
+                  size: 24,
+                ),
+              ),
+            ),
+          // The actual widget
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            transform: Matrix4.translationValues(_dragExtent, 0, 0),
+            child: widget.child,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // ─── Reorderable item wrapper ─────────────────────────────────────────────────
 // Owns the drag handle (invisible — full widget is draggable) + delete badge.
 
@@ -858,6 +938,7 @@ class _AddWidgetSheet extends StatelessWidget {
     return Consumer<InsightsLayoutController>(
       builder: (_, controller, _) {
         final hidden = controller.hiddenConfigs;
+        final visible = controller.visibleConfigs;
 
         return Container(
           decoration: const BoxDecoration(
@@ -888,7 +969,7 @@ class _AddWidgetSheet extends StatelessWidget {
                 child: Row(
                   children: [
                     const Text(
-                      'Agregar widgets',
+                      'Widgets',
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
@@ -914,18 +995,61 @@ class _AddWidgetSheet extends StatelessWidget {
                 ),
               ),
 
-              if (hidden.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 32),
-                  child: Text(
-                    'Todos los widgets están visibles.',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.secondaryLabel,
-                    ),
+              // Currently added widgets (section 1)
+              if (visible.isNotEmpty) ...[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                  child: Row(
+                    children: [
+                      Text(
+                        'EN PANTALLA (swipe para eliminar)',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.6,
+                          color: AppColors.secondaryLabel,
+                          height: 1.33,
+                        ),
+                      ),
+                    ],
                   ),
-                )
-              else
+                ),
+                ...visible.where((c) => !controller.isPinned(c.id)).map((
+                  config,
+                ) {
+                  final id = config.id;
+                  final color = _colorFor(id);
+                  return _AddWidgetRow(
+                    icon: _iconFor(id),
+                    iconColor: color,
+                    label: _labelFor(id),
+                    onAdd: null,
+                    onRemove: () => controller.remove(id),
+                    isAdded: true,
+                  );
+                }),
+                const SizedBox(height: 16),
+              ],
+
+              // Available widgets (section 2)
+              if (hidden.isNotEmpty) ...[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                  child: Row(
+                    children: [
+                      Text(
+                        'DISPONIBLES',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.6,
+                          color: AppColors.secondaryLabel,
+                          height: 1.33,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 ...hidden.map((config) {
                   final id = config.id;
                   final color = _colorFor(id);
@@ -935,12 +1059,24 @@ class _AddWidgetSheet extends StatelessWidget {
                     label: _labelFor(id),
                     onAdd: () {
                       controller.addWidget(id);
-                      if (controller.hiddenConfigs.isEmpty) {
-                        Navigator.of(context).pop();
-                      }
                     },
+                    onRemove: null,
+                    isAdded: false,
                   );
                 }),
+              ],
+
+              if (hidden.isEmpty && visible.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 32),
+                  child: Text(
+                    'Todos los widgets están visibles.',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.secondaryLabel,
+                    ),
+                  ),
+                ),
 
               const SizedBox(height: 8),
             ],
@@ -955,13 +1091,17 @@ class _AddWidgetRow extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
   final String label;
-  final VoidCallback onAdd;
+  final VoidCallback? onAdd;
+  final VoidCallback? onRemove;
+  final bool isAdded;
 
   const _AddWidgetRow({
     required this.icon,
     required this.iconColor,
     required this.label,
-    required this.onAdd,
+    this.onAdd,
+    this.onRemove,
+    this.isAdded = false,
   });
 
   @override
@@ -1002,29 +1142,70 @@ class _AddWidgetRow extends StatelessWidget {
                   ),
                 ),
               ),
-              CupertinoButton(
-                padding: EdgeInsets.zero,
-                onPressed: onAdd,
-                minimumSize: Size(0, 0),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: AppColors.systemGreen,
-                    borderRadius: BorderRadius.circular(999),
+              if (isAdded && onRemove != null)
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: onRemove,
+                  minimumSize: Size(0, 0),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: AppColors.systemRed,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            CupertinoIcons.trash,
+                            size: 14,
+                            color: Colors.white,
+                          ),
+                          SizedBox(width: 4),
+                          Text(
+                            'Quitar',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 7),
-                    child: Text(
-                      'Agregar',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        height: 1.38,
+                )
+              else if (onAdd != null)
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: onAdd,
+                  minimumSize: Size(0, 0),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: AppColors.systemGreen,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 7,
+                      ),
+                      child: Text(
+                        'Agregar',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          height: 1.38,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
             ],
           ),
         ),
