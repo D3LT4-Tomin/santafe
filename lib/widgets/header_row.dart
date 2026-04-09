@@ -139,23 +139,26 @@ class _HeaderRowState extends State<HeaderRow>
                           color: AppColors.cardBackground,
                           borderRadius: BorderRadius.circular(18.0),
                           border: Border.all(
-                            color: AppColors.cardBorder,
+                            color: _borderAnimation.value >= 1.0
+                                ? AppColors.cardBorder
+                                : AppColors.systemGreen.withValues(alpha: 0.3),
                             width: 1.0,
                           ),
                         ),
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
-                            // Animated rounded border going around
-                            Positioned.fill(
-                              child: CustomPaint(
-                                painter: _TrackBorderPainter(
-                                  progress: _borderAnimation.value,
-                                  color: AppColors.systemGreen,
-                                  strokeWidth: 2.0,
+                            // Animated rounded border going around - hide when complete
+                            if (_borderAnimation.value < 1.0)
+                              Positioned.fill(
+                                child: CustomPaint(
+                                  painter: _TrackBorderPainter(
+                                    progress: _borderAnimation.value,
+                                    color: AppColors.systemGreen,
+                                    strokeWidth: 2.0,
+                                  ),
                                 ),
                               ),
-                            ),
                             // Content with padding
                             Padding(
                               padding: const EdgeInsets.symmetric(
@@ -176,7 +179,8 @@ class _HeaderRowState extends State<HeaderRow>
                                       placeholder: 'Chatear con tu asistente',
                                       placeholderStyle:
                                           AppTextStyles.subheadline,
-                                      textAlignVertical: TextAlignVertical.center,
+                                      textAlignVertical:
+                                          TextAlignVertical.center,
                                       style: const TextStyle(
                                         fontSize: 15,
                                         letterSpacing: -0.24,
@@ -242,7 +246,7 @@ class _TrackBorderPainter extends CustomPainter {
 
     // Create the rounded rectangle matching your container's radius
     final rrect = RRect.fromRectAndRadius(
-      rect, 
+      rect,
       Radius.circular(18.0 - (strokeWidth / 2)),
     );
 
