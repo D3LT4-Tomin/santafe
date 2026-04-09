@@ -126,7 +126,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       children: [
                         const BalanceCard(),
                         const SizedBox(height: 16),
-                        const TipCard(),
+                        const SavingsGoalCard(),
                         const SizedBox(height: 28),
                         _buildRecentExpenses(dataProvider.transactions),
                       ],

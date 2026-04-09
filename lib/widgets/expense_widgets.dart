@@ -75,6 +75,12 @@ class ExpenseRow extends StatelessWidget {
     return '$prefix$main.${parts[1]}';
   }
 
+  Color get _amountColor {
+    if (data != null) return AppColors.label;
+    final amount = transaction?.amount ?? 0;
+    return amount >= 0 ? AppColors.systemGreen : AppColors.systemRed;
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -131,11 +137,11 @@ class ExpenseRow extends StatelessWidget {
                   ),
                   Text(
                     _amount,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                       letterSpacing: -0.32,
-                      color: AppColors.label,
+                      color: _amountColor,
                       height: 1.31,
                     ),
                   ),

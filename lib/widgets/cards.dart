@@ -236,7 +236,10 @@ class BankPromoCard extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [AppColors.gradientStart, AppColors.gradientEnd],
+            colors: [
+              AppColors.systemGreen,
+              AppColors.systemGreen.withValues(alpha: 0.85),
+            ],
           ),
           border: Border.all(color: AppColors.white30, width: 0.5),
           boxShadow: const [
@@ -259,7 +262,7 @@ class BankPromoCard extends StatelessWidget {
                   height: 130,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppColors.legacyBlue.withValues(alpha: 0.1),
+                    color: Colors.white.withValues(alpha: 0.1),
                   ),
                 ),
               ),
@@ -271,7 +274,7 @@ class BankPromoCard extends StatelessWidget {
                   height: 100,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppColors.legacyBlue.withValues(alpha: 0.07),
+                    color: Colors.white.withValues(alpha: 0.07),
                   ),
                 ),
               ),
@@ -282,10 +285,10 @@ class BankPromoCard extends StatelessWidget {
                   children: [
                     DecoratedBox(
                       decoration: BoxDecoration(
-                        color: AppColors.legacyBlue.withValues(alpha: 0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(999),
                         border: Border.all(
-                          color: AppColors.legacyBlue.withValues(alpha: 0.3),
+                          color: Colors.white.withValues(alpha: 0.3),
                           width: 0.5,
                         ),
                       ),
@@ -295,12 +298,12 @@ class BankPromoCard extends StatelessWidget {
                           vertical: 4,
                         ),
                         child: Text(
-                          'NUEVO · CUENTA DIGITAL',
+                          'NUEVO · GUARDADITO',
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 0.6,
-                            color: AppColors.systemGreen,
+                            color: Colors.white,
                             height: 1.4,
                           ),
                         ),
@@ -308,12 +311,12 @@ class BankPromoCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     const Text(
-                      'Cuenta Flex\nSin comisiones',
+                      'Guardadito\nBanco Azteca',
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 0.2,
-                        color: AppColors.label,
+                        color: Colors.white,
                         height: 1.2,
                       ),
                     ),
@@ -324,7 +327,7 @@ class BankPromoCard extends StatelessWidget {
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
                         letterSpacing: -0.1,
-                        color: AppColors.white70,
+                        color: Colors.white70,
                         height: 1.5,
                       ),
                     ),
@@ -333,18 +336,11 @@ class BankPromoCard extends StatelessWidget {
                       children: [
                         DecoratedBox(
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                AppColors.legacyBlue,
-                                AppColors.legacyBlueLight,
-                              ],
-                            ),
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(999),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.legacyBlue.withValues(
-                                  alpha: 0.25,
-                                ),
+                                color: Colors.black.withValues(alpha: 0.1),
                                 blurRadius: 10,
                                 offset: Offset(0, 3),
                               ),
@@ -363,7 +359,7 @@ class BankPromoCard extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
-                                    color: AppColors.label,
+                                    color: AppColors.systemGreen,
                                     letterSpacing: -0.1,
                                   ),
                                 ),
@@ -371,36 +367,11 @@ class BankPromoCard extends StatelessWidget {
                                 Icon(
                                   CupertinoIcons.arrow_right,
                                   size: 12,
-                                  color: AppColors.label,
+                                  color: AppColors.systemGreen,
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '9% RAT',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.systemGreen,
-                                letterSpacing: -0.2,
-                                height: 1.2,
-                              ),
-                            ),
-                            Text(
-                              'rendimiento anual',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: AppColors.white50,
-                                letterSpacing: -0.1,
-                                height: 1.3,
-                              ),
-                            ),
-                          ],
                         ),
                       ],
                     ),

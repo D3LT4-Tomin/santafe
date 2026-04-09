@@ -65,9 +65,9 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
     final d = widget.data;
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.white05,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.white.withValues(alpha: 0.07)),
+        border: Border.all(color: AppColors.black07),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -102,7 +102,7 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
                   style: const TextStyle(
                     fontSize: 34,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.white,
+                    color: AppColors.label,
                     letterSpacing: -1,
                     height: 1.1,
                   ),
@@ -114,9 +114,11 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
                     width: 22,
                     height: 22,
                     decoration: BoxDecoration(
-                      color: AppColors.white10,
+                      color: AppColors.systemGreen.withValues(alpha: 0.10),
                       shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.white20),
+                      border: Border.all(
+                        color: AppColors.systemGreen.withValues(alpha: 0.20),
+                      ),
                     ),
                     child: const Center(
                       child: Text(
@@ -124,7 +126,7 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.secondaryLabel,
+                          color: AppColors.systemGreen,
                         ),
                       ),
                     ),
@@ -154,7 +156,7 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.white,
+                          color: AppColors.label,
                           letterSpacing: -0.3,
                         ),
                       ),
@@ -178,7 +180,7 @@ class _SavingsProjectionCardState extends State<SavingsProjectionCard>
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.white,
+                          color: AppColors.label,
                           letterSpacing: -0.3,
                         ),
                       ),

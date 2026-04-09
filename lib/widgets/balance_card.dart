@@ -105,18 +105,24 @@ class _BalanceCardState extends State<BalanceCard> {
                   Row(
                     children: [
                       Icon(
-                        CupertinoIcons.arrow_up_right,
+                        weeklyIncome >= 0
+                            ? CupertinoIcons.arrow_up_right
+                            : CupertinoIcons.arrow_down_right,
                         size: 12,
-                        color: AppColors.systemGreen,
+                        color: weeklyIncome >= 0
+                            ? AppColors.systemGreen
+                            : AppColors.systemRed,
                       ),
                       const SizedBox(width: 3),
                       Text(
                         weeklyText,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
                           letterSpacing: -0.08,
-                          color: AppColors.systemGreen,
+                          color: weeklyIncome >= 0
+                              ? AppColors.systemGreen
+                              : AppColors.systemRed,
                           height: 1.38,
                         ),
                       ),
