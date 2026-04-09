@@ -119,7 +119,7 @@ class _LessonShellState extends State<_LessonShell>
                     onPressed: _back,
                     child: const Icon(
                       CupertinoIcons.xmark,
-                      color: Colors.white54,
+                      color: AppColors.tertiaryLabel,
                       size: 20,
                     ),
                   ),
@@ -148,7 +148,7 @@ class _LessonShellState extends State<_LessonShell>
                   ),
                   const Icon(
                     CupertinoIcons.bell,
-                    color: Colors.white38,
+                    color: AppColors.tertiaryLabel,
                     size: 20,
                   ),
                 ],
@@ -275,7 +275,7 @@ class _Step0IntroState extends State<_Step0Intro>
                       ),
                     ),
                     const SizedBox(height: 24),
-                    const Text(
+                    Text(
                       'Gastos\nHormiga',
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -296,7 +296,7 @@ class _Step0IntroState extends State<_Step0Intro>
                         color: AppColors.systemOrange.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(999),
                       ),
-                      child: const Text(
+                      child: Text(
                         'No son grandes compras...\nson pequeños hábitos',
                         textAlign: TextAlign.center,
                         style: TextStyle(
@@ -312,10 +312,10 @@ class _Step0IntroState extends State<_Step0Intro>
                       width: double.infinity,
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.05),
+                        color: AppColors.label.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.10),
+                          color: AppColors.label.withValues(alpha: 0.10),
                         ),
                       ),
                       child: Column(
@@ -329,18 +329,18 @@ class _Step0IntroState extends State<_Step0Intro>
                                 size: 18,
                               ),
                               const SizedBox(width: 8),
-                              const Text(
+                              Text(
                                 '¿Sabías que...?',
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.white70,
+                                  color: AppColors.secondaryLabel,
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 12),
-                          const Text(
+                          Text(
                             'Los pequeños gastos diarios pueden sumar hasta \$1,500 pesos al mes sin que te des cuenta.',
                             style: TextStyle(
                               fontSize: 15,
@@ -352,11 +352,11 @@ class _Step0IntroState extends State<_Step0Intro>
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
+                    Text(
                       'Hoy aprenderás a:\n• Identificar gastos hormiga\n• Calcular su impacto mensual\n• Crear un plan para reducirlos',
                       style: TextStyle(
                         fontSize: 15,
-                        color: Colors.white70,
+                        color: AppColors.secondaryLabel,
                         height: 1.6,
                       ),
                     ),
@@ -464,7 +464,7 @@ class _Step1MultiChoiceState extends State<_Step1MultiChoice> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     '¿Cuál es un\ngasto hormiga?',
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -481,7 +481,7 @@ class _Step1MultiChoiceState extends State<_Step1MultiChoice> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
-                      color: Colors.white.withValues(alpha: 0.45),
+                      color: AppColors.label.withValues(alpha: 0.45),
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -505,12 +505,12 @@ class _Step1MultiChoiceState extends State<_Step1MultiChoice> {
                               decoration: BoxDecoration(
                                 color: isSelected
                                     ? item.color.withValues(alpha: 0.20)
-                                    : Colors.white.withValues(alpha: 0.06),
+                                    : AppColors.label.withValues(alpha: 0.06),
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
                                   color: isSelected
                                       ? item.color.withValues(alpha: 0.60)
-                                      : Colors.white.withValues(alpha: 0.10),
+                                      : AppColors.label.withValues(alpha: 0.10),
                                   width: isSelected ? 1.5 : 1,
                                 ),
                               ),
@@ -533,7 +533,7 @@ class _Step1MultiChoiceState extends State<_Step1MultiChoice> {
                                       item.icon,
                                       color: isSelected
                                           ? item.color
-                                          : Colors.white38,
+                                          : AppColors.tertiaryLabel,
                                       size: 22,
                                     ),
                                   ),
@@ -545,8 +545,10 @@ class _Step1MultiChoiceState extends State<_Step1MultiChoice> {
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
                                       color: isSelected
-                                          ? Colors.white
-                                          : Colors.white60,
+                                          ? AppColors.label
+                                          : AppColors.label.withValues(
+                                              alpha: 0.6,
+                                            ),
                                       height: 1.2,
                                     ),
                                   ),
@@ -672,7 +674,7 @@ class _Step2RevealMultiState extends State<_Step2RevealMulti>
                       ),
                       child: Text(
                         '+$points pts',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: AppColors.systemGreen,
@@ -697,7 +699,7 @@ class _Step2RevealMultiState extends State<_Step2RevealMulti>
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text(
+                    Text(
                       'Así están los\ngastos hormiga:',
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -709,12 +711,12 @@ class _Step2RevealMultiState extends State<_Step2RevealMulti>
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       'Café diario y Spotify son gastos hormiga porque:\n• Se repiten frecuentemente\n• Parecen pequeños pero suman mucho',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.white70,
+                        color: AppColors.secondaryLabel,
                         height: 1.5,
                       ),
                     ),
@@ -823,7 +825,7 @@ class _Step3SingleChoiceState extends State<_Step3SingleChoice> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     'Si gastas \$50 diarios...\n¿Cuánto es al mes?',
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -847,14 +849,14 @@ class _Step3SingleChoiceState extends State<_Step3SingleChoice> {
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? AppColors.systemGreen.withValues(alpha: 0.15)
-                                : Colors.white.withValues(alpha: 0.06),
+                                : AppColors.label.withValues(alpha: 0.06),
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(
                               color: isSelected
                                   ? AppColors.systemGreen.withValues(
                                       alpha: 0.50,
                                     )
-                                  : Colors.white.withValues(alpha: 0.10),
+                                  : AppColors.label.withValues(alpha: 0.10),
                               width: isSelected ? 1.5 : 1,
                             ),
                           ),
@@ -872,7 +874,9 @@ class _Step3SingleChoiceState extends State<_Step3SingleChoice> {
                                   border: Border.all(
                                     color: isSelected
                                         ? AppColors.systemGreen
-                                        : Colors.white30,
+                                        : AppColors.label.withValues(
+                                            alpha: 0.3,
+                                          ),
                                     width: 2,
                                   ),
                                 ),
@@ -891,8 +895,8 @@ class _Step3SingleChoiceState extends State<_Step3SingleChoice> {
                                   fontSize: 18,
                                   fontWeight: FontWeight.w600,
                                   color: isSelected
-                                      ? Colors.white
-                                      : Colors.white70,
+                                      ? AppColors.label
+                                      : AppColors.secondaryLabel,
                                 ),
                               ),
                             ],
@@ -1014,10 +1018,7 @@ class _Step4RevealSingleState extends State<_Step4RevealSingle>
                             widget.correct
                                 ? '\$50 × 30 días = \$1,500 al mes'
                                 : '\$50 × 30 días = \$1,500',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
+                            style: TextStyle(fontSize: 16, color: Colors.white),
                           ),
                         ],
                       ),
@@ -1038,7 +1039,7 @@ class _Step4RevealSingleState extends State<_Step4RevealSingle>
                         ),
                         child: Text(
                           '+$points pts',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                             color: AppColors.systemGreen,
@@ -1051,10 +1052,10 @@ class _Step4RevealSingleState extends State<_Step4RevealSingle>
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.05),
+                      color: AppColors.label.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.10),
+                        color: AppColors.label.withValues(alpha: 0.10),
                       ),
                     ),
                     child: Column(
@@ -1068,18 +1069,18 @@ class _Step4RevealSingleState extends State<_Step4RevealSingle>
                               size: 18,
                             ),
                             const SizedBox(width: 8),
-                            const Text(
+                            Text(
                               'Dato',
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.white70,
+                                color: AppColors.secondaryLabel,
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 12),
-                        const Text(
+                        Text(
                           'Un gasto de \$50 diarios suma \$18,250 al año. ¡Equivalente a un viaje!',
                           style: TextStyle(
                             fontSize: 15,
@@ -1185,7 +1186,7 @@ class _Step5CompletionState extends State<_Step5Completion>
                       ),
                     ),
                     const SizedBox(height: 24),
-                    const Text(
+                    Text(
                       'Este mes, el gasto hormiga\nque reduciré será:',
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -1198,23 +1199,20 @@ class _Step5CompletionState extends State<_Step5Completion>
                     const SizedBox(height: 24),
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.06),
+                        color: AppColors.label.withValues(alpha: 0.06),
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.10),
+                          color: AppColors.label.withValues(alpha: 0.10),
                         ),
                       ),
                       child: CupertinoTextField(
                         controller: _controller,
                         placeholder: 'Ej: Café de \$50',
-                        placeholderStyle: const TextStyle(
-                          color: Colors.white30,
+                        placeholderStyle: TextStyle(
+                          color: AppColors.label.withValues(alpha: 0.3),
                           fontSize: 16,
                         ),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
+                        style: TextStyle(color: Colors.white, fontSize: 16),
                         decoration: null,
                         padding: const EdgeInsets.all(16),
                         onSubmitted: (_) => _submitText(),
@@ -1269,7 +1267,7 @@ class _Step5CompletionState extends State<_Step5Completion>
                           ),
                         ),
                         const SizedBox(height: 20),
-                        const Text(
+                        Text(
                           'Gastos\nHormiga',
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -1293,7 +1291,7 @@ class _Step5CompletionState extends State<_Step5Completion>
                           ),
                           child: Text(
                             '$_pointsShown pts',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
                               color: AppColors.systemGreen,
@@ -1310,10 +1308,10 @@ class _Step5CompletionState extends State<_Step5Completion>
                       width: double.infinity,
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.05),
+                        color: AppColors.label.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.10),
+                          color: AppColors.label.withValues(alpha: 0.10),
                         ),
                       ),
                       child: Column(
@@ -1324,12 +1322,12 @@ class _Step5CompletionState extends State<_Step5Completion>
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              color: Colors.white.withValues(alpha: 0.50),
+                              color: AppColors.label.withValues(alpha: 0.50),
                               letterSpacing: 0.3,
                             ),
                           ),
                           const SizedBox(height: 10),
-                          const Text(
+                          Text(
                             'Lo pequeño repetido\nes lo que más dinero consume',
                             style: TextStyle(
                               fontSize: 18,
@@ -1346,13 +1344,15 @@ class _Step5CompletionState extends State<_Step5Completion>
                                 color: AppColors.systemOrange,
                                 size: 20,
                               ),
-                              const SizedBox(width: 8),
-                              const Expanded(
+                              SizedBox(width: 8),
+                              Expanded(
                                 child: Text(
                                   'Gasto que reducirás:',
                                   style: TextStyle(
                                     fontSize: 13,
-                                    color: Colors.white60,
+                                    color: AppColors.label.withValues(
+                                      alpha: 0.6,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -1361,7 +1361,7 @@ class _Step5CompletionState extends State<_Step5Completion>
                           const SizedBox(height: 4),
                           Text(
                             _controller.text.trim(),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                               color: AppColors.systemOrange,
@@ -1470,18 +1470,18 @@ class _PointsBadge extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             '$points',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
               color: Colors.white,
             ),
           ),
-          const Text(
+          Text(
             'pts',
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: Colors.white70,
+              color: AppColors.secondaryLabel,
             ),
           ),
         ],
@@ -1516,7 +1516,7 @@ class _BadgeUnlocked extends StatelessWidget {
                 badgeName,
                 textAlign: TextAlign.center,
                 maxLines: 2,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -1634,7 +1634,7 @@ class _RevealCard extends StatelessWidget {
                   color: AppColors.systemGreen.withValues(alpha: 0.20),
                   borderRadius: BorderRadius.circular(999),
                 ),
-                child: const Text(
+                child: Text(
                   '+5',
                   style: TextStyle(
                     fontSize: 10,
@@ -1671,7 +1671,7 @@ class _BottomButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: enabled
                 ? AppColors.systemOrange
-                : Colors.white.withValues(alpha: 0.08),
+                : AppColors.label.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(14),
           ),
           child: Center(
@@ -1680,7 +1680,9 @@ class _BottomButton extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: enabled ? Colors.white : Colors.white30,
+                color: enabled
+                    ? Colors.white
+                    : AppColors.label.withValues(alpha: 0.3),
                 letterSpacing: -0.2,
               ),
             ),

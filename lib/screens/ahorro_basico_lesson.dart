@@ -117,7 +117,7 @@ class _LessonShellState extends State<_LessonShell>
                     onPressed: _back,
                     child: const Icon(
                       CupertinoIcons.xmark,
-                      color: Colors.white54,
+                      color: AppColors.tertiaryLabel,
                       size: 20,
                     ),
                   ),
@@ -146,7 +146,7 @@ class _LessonShellState extends State<_LessonShell>
                   ),
                   const Icon(
                     CupertinoIcons.bell,
-                    color: Colors.white38,
+                    color: AppColors.tertiaryLabel,
                     size: 20,
                   ),
                 ],
@@ -264,7 +264,7 @@ class _Step0IntroState extends State<_Step0Intro>
                       ),
                     ),
                     const SizedBox(height: 24),
-                    const Text(
+                    Text(
                       'Ahorro\nBásico',
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -285,7 +285,7 @@ class _Step0IntroState extends State<_Step0Intro>
                         color: AppColors.systemGreen.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(999),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Ahorrar no es lo que te sobra',
                         style: TextStyle(
                           fontSize: 14,
@@ -299,10 +299,10 @@ class _Step0IntroState extends State<_Step0Intro>
                       width: double.infinity,
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.05),
+                        color: AppColors.label.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.10),
+                          color: AppColors.label.withValues(alpha: 0.10),
                         ),
                       ),
                       child: Column(
@@ -316,18 +316,18 @@ class _Step0IntroState extends State<_Step0Intro>
                                 size: 18,
                               ),
                               const SizedBox(width: 8),
-                              const Text(
+                              Text(
                                 '¿Sabías que...?',
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.white70,
+                                  color: AppColors.secondaryLabel,
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 12),
-                          const Text(
+                          Text(
                             'La mayoría de las personas que ahorran exitosamente lo hacen ANTES de gastar, no después.',
                             style: TextStyle(
                               fontSize: 15,
@@ -339,11 +339,11 @@ class _Step0IntroState extends State<_Step0Intro>
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
+                    Text(
                       'Hoy aprenderás a:\n• Cuándo y cuánto ahorrar\n• La regla del 10-20%\n• Crear tu primer plan de ahorro',
                       style: TextStyle(
                         fontSize: 15,
-                        color: Colors.white70,
+                        color: AppColors.secondaryLabel,
                         height: 1.6,
                       ),
                     ),
@@ -409,7 +409,7 @@ class _Step1BinaryChoiceState extends State<_Step1BinaryChoice> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     '¿Cuándo deberías\nahorrar?',
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -426,7 +426,7 @@ class _Step1BinaryChoiceState extends State<_Step1BinaryChoice> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
-                      color: Colors.white.withValues(alpha: 0.45),
+                      color: AppColors.label.withValues(alpha: 0.45),
                     ),
                   ),
                   const SizedBox(height: 40),
@@ -485,12 +485,12 @@ class _BinaryOption extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? color.withValues(alpha: 0.15)
-              : Colors.white.withValues(alpha: 0.06),
+              : AppColors.label.withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected
                 ? color.withValues(alpha: 0.50)
-                : Colors.white.withValues(alpha: 0.10),
+                : AppColors.label.withValues(alpha: 0.10),
             width: isSelected ? 1.5 : 1,
           ),
         ),
@@ -503,12 +503,12 @@ class _BinaryOption extends StatelessWidget {
               decoration: BoxDecoration(
                 color: isSelected
                     ? color.withValues(alpha: 0.25)
-                    : Colors.white.withValues(alpha: 0.08),
+                    : AppColors.label.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(
                 icon,
-                color: isSelected ? color : Colors.white38,
+                color: isSelected ? color : AppColors.tertiaryLabel,
                 size: 26,
               ),
             ),
@@ -519,7 +519,9 @@ class _BinaryOption extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: isSelected ? Colors.white : Colors.white60,
+                  color: isSelected
+                      ? Colors.white
+                      : AppColors.label.withValues(alpha: 0.6),
                   height: 1.3,
                 ),
               ),
@@ -642,7 +644,7 @@ class _Step2RevealBinaryState extends State<_Step2RevealBinary>
                               ),
                               borderRadius: BorderRadius.circular(999),
                             ),
-                            child: const Text(
+                            child: Text(
                               '+4 pts',
                               style: TextStyle(
                                 fontSize: 16,
@@ -677,18 +679,18 @@ class _Step2RevealBinaryState extends State<_Step2RevealBinary>
                               size: 18,
                             ),
                             const SizedBox(width: 8),
-                            const Text(
+                            Text(
                               'La clave',
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.white70,
+                                color: AppColors.secondaryLabel,
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 12),
-                        const Text(
+                        Text(
                           'Págate primero a ti mismo.\nAhorra antes de pagar cuentas,\ncomprar o gastar.',
                           style: TextStyle(
                             fontSize: 16,
@@ -766,7 +768,7 @@ class _Step3SingleChoiceState extends State<_Step3SingleChoice> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     'Si ganas \$1,000 mensuales...\n¿Cuánto deberías ahorrar?',
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -790,14 +792,14 @@ class _Step3SingleChoiceState extends State<_Step3SingleChoice> {
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? AppColors.systemGreen.withValues(alpha: 0.15)
-                                : Colors.white.withValues(alpha: 0.06),
+                                : AppColors.label.withValues(alpha: 0.06),
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(
                               color: isSelected
                                   ? AppColors.systemGreen.withValues(
                                       alpha: 0.50,
                                     )
-                                  : Colors.white.withValues(alpha: 0.10),
+                                  : AppColors.label.withValues(alpha: 0.10),
                               width: isSelected ? 1.5 : 1,
                             ),
                           ),
@@ -815,7 +817,9 @@ class _Step3SingleChoiceState extends State<_Step3SingleChoice> {
                                   border: Border.all(
                                     color: isSelected
                                         ? AppColors.systemGreen
-                                        : Colors.white30,
+                                        : AppColors.label.withValues(
+                                            alpha: 0.3,
+                                          ),
                                     width: 2,
                                   ),
                                 ),
@@ -834,8 +838,8 @@ class _Step3SingleChoiceState extends State<_Step3SingleChoice> {
                                   fontSize: 18,
                                   fontWeight: FontWeight.w600,
                                   color: isSelected
-                                      ? Colors.white
-                                      : Colors.white70,
+                                      ? AppColors.label
+                                      : AppColors.secondaryLabel,
                                 ),
                               ),
                             ],
@@ -961,10 +965,7 @@ class _Step4RevealWithPopUpState extends State<_Step4RevealWithPopUp>
                             widget.correct
                                 ? '\$1,000 × 10% = \$100 al mes'
                                 : 'La respuesta correcta es \$100',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
+                            style: TextStyle(fontSize: 16, color: Colors.white),
                           ),
                           if (widget.correct) ...[
                             const SizedBox(height: 8),
@@ -979,7 +980,7 @@ class _Step4RevealWithPopUpState extends State<_Step4RevealWithPopUp>
                                 ),
                                 borderRadius: BorderRadius.circular(999),
                               ),
-                              child: const Text(
+                              child: Text(
                                 '+4 pts',
                                 style: TextStyle(
                                   fontSize: 14,
@@ -1029,7 +1030,7 @@ class _Step4RevealWithPopUpState extends State<_Step4RevealWithPopUp>
                                   ),
                                 ),
                                 const SizedBox(width: 12),
-                                const Text(
+                                Text(
                                   'Dato curioso',
                                   style: TextStyle(
                                     fontSize: 15,
@@ -1040,7 +1041,7 @@ class _Step4RevealWithPopUpState extends State<_Step4RevealWithPopUp>
                               ],
                             ),
                             const SizedBox(height: 16),
-                            const Text(
+                            Text(
                               'Según datos de diferentes instituciones, se debe ahorrar entre el 10% y el 17% de nuestros ingresos mensuales.',
                               style: TextStyle(
                                 fontSize: 15,
@@ -1147,7 +1148,7 @@ class _Step5CompletionState extends State<_Step5Completion>
                       ),
                     ),
                     const SizedBox(height: 24),
-                    const Text(
+                    Text(
                       'Empieza hoy con una cantidad pequeña...',
                       style: TextStyle(
                         fontSize: 18,
@@ -1156,31 +1157,31 @@ class _Step5CompletionState extends State<_Step5Completion>
                       ),
                     ),
                     const SizedBox(height: 12),
-                    const Text(
+                    Text(
                       '¿Cuánto quieres ahorrar esta semana?',
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16, color: Colors.white70),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: AppColors.secondaryLabel,
+                      ),
                     ),
                     const SizedBox(height: 24),
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.06),
+                        color: AppColors.label.withValues(alpha: 0.06),
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.10),
+                          color: AppColors.label.withValues(alpha: 0.10),
                         ),
                       ),
                       child: CupertinoTextField(
                         controller: _controller,
                         placeholder: 'Ej: \$100',
-                        placeholderStyle: const TextStyle(
-                          color: Colors.white30,
+                        placeholderStyle: TextStyle(
+                          color: AppColors.label.withValues(alpha: 0.3),
                           fontSize: 16,
                         ),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
+                        style: TextStyle(color: Colors.white, fontSize: 16),
                         decoration: null,
                         padding: const EdgeInsets.all(16),
                         onSubmitted: (_) => _submitText(),
@@ -1235,7 +1236,7 @@ class _Step5CompletionState extends State<_Step5Completion>
                           ),
                         ),
                         const SizedBox(height: 20),
-                        const Text(
+                        Text(
                           'Ahorro\nBásico',
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -1259,7 +1260,7 @@ class _Step5CompletionState extends State<_Step5Completion>
                           ),
                           child: Text(
                             '$_pointsShown pts',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
                               color: AppColors.systemGreen,
@@ -1276,10 +1277,10 @@ class _Step5CompletionState extends State<_Step5Completion>
                       width: double.infinity,
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.05),
+                        color: AppColors.label.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.10),
+                          color: AppColors.label.withValues(alpha: 0.10),
                         ),
                       ),
                       child: Column(
@@ -1290,12 +1291,12 @@ class _Step5CompletionState extends State<_Step5Completion>
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              color: Colors.white.withValues(alpha: 0.50),
+                              color: AppColors.label.withValues(alpha: 0.50),
                               letterSpacing: 0.3,
                             ),
                           ),
                           const SizedBox(height: 10),
-                          const Text(
+                          Text(
                             'Poco a poco\ntu ahorro crecerá',
                             style: TextStyle(
                               fontSize: 18,
@@ -1312,13 +1313,15 @@ class _Step5CompletionState extends State<_Step5Completion>
                                 color: AppColors.systemGreen,
                                 size: 20,
                               ),
-                              const SizedBox(width: 8),
-                              const Expanded(
+                              SizedBox(width: 8),
+                              Expanded(
                                 child: Text(
                                   'Ahorrarás esta semana:',
                                   style: TextStyle(
                                     fontSize: 13,
-                                    color: Colors.white60,
+                                    color: AppColors.label.withValues(
+                                      alpha: 0.6,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -1327,7 +1330,7 @@ class _Step5CompletionState extends State<_Step5Completion>
                           const SizedBox(height: 4),
                           Text(
                             _controller.text.trim(),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                               color: AppColors.systemGreen,
@@ -1436,18 +1439,18 @@ class _PointsBadge extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             '$points',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
               color: Colors.white,
             ),
           ),
-          const Text(
+          Text(
             'pts',
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: Colors.white70,
+              color: AppColors.secondaryLabel,
             ),
           ),
         ],
@@ -1482,7 +1485,7 @@ class _BadgeUnlocked extends StatelessWidget {
                 badgeName,
                 textAlign: TextAlign.center,
                 maxLines: 2,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -1519,7 +1522,7 @@ class _BottomButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: enabled
                 ? AppColors.systemGreen
-                : Colors.white.withValues(alpha: 0.08),
+                : AppColors.label.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(14),
           ),
           child: Center(
@@ -1528,7 +1531,9 @@ class _BottomButton extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: enabled ? Colors.white : Colors.white30,
+                color: enabled
+                    ? Colors.white
+                    : AppColors.label.withValues(alpha: 0.3),
                 letterSpacing: -0.2,
               ),
             ),

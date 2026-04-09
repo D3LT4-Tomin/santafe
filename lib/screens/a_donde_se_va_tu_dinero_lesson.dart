@@ -130,7 +130,7 @@ class _LessonShellState extends State<_LessonShell>
                     onPressed: _back,
                     child: const Icon(
                       CupertinoIcons.xmark,
-                      color: Colors.white54,
+                      color: AppColors.tertiaryLabel,
                       size: 20,
                     ),
                   ),
@@ -159,7 +159,7 @@ class _LessonShellState extends State<_LessonShell>
                   ),
                   const Icon(
                     CupertinoIcons.bell,
-                    color: Colors.white38,
+                    color: AppColors.tertiaryLabel,
                     size: 20,
                   ),
                 ],
@@ -264,7 +264,7 @@ class _LessonHeader extends StatelessWidget {
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 13,
-            color: Colors.white.withValues(alpha: 0.45),
+            color: AppColors.label.withValues(alpha: 0.45),
             height: 1.4,
           ),
         ),
@@ -338,12 +338,12 @@ class _Step0MultiChoiceState extends State<_Step0MultiChoice> {
                   decoration: BoxDecoration(
                     color: selected
                         ? c.color.withValues(alpha: 0.20)
-                        : Colors.white.withValues(alpha: 0.06),
+                        : AppColors.label.withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: selected
                           ? c.color.withValues(alpha: 0.60)
-                          : Colors.white.withValues(alpha: 0.10),
+                          : AppColors.label.withValues(alpha: 0.10),
                       width: selected ? 1.5 : 1,
                     ),
                   ),
@@ -357,7 +357,7 @@ class _Step0MultiChoiceState extends State<_Step0MultiChoice> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: selected ? Colors.white : Colors.white70,
+                          color: selected ? Colors.white : AppColors.secondaryLabel,
                         ),
                       ),
                     ],
@@ -528,7 +528,7 @@ class _Step1RevealState extends State<_Step1Reveal>
                                           ),
                                           Text(
                                             item.amount,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 20,
                                               fontWeight: FontWeight.w700,
                                               color: Colors.white,
@@ -793,7 +793,7 @@ class _Step2RankState extends State<_Step2Rank> {
                                                       item.icon,
                                                       color: isSelected
                                                           ? color
-                                                          : Colors.white38,
+                                                          : AppColors.tertiaryLabel,
                                                       size: 18,
                                                     ),
                                             ),
@@ -812,8 +812,8 @@ class _Step2RankState extends State<_Step2Rank> {
                                                 fontSize: 10,
                                                 fontWeight: FontWeight.w500,
                                                 color: isSelected
-                                                    ? Colors.white
-                                                    : Colors.white60,
+                                                    ? AppColors.label
+                                                    : AppColors.label.withValues(alpha: 0.6),
                                                 height: 1.2,
                                               ),
                                             ),
@@ -845,7 +845,7 @@ class _Step2RankState extends State<_Step2Rank> {
                                         ),
                                         child: Text(
                                           badge,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 9,
                                             fontWeight: FontWeight.w700,
                                             color: AppColors.systemGreen,
@@ -969,7 +969,7 @@ class _Step4CompletionState extends State<_Step4Completion>
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 13,
-                    color: Colors.white.withValues(alpha: 0.45),
+                    color: AppColors.label.withValues(alpha: 0.45),
                     height: 1.4,
                   ),
                 ),
@@ -977,7 +977,7 @@ class _Step4CompletionState extends State<_Step4Completion>
 
                 Container(
                   height: 1,
-                  color: Colors.white.withValues(alpha: 0.08),
+                  color: AppColors.label.withValues(alpha: 0.08),
                 ),
                 const SizedBox(height: 28),
 
@@ -987,10 +987,10 @@ class _Step4CompletionState extends State<_Step4Completion>
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.05),
+                      color: AppColors.label.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.10),
+                        color: AppColors.label.withValues(alpha: 0.10),
                       ),
                     ),
                     child: Column(
@@ -1001,7 +1001,7 @@ class _Step4CompletionState extends State<_Step4Completion>
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
-                            color: Colors.white.withValues(alpha: 0.50),
+                            color: AppColors.label.withValues(alpha: 0.50),
                             letterSpacing: 0.3,
                           ),
                         ),
@@ -1082,7 +1082,7 @@ class _CompletionBadge extends StatelessWidget {
           Text(
             label,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
               color: Colors.white,
@@ -1117,7 +1117,7 @@ class _BottomButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: enabled
                 ? AppColors.systemGreen
-                : Colors.white.withValues(alpha: 0.08),
+                : AppColors.label.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(14),
           ),
           child: Center(
@@ -1126,7 +1126,7 @@ class _BottomButton extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: enabled ? Colors.white : Colors.white30,
+                color: enabled ? Colors.white : AppColors.label.withValues(alpha: 0.3),
                 letterSpacing: -0.2,
               ),
             ),

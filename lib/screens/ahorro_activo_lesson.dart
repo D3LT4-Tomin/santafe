@@ -366,7 +366,7 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
               // Progress counter – same style as dashboard section labels
               Text(
                 '$_totalAnswered / ${_shuffledExpenses.length}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.6,
@@ -560,7 +560,7 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
               // Amount – prominent, same weight as balance card
               Text(
                 '\$${item.amount}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w800,
                   letterSpacing: -1.0,
@@ -572,7 +572,7 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
           const SizedBox(height: 16),
           Text(
             item.name,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w700,
               letterSpacing: -0.5,
@@ -583,7 +583,7 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
           // Category label – same style as dashboard's secondary body text
           Text(
             _getCategoryText(item.category),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               color: AppColors.secondaryLabel,
               letterSpacing: -0.1,
@@ -705,7 +705,7 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
             const SizedBox(height: 28),
             Text(
               passed ? '¡EXCELENTE!' : '¡SIGUE PRACTICANDO!',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.w800,
                 color: AppColors.label,
@@ -715,7 +715,7 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
             const SizedBox(height: 8),
             Text(
               'Clasificaste correctamente $_correctAnswers de ${_shuffledExpenses.length} gastos',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 color: AppColors.secondaryLabel,
                 height: 1.4,
@@ -742,7 +742,7 @@ class _AhorroActivoLessonState extends State<AhorroActivoLesson>
                   const SizedBox(width: 10),
                   Text(
                     '$_score XP ganados',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
                       letterSpacing: -0.4,
